@@ -5,7 +5,6 @@ from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 
 from Account.models import CustomUser
-from Announcement.variables import MediaPaths, Strings
 
 
 class Announcement(models.Model):
@@ -46,7 +45,7 @@ class Announcement(models.Model):
 
     message = CKEditor5Field(config_name='extends')
 
-    image = models.ImageField(upload_to=MediaPaths.announcement_image, blank=True, null=True)
+    image = models.ImageField(upload_to="Announcement/Announcement/image", blank=True, null=True)
 
     users = models.ManyToManyField(to=CustomUser, blank=True)
 
@@ -62,6 +61,6 @@ class Announcement(models.Model):
         return self.title
 
     class Meta:
-        db_table = 'notification'
-        verbose_name = Strings.announcement
-        verbose_name_plural = Strings.announcements
+        db_table = 'announcement'
+        verbose_name = "اعلانیه"
+        verbose_name_plural = "اعلانیه‌ها"
