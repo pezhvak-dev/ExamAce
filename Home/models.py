@@ -1,33 +1,24 @@
 from django.db import models
 from django_jalali.db.models import jDateTimeField
 
-from Home.variables import Numbers as HomeMaxAndMinLengthStrings
-from Home.variables import MediaPaths as HomeModelMediaPath
-from Home.variables import Strings as HomeModelVerboseNameStrings
-
 
 class HeroBanner(models.Model):
-    title = models.CharField(max_length=HomeMaxAndMinLengthStrings.title_max,
-                             verbose_name=HomeModelVerboseNameStrings.title,
-                             help_text=HomeModelVerboseNameStrings.needed)
+    title = models.CharField(max_length=1000)
 
-    link = models.URLField(blank=True, null=True, verbose_name=HomeModelVerboseNameStrings.link, unique=True)
+    link = models.URLField(blank=True, null=True, unique=True)
 
-    file = models.FileField(upload_to=HomeModelMediaPath.hero_banner_files,
-                            verbose_name=HomeModelVerboseNameStrings.file,
-                            help_text=HomeModelVerboseNameStrings.needed)
+    file = models.FileField(upload_to="Home/HeroBanner/file")
 
-    can_be_shown = models.BooleanField(default=True, verbose_name=HomeModelVerboseNameStrings.can_be_shown)
+    can_be_shown = models.BooleanField(default=True)
 
-    created_at = jDateTimeField(auto_now_add=True, verbose_name=HomeModelVerboseNameStrings.created_at,
-                                help_text=HomeModelVerboseNameStrings.needed)
+    created_at = jDateTimeField(auto_now_add=True)
 
-    updated_at = jDateTimeField(auto_now=True, verbose_name=HomeModelVerboseNameStrings.updated_at)
+    updated_at = jDateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
 
     class Meta:
-        verbose_name = HomeModelVerboseNameStrings.hero_banner
-        verbose_name_plural = HomeModelVerboseNameStrings.hero_banners
+        verbose_name = "هیرو بنر"
+        verbose_name_plural = "هیرو بنرها"
         ordering = ('-created_at',)

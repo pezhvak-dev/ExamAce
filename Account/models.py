@@ -4,21 +4,18 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.text import slugify
-from django_jalali.db.models import jDateTimeField
+from django_jalali.db.models import jDateTimeField, jDateField
 
 from Account.validators import validate_email
-from Account.variables import Numbers as AccountNumbers
-from Account.variables import Strings as AccountStrings
-from Account.variables import ErrorTexts as AccountErrorTexts
 
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, mobile_phone, username=None, email=None, password=None, **extra_fields):
         if not mobile_phone:
-            raise ValueError(AccountErrorTexts.only_available_with_mobile_phone)
+            raise ValueError("شماره تلفن الزامی است.")
 
         if not username:
-            raise ValueError(AccountErrorTexts.only_available_with_username)
+            raise ValueError("نام کاربری الزامی است.")
 
         user = self.model(mobile_phone=self.normalize_phone(mobile_phone), username=username,
                           email=self.normalize_email(email) if email else None, **extra_fields)
@@ -32,9 +29,9 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
 
         if extra_fields.get('is_staff') is not True:
-            raise ValueError(AccountErrorTexts.is_staff_must_be_true_for_staff)
+            raise ValueError("None")
         if extra_fields.get('is_superuser') is not True:
-            raise ValueError(AccountErrorTexts.is_staff_must_be_true_for_super_user)
+            raise ValueError("None")
 
         return self.create_user(mobile_phone, username, email, password, **extra_fields)
 
@@ -43,24 +40,33 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=AccountNumbers.username_max, unique=True,
-                                verbose_name=AccountStrings.username)
+    username = models.CharField(max_length=75, unique=True)
 
-    mobile_phone = models.CharField(max_length=AccountNumbers.mobile_phone_max, unique=True, blank=False,
-                                    null=False, verbose_name=AccountStrings.mobile_phone)
+    mobile_phone = models.CharField(max_length=11, unique=True, blank=False, null=False)
 
     authentication_token = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
 
-    email = models.EmailField(max_length=AccountNumbers.email_max, unique=True,
-                              validators=[validate_email], blank=True, null=True, verbose_name=AccountStrings.email)
+    email = models.EmailField(max_length=254, unique=True, validators=[validate_email], blank=True, null=True, )
 
-    slug = models.SlugField(max_length=AccountNumbers.username_slug_max, verbose_name=AccountStrings.slug)
+    full_name = models.CharField(max_length=100)
 
-    is_staff = models.BooleanField(default=False, verbose_name=AccountStrings.is_staff)
+    birth_year = models.PositiveSmallIntegerField(blank=True, null=True)
 
-    is_active = models.BooleanField(default=True, verbose_name=AccountStrings.is_active)
+    birth_month = models.PositiveSmallIntegerField(blank=True, null=True)
 
-    date_joined = jDateTimeField(auto_now_add=True, editable=False, verbose_name=AccountStrings.date_joined)
+    birth_day = models.PositiveSmallIntegerField(blank=True, null=True)
+
+    birth_date = jDateField(blank=True, null=True)
+
+    about_me = models.TextField(blank=True, null=True)
+
+    slug = models.SlugField(max_length=75)
+
+    is_staff = models.BooleanField(default=False)
+
+    is_active = models.BooleanField(default=True)
+
+    date_joined = jDateTimeField(auto_now_add=True, editable=False)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['mobile_phone']
@@ -76,36 +82,41 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         self.slug = slugify(self.username)
         self.username = self.username.lower()
 
+    def calculate_birth_date(self, birth_day, birth_month, birth_year):
+        if not birth_day or not birth_month or not birth_year:
+            return None
+
     class Meta:
-        verbose_name = AccountStrings.custom_user
-        verbose_name_plural = AccountStrings.custom_users
+        verbose_name = "کاربر"
+        verbose_name_plural = "کاربران"
 
 
 class OTP(models.Model):
     otp_type_choices = (
-        ("R", "register"),
-        ("F", "register"),
+        ("R", "ثبت نام"),
+        ("F", "فراموشی رمز عبور"),
+        ("D", "حذف حساب کاربری"),
     )
 
-    username = models.CharField(max_length=AccountNumbers.username_max, blank=True, null=True)
+    username = models.CharField(max_length=75, blank=True, null=True)
 
-    mobile_phone = models.CharField(max_length=AccountNumbers.mobile_phone_max)
+    mobile_phone = models.CharField(max_length=11)
 
-    password = models.CharField(max_length=AccountNumbers.password_max)
+    password = models.CharField(max_length=100)
 
-    sms_code = models.CharField(max_length=AccountNumbers.sms_code_max)
+    sms_code = models.CharField(max_length=4)
 
     authentication_token = models.UUIDField(blank=True, null=True)
 
-    uuid = models.CharField(max_length=AccountNumbers.uuid_4_token_max)
+    uuid = models.UUIDField()
 
-    slug = models.SlugField(max_length=AccountNumbers.username_slug_max, blank=True, null=True)
+    slug = models.SlugField(max_length=75, blank=True, null=True)
 
-    otp_type = models.CharField(max_length=AccountNumbers.otp_type_max)
+    otp_type = models.CharField(max_length=1, choices=otp_type_choices)
 
     class Meta:
-        verbose_name = AccountStrings.otp
-        verbose_name_plural = AccountStrings.otp_plural
+        verbose_name = "رمز یکبار مصرف"
+        verbose_name_plural = "رمزهای یکبار مصرف"
 
     def __str__(self):
         return f"{self.mobile_phone}"

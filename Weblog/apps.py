@@ -1,7 +1,6 @@
 from django.apps import AppConfig
 
 
-class HomeConfig(AppConfig):
+class WeblogConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'Home'
-    verbose_name = "خانه"
+    name = 'Weblog'

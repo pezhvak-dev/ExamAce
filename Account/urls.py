@@ -5,7 +5,8 @@ from Account import views
 app_name = "account"
 
 urlpatterns = [
-    path("profile/detail", views.ProfileDetailView.as_view(), name="profile"),
+    path("profile/<slug:slug>", views.ProfileDetailView.as_view(), name="profile"),
+    path("profile/<slug:slug>/edit", views.ProfileEditView.as_view(), name="edit_profile"),
     path("login", views.LogInView.as_view(), name="login"),
     path("register", views.OTPRegisterView.as_view(), name="register"),
     path("logout", views.LogOutView.as_view(), name="logout"),
