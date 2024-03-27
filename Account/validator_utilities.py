@@ -63,23 +63,21 @@ def validate_username_handler(username, username_exists_importance=True):
             message = "این نام کاربری قبلا  ثبت شده است."
             code = "already_exists"
 
-    if len(username) < AccountMaxAndMinLengthStrings.username_min:
+    if len(username) < 5:
         has_errors = True
-        message = AccountValidationErrorStrings.length_is_low(min_length=AccountMaxAndMinLengthStrings.username_min,
-                                                              field_name=AccountModelVerboseNameStrings.username,
-                                                              digit_or_char="char")
+        message = "نام کاربری نمی‌تواند کمتر از 5 کاراکتر داشته باشد."
         code = "length_is_low"
 
     elif username.isnumeric():
         has_errors = True
-        message = AccountValidationErrorStrings.at_least_one_letter(field_name=AccountModelVerboseNameStrings.username)
+        message = "نام کاربری باید حداقل یک حرف انگلیسی داشته باشد."
         code = "at_least_one_letter"
 
     for character_checker in username:
         if character_checker not in slug_allowed_characters:
             has_errors = True
-            message = AccountValidationErrorStrings.username_contains_disallowed_characters
-            code = "username_contains_disallowed_characters"
+            message = "این نام کاربری قابل قبول نیست."
+            code = "disallowed_characters"
             break
 
     return {"has_errors": has_errors, "message": message, "code": code}
@@ -92,57 +90,13 @@ def validate_passwords_handler(password, password_repeat):
 
     if password and password_repeat and password != password_repeat:
         has_errors = True
-        message = AccountValidationErrorStrings.passwords_do_not_match
+        message = "رمز عبورها با یکدیگر هم‌خوانی ندارند."
         code = "passwords_do_not_match"
 
-    elif len(password) < AccountMaxAndMinLengthStrings.password_min:
+    elif len(password) < 4:
         has_errors = True
-        message = AccountValidationErrorStrings.length_is_low(min_length=AccountMaxAndMinLengthStrings.password_min,
-                                                              field_name=AccountModelVerboseNameStrings.password,
-                                                              digit_or_char="char")
+        message = "رمز عبور باید حداقل 4 کاراکتر داشته باشد."
         code = "length_is_low"
-
-    return {"has_errors": has_errors, "message": message, "code": code}
-
-
-def validate_landline_phone_handler(landline_phone):
-    has_errors = False
-    message = None
-    code = None
-
-    if not landline_phone.isnumeric():
-        has_errors = True
-        message = AccountValidationErrorStrings.characters_not_allowed(
-            field_name=AccountModelVerboseNameStrings.landline_phone)
-        code = "characters_not_allowed"
-
-    if len(landline_phone) < AccountMaxAndMinLengthStrings.landline_min:
-        has_errors = True
-        message = AccountValidationErrorStrings.length_is_low(min_length=AccountMaxAndMinLengthStrings.landline_min,
-                                                              field_name=AccountModelVerboseNameStrings.landline_phone,
-                                                              digit_or_char="digit")
-        code = "characters_not_allowed"
-
-    return {"has_errors": has_errors, "message": message, "code": code}
-
-
-def validate_national_id_handler(national_id):
-    has_errors = False
-    message = None
-    code = None
-
-    if not national_id.isnumeric():
-        has_errors = True
-        message = AccountValidationErrorStrings.characters_not_allowed(
-            field_name=AccountModelVerboseNameStrings.national_id)
-        code = "characters_not_allowed"
-
-    elif len(national_id) != AccountMaxAndMinLengthStrings.national_id_max:
-        has_errors = True
-        message = AccountValidationErrorStrings.not_exact_length(
-            exact_length=AccountMaxAndMinLengthStrings.national_id_max,
-            field_name=AccountModelVerboseNameStrings.national_id, digit_or_char="digit")
-        code = "not_exact_length"
 
     return {"has_errors": has_errors, "message": message, "code": code}
 
@@ -152,42 +106,20 @@ def validate_full_name_handler(full_name):
     message = None
     code = None
 
-    if len(full_name) < AccountMaxAndMinLengthStrings.full_name_min:
+    if len(full_name) < 4:
         has_errors = True
-        message = AccountValidationErrorStrings.length_is_low(min_length=AccountMaxAndMinLengthStrings.full_name_min,
-                                                              field_name=AccountModelVerboseNameStrings.full_name,
-                                                              digit_or_char='char')
+        message = "نام و نام خانوادگی باید حداقل 4 حرف داشته باشد."
         code = "length_is_low"
 
     elif not full_name.replace(" ", "").isalpha():
         has_errors = True
-        message = AccountValidationErrorStrings.digits_not_allowed(field_name=AccountModelVerboseNameStrings.full_name)
+        message = "نام و نام خانوادگی نمی‌تواند شامل رقم باشد."
         code = "digits_not_allowed"
 
     elif has_multiple_languages(value=full_name):
         has_errors = True
-        message = AccountValidationErrorStrings.only_1_language(field_name=AccountModelVerboseNameStrings.full_name)
+        message = "نام و نام خانوادگی می‌تواند شامل یک زبان باشد."
         code = "only_1_language"
-
-    return {"has_errors": has_errors, "message": message, "code": code}
-
-
-def validate_bank_card_number_handler(bank_card_number):
-    has_errors = False
-    message = None
-    code = None
-
-    if not bank_card_number.isnumeric():
-        has_errors = True
-        message = AccountValidationErrorStrings.characters_not_allowed(AccountModelVerboseNameStrings.bank_card_number)
-        code = "characters_not_allowed"
-
-    elif len(bank_card_number) != AccountMaxAndMinLengthStrings.bank_card_number_max:
-        has_errors = True
-        message = AccountValidationErrorStrings.not_exact_length(
-            exact_length=AccountMaxAndMinLengthStrings.bank_card_number_max,
-            field_name=AccountModelVerboseNameStrings.bank_card_number, digit_or_char="digit")
-        code = "not_exact_length"
 
     return {"has_errors": has_errors, "message": message, "code": code}
 
@@ -201,22 +133,7 @@ def validate_email_handler(email):
 
     if email_exists:
         has_errors = True
-        message = AccountValidationErrorStrings.already_exists(field_name=AccountModelVerboseNameStrings.email)
+        message = "این آدرس ایمیل قبلا ثبت شده است."
         code = "already_exists"
-
-    return {"has_errors": has_errors, "message": message, "code": code}
-
-
-def validate_address_count_handler(address_count):
-    has_errors = False
-    message = None
-    code = None
-
-    if address_count >= AccountMaxAndMinLengthStrings.address_instance_max:
-        has_errors = True
-        message = AccountValidationErrorStrings.too_many_instances(
-            max_instance=AccountMaxAndMinLengthStrings.address_instance_max,
-            field_name=AccountModelVerboseNameStrings.address)
-        code = "instance_is_too_much"
 
     return {"has_errors": has_errors, "message": message, "code": code}

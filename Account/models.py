@@ -50,14 +50,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     full_name = models.CharField(max_length=100)
 
-    birth_year = models.PositiveSmallIntegerField(blank=True, null=True)
-
-    birth_month = models.PositiveSmallIntegerField(blank=True, null=True)
-
-    birth_day = models.PositiveSmallIntegerField(blank=True, null=True)
-
-    birth_date = jDateField(blank=True, null=True)
-
     about_me = models.TextField(blank=True, null=True)
 
     slug = models.SlugField(max_length=75)
@@ -81,10 +73,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
         self.slug = slugify(self.username)
         self.username = self.username.lower()
-
-    def calculate_birth_date(self, birth_day, birth_month, birth_year):
-        if not birth_day or not birth_month or not birth_year:
-            return None
 
     class Meta:
         verbose_name = "کاربر"

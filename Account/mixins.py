@@ -1,8 +1,6 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from Account.variables import ErrorTexts as AccountValidationErrorStrings
-
 
 class NonAuthenticatedUsersOnlyMixin:
     def dispatch(self, request, *args, **kwargs):
@@ -18,7 +16,7 @@ class AuthenticatedUsersOnlyMixin:
             request.session['referring_url'] = referring_url
 
             redirect_url = reverse("home:temp_info")
-            message = AccountValidationErrorStrings.log_in_first
+            message = "ابتدار وارد حساب کاربری خود شوید."
             success = "no"
             failure = "yes"
             next_url = reverse('account:login')
@@ -33,7 +31,7 @@ class StaffOnlyMixin:
 
         if not user.is_superuser or not user.is_staff:
             redirect_url = reverse("home:temp_info")
-            message = AccountValidationErrorStrings.staff_only
+            message = "این بخش فقط مخصوص ادمین های وبسایت است."
             success = "no"
             failure = "yes"
             next_url = reverse('account:profile')
@@ -49,7 +47,7 @@ class NonStaffOnlyMixin:
 
         if user.is_superuser or user.is_staff:
             redirect_url = reverse("home:temp_info")
-            message = AccountValidationErrorStrings.non_staff_only
+            message = "این بخش فقط مخصوص کاربران معمولی وبسایت است."
             success = "no"
             failure = "yes"
             next_url = reverse('account:profile')
@@ -64,7 +62,7 @@ class SuperUserOnlyMixin:
         user = request.user
         if not user.is_superuser:
             redirect_url = reverse("home:temp_info")
-            message = AccountValidationErrorStrings.non_staff_only
+            message = "این بخش فقط مخصوص کاربران معمولی وبسایت است."
             success = "no"
             failure = "yes"
             next_url = reverse('account:profile')

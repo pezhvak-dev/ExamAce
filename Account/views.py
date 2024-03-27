@@ -214,24 +214,8 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, UpdateView):
     slug_url_kwarg = "slug"
     success_url = "/"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user_birth_date = CustomUser.objects.get(username=self.request.user.username).birth_date
-        context['user_birth_date'] = user_birth_date
-
-        return context
 
     def form_valid(self, form):
-        birth_year = self.request.POST.get('birth_year', 1375)
-        birth_month = self.request.POST.get('birth_month', 1)
-        birth_day = self.request.POST.get('birth_day', 1)
-
-        user = CustomUser.objects.get(username=self.request.user.username)
-        user.birth_year = birth_year
-        user.birth_month = birth_month
-        user.birth_day = birth_day
-        user.save()
-
         return super().form_valid(form)
 
     def get_success_url(self):

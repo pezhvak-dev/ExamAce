@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from Account.models import CustomUser, OTP
-from Account.variables import Strings as AccountModelVerboseNameStrings
 
 
 class CustomUserAdmin(UserAdmin):
