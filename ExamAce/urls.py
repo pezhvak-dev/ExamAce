@@ -7,8 +7,9 @@ from ExamAce import settings
 urlpatterns = ([
                    path('admin/', admin.site.urls),
                    path("ckeditor5/", include('django_ckeditor_5.urls'), name="ck_editor_5_upload_file"),
+                   path("__debug__/", include("debug_toolbar.urls")),
                    path('', include('Home.urls')),
                    path('account/', include('Account.urls')),
-                   path('announcement/', include('Announcement.urls')),
+                   path('course/', include('Course.urls')),
                ]
                + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))

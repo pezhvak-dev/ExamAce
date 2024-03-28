@@ -30,12 +30,12 @@
                                 <!-- section:notifications:wrapper -->
                                 <div class="space-y-5">
 
-                                    {% for announcement in announcements %}
+                                    {% for notification in notifications %}
                                         <!-- notification-item -->
                                         <div class="flex md:items-center items-start gap-5 bg-background border border-border rounded-xl p-5">
                                             <div class="flex items-center gap-5">
 
-                                                {% if announcement.mode == "D" %}
+                                                {% if notification.mode == "D" %}
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                          viewBox="0 0 24 24"
                                                          stroke-width="1.5" stroke="currentColor"
@@ -43,7 +43,7 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                               d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
                                                     </svg>
-                                                {% elif announcement.mode == "C" %}
+                                                {% elif notification.mode == "C" %}
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                          viewBox="0 0 24 24"
                                                          stroke-width="1.5" stroke="currentColor"
@@ -65,13 +65,13 @@
                                             </div>
                                             <div class="flex flex-col items-start space-y-1">
                                                 <div class="font-bold text-xs text-foreground">
-                                                    {{ announcement.title }}
+                                                    {{ notification.title }}
                                                 </div>
                                                 <div class="font-medium text-xs text-muted">
-                                                    {{ announcement.message|safe }}
+                                                    {{ notification.message|safe }}
                                                 </div>
                                                 <div class="flex items-center gap-1 font-medium text-xs text-muted">
-                                                    {{ announcement.created_at }}
+                                                    {{ notification.created_at }}
                                                 </div>
                                             </div>
                                         </div>

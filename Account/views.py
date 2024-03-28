@@ -5,11 +5,11 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import FormView, TemplateView, UpdateView
+from django.views.generic import FormView, TemplateView, UpdateView, ListView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
-from Account.models import CustomUser, OTP
+from Account.models import CustomUser, OTP, Notification, Wallet
 from Home.sms import send_register_sms, send_forget_password_sms
 
 
@@ -167,6 +167,7 @@ class CheckOTPView(FormView):
             password = otp.password
 
             user = CustomUser.objects.create_user(mobile_phone=mobile_phone, username=username)
+            Wallet.objects.create(owner=user)
 
             user.set_password(password)
             user.save()
@@ -214,9 +215,19 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, UpdateView):
     slug_url_kwarg = "slug"
     success_url = "/"
 
-
     def form_valid(self, form):
         return super().form_valid(form)
 
     def get_success_url(self):
         return reverse('account:profile', kwargs={'slug': self.request.user.username})
+
+
+class NotificationListView(ListView):
+    model = Notification
+    template_name = "Account/notifications.html"
+    context_object_name = "notifications"
+
+    def get_queryset(self):
+        user = self.request.user
+
+        return Notification.objects.filter(users=user).order_by("-created_at")

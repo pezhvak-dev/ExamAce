@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from Account.models import CustomUser, OTP
+from Account.models import CustomUser, OTP, Wallet, WalletUsage, Notification
 
 
 class CustomUserAdmin(UserAdmin):
@@ -31,4 +31,21 @@ admin.site.register(CustomUser, CustomUserAdmin)
 
 @admin.register(OTP)
 class OTPAdmin(admin.ModelAdmin):
-    list_display = ("username", "mobile_phone", "password", "sms_code", "uuid", "otp_type")
+    list_display = ("username", "mobile_phone", "password", "sms_code", "otp_type")
+
+
+class WalletUsageInline(admin.TabularInline):
+    model = WalletUsage
+    extra = 1
+    # readonly_fields = ("purchase_price",)
+
+
+@admin.register(Wallet)
+class WalletAdmin(admin.ModelAdmin):
+    list_display = ("owner", "fund", "level", "usage_count")
+    inlines = [WalletUsageInline]
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('uuid', 'title', 'created_at', 'mode', 'visibility', 'has_been_read')

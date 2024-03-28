@@ -1,12 +1,14 @@
-import uuid
+from uuid import uuid4
 
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.text import slugify
-from django_jalali.db.models import jDateTimeField, jDateField
+from django_ckeditor_5.fields import CKEditor5Field
+from django_jalali.db.models import jDateTimeField
 
 from Account.validators import validate_email
+from Course.models import VideoCourse
 
 
 class CustomUserManager(BaseUserManager):
@@ -40,25 +42,26 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=75, unique=True)
+    username = models.CharField(max_length=75, unique=True, verbose_name='نام کاربری')
 
-    mobile_phone = models.CharField(max_length=11, unique=True, blank=False, null=False)
+    mobile_phone = models.CharField(max_length=11, unique=True, verbose_name='شمارع تلفن')
 
-    authentication_token = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+    authentication_token = models.UUIDField(unique=True, default=uuid4, verbose_name="یو یو آی دی")
 
-    email = models.EmailField(max_length=254, unique=True, validators=[validate_email], blank=True, null=True, )
+    email = models.EmailField(max_length=254, unique=True, validators=[validate_email], blank=True, null=True,
+                              verbose_name='آدرس ایمیل')
 
-    full_name = models.CharField(max_length=100)
+    full_name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
 
-    about_me = models.TextField(blank=True, null=True)
+    about_me = models.TextField(blank=True, null=True, verbose_name='درباره من')
 
-    slug = models.SlugField(max_length=75)
+    slug = models.SlugField(max_length=75, unique=True, verbose_name='اسلاگ')
 
-    is_staff = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False, verbose_name='آیا کارمند است؟')
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, verbose_name="آیا فعال است؟")
 
-    date_joined = jDateTimeField(auto_now_add=True, editable=False)
+    date_joined = jDateTimeField(auto_now_add=True, editable=False, verbose_name='تاریخ پیوستن')
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['mobile_phone']
@@ -86,19 +89,17 @@ class OTP(models.Model):
         ("D", "حذف حساب کاربری"),
     )
 
-    username = models.CharField(max_length=75, blank=True, null=True)
+    username = models.CharField(max_length=75, blank=True, null=True, verbose_name='نام کاربری')
 
-    mobile_phone = models.CharField(max_length=11)
+    mobile_phone = models.CharField(max_length=11, verbose_name='شمارع تلفن')
 
-    password = models.CharField(max_length=100)
+    password = models.CharField(max_length=100, verbose_name='رمز عبور')
 
-    sms_code = models.CharField(max_length=4)
+    sms_code = models.CharField(max_length=4, verbose_name='کد تایید')
 
-    authentication_token = models.UUIDField(blank=True, null=True)
+    authentication_token = models.UUIDField(blank=True, null=True, verbose_name="یو یو آی دی")
 
-    uuid = models.UUIDField()
-
-    slug = models.SlugField(max_length=75, blank=True, null=True)
+    slug = models.SlugField(max_length=75, blank=True, null=True, verbose_name='اسلاگ')
 
     otp_type = models.CharField(max_length=1, choices=otp_type_choices)
 
@@ -112,3 +113,99 @@ class OTP(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.username)
         super().save(*args, **kwargs)
+
+
+class Wallet(models.Model):
+    wallet_choices = (
+        ("T", "تیتانیومی"),
+        ("G", "طلایی"),
+        ("S", "نقره‌ای"),
+        ("B", "برنزی"),
+    )
+
+    owner = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE, related_name="wallets", verbose_name="مالک")
+
+    fund = models.PositiveSmallIntegerField(default=0, verbose_name="سرمایه")
+
+    level = models.CharField(max_length=1, choices=wallet_choices, default="B", verbose_name="سطح")
+
+    usage_count = models.PositiveSmallIntegerField(default=0, verbose_name="دفعات استفاده")
+
+    class Meta:
+        db_table = "wallet"
+        verbose_name = "کیف پول"
+        verbose_name_plural = "کیف‌های پول"
+
+
+class WalletUsage(models.Model):
+    wallet = models.ForeignKey(to=Wallet, on_delete=models.CASCADE, verbose_name="کیف پول")
+
+    purchase_price = models.PositiveSmallIntegerField(default=0, verbose_name="قیمت خرید")
+
+    video_course = models.ForeignKey(to=VideoCourse, on_delete=models.CASCADE, verbose_name="دوره ویدئویی")
+
+    created_at = jDateTimeField(auto_now_add=True, editable=False, verbose_name="ایجاد شده در تاریخ")
+
+    class Meta:
+        db_table = "wallet_usage"
+        verbose_name = "مورد استفاده از کیف پول"
+        verbose_name_plural = "موارد استفاده از کیف پول"
+
+
+class Notification(models.Model):
+    """
+    A model for managing user notifications within the application.
+
+    This model provides a flexible and robust framework for creating different
+    types of notifications (safe, caution, danger), targeting specific
+    user groups (global or private), and offering rich text formatting capabilities
+    through the CKEditor5Field.
+
+    Fields:
+        title (CharField): A concise and informative notification title.
+        message (CKEditor5Field): The notification's detailed content, supporting
+        rich text formatting for enhanced user experience.
+        users (ManyToManyField): A relationship to link notifications with
+        specific CustomUser instances (blank=True allows for global notifications).
+        created_at (jDateTimeField): An automatically populated field recording
+        the notification's creation timestamp.
+        mode (CharField): The notification's severity level (choices from mode_choices).
+        visibility (CharField): The notification's target audience (choices from visibility_choices).
+    """
+
+    mode_choices = (
+        ("S", "Safe"),
+        ("C", "Caution"),
+        ("D", "Danger"),
+    )
+
+    visibility_choices = (
+        ("G", "Global"),
+        ("P", "Private"),
+    )
+
+    uuid = models.UUIDField(default=uuid4, editable=False)
+
+    title = models.CharField(max_length=100)
+
+    message = CKEditor5Field(config_name='extends')
+
+    image = models.ImageField(upload_to="Account/Notification/image", blank=True, null=True)
+
+    users = models.ManyToManyField(to=CustomUser, blank=True)
+
+    created_at = jDateTimeField(auto_now_add=True)
+
+    mode = models.CharField(max_length=1, choices=mode_choices)
+
+    visibility = models.CharField(max_length=1, choices=visibility_choices)
+
+    has_been_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        db_table = 'notification'
+        verbose_name = "اعلانیه"
+        verbose_name_plural = "اعلانیه‌ها"
