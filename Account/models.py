@@ -55,6 +55,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     about_me = models.TextField(blank=True, null=True, verbose_name='درباره من')
 
+    image = models.ImageField(upload_to='Account/Users/profiles/', verbose_name="تصویر پروفایل", blank=True, null=True)
+
     slug = models.SlugField(max_length=75, unique=True, verbose_name='اسلاگ')
 
     is_staff = models.BooleanField(default=False, verbose_name='آیا کارمند است؟')

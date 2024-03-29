@@ -1,11 +1,12 @@
 from django.contrib import admin
+from django.urls import reverse
 
-from Course.models import VideoCourse, VideoCourseObject, Category
+from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason
 
 
-class VideoCourseObjectTabularInline(admin.StackedInline):
-    model = VideoCourseObject
-    extra = 1
+@admin.register(VideoCourseObject)
+class VideoCourseObjectAdmin(admin.ModelAdmin):
+    list_display = ("title",)
 
 
 @admin.register(VideoCourse)
@@ -14,9 +15,15 @@ class VideoCourseAdmin(admin.ModelAdmin):
     search_fields = ('name', 'description', 'teacher')
     autocomplete_fields = ('teacher',)
     prepopulated_fields = {'slug': ('name',)}
-    inlines = [VideoCourseObjectTabularInline]
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
+
+
+@admin.register(VideoSeason)
+class VideoSeasonAdmin(admin.ModelAdmin):
+    list_display = ('course', 'number')
+    list_filter = ('course',)
+    search_fields = ('course__name',)

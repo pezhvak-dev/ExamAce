@@ -1,10 +1,8 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 from moviepy.editor import VideoFileClip
-
-from utilities.useful_functions import humanize_video_duration
 
 
 class Category(models.Model):
@@ -14,11 +12,25 @@ class Category(models.Model):
 
     description = CKEditor5Field(config_name="extends", verbose_name='درباره دسته بندی')
 
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        db_table = 'category'
+        verbose_name = 'دسته بندی'
+        verbose_name_plural = 'دسته بندی‌ها'
+
 
 class VideoCourse(models.Model):
-    course_types = (
+    course_payment_types = (
         ('F', 'رایگان'),
         ('P', 'پولی'),
+    )
+
+    course_status_types = (
+        ('NS', 'هنوز شروع نشده'),
+        ('IP', 'در حال برگزاری'),
+        ('F', 'به اتمام رسیده'),
     )
 
     name = models.CharField(max_length=100, unique=True, verbose_name='نام دوره')
@@ -27,26 +39,28 @@ class VideoCourse(models.Model):
 
     description = CKEditor5Field(config_name="extends", verbose_name='درباره دوره')
 
-    teacher = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name='استاد')
+    what_we_will_learn = CKEditor5Field(config_name="extends", max_length=500, verbose_name='چی یاد میگیریم؟')
+
+    teacher = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name='مدرس',
+                                related_name='video_courses')
 
     cover_image = models.ImageField(upload_to='Course/VideoCourse/cover_images', verbose_name='عکس کاور')
 
     introduction_video = models.FileField(upload_to='Course/VideoCourse/introduction_video', verbose_name='فیلم مقدمه')
 
-    has_been_finished = models.BooleanField(default=False, verbose_name='آیا دوره به پایان رسده؟')
+    status = models.CharField(max_length=2, choices=course_status_types, verbose_name='وضعیت دوره', default='NS')
 
     total_seasons = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد فصل‌ها')
 
-    total_sessions = models.PositiveSmallIntegerField(default=0, blank=True, verbose_name='تعداد قسمت‌ها')
+    total_sessions = models.PositiveSmallIntegerField(default=0, blank=True, null=True, verbose_name='تعداد قسمت‌ها')
 
-    total_duration = models.PositiveSmallIntegerField(default=0, blank=True, verbose_name='مجموع دقایق')
+    total_duration = models.PositiveIntegerField(default=0, verbose_name='مدت دوره')
 
     prerequisites = models.ManyToManyField(to="self", blank=True, verbose_name='پیش نیاز دوره')
 
-    participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, related_name="video_courses",
-                                                verbose_name='کاربران ثبت نام شده')
+    participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده')
 
-    type = models.CharField(max_length=1, choices=course_types, default='F', verbose_name='نوع دوره')
+    type = models.CharField(max_length=1, choices=course_payment_types, default='F', verbose_name='نوع دوره')
 
     price = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت')
 
@@ -54,6 +68,8 @@ class VideoCourse(models.Model):
 
     discount_percentage = models.PositiveSmallIntegerField(default=0, verbose_name='درصد تخفیف',
                                                            validators=[MaxValueValidator(100)])
+
+    price_after_discount = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
 
     slug = models.SlugField(allow_unicode=True, unique=True, verbose_name='اسلاگ')
 
@@ -64,30 +80,55 @@ class VideoCourse(models.Model):
     def __str__(self):
         return f"{self.name}"
 
+    def save(self, *args, **kwargs):
+        if self.type == "F":
+            self.price = self.price_after_discount = self.discount_percentage = self.has_discount = 0
+
+        if self.has_discount:
+            self.price_after_discount = self.price - (self.price * (self.discount_percentage / 100))
+        super().save(*args, **kwargs)
+
     class Meta:
         db_table = 'video_course'
         verbose_name = 'دوره ویدئویی'
         verbose_name_plural = 'دوره‌های ویدئویی'
 
 
+class VideoSeason(models.Model):
+    number = models.PositiveSmallIntegerField(default=1, verbose_name="شماره فصل")
+
+    name = models.CharField(max_length=75, verbose_name="اسم فصل")
+
+    course = models.ForeignKey(to=VideoCourse, on_delete=models.CASCADE, verbose_name="دوره")
+
+    def __str__(self):
+        return f"{self.course.name} - {self.name} - {self.number}"
+
+    class Meta:
+        db_table = 'video_season'
+        verbose_name = 'فصل ویدئو'
+        verbose_name_plural = 'فصل‌های ویدئو'
+
+
 class VideoCourseObject(models.Model):
-    video_course = models.ForeignKey(VideoCourse, on_delete=models.CASCADE, verbose_name="قسمت دوره فیلمی", blank=True,
+    video_course = models.ForeignKey(VideoCourse, on_delete=models.CASCADE, verbose_name="دوره", blank=True,
                                      null=True)
 
     title = models.CharField(max_length=200, verbose_name="تیتر", blank=True, null=True)
 
     note = CKEditor5Field(config_name="extends", verbose_name="یادداشت", blank=True, null=True)
 
-    season_number = models.PositiveSmallIntegerField(default=0, verbose_name="شماره فصل", blank=True, null=True)
+    season = models.ForeignKey(to=VideoSeason, on_delete=models.CASCADE, blank=True, null=True, verbose_name="فصل")
 
-    session_number = models.PositiveSmallIntegerField(default=0, verbose_name="شماره قسمت", blank=True, null=True)
+    can_be_sample = models.BooleanField(default=False, verbose_name="به عنوان نمونه تدریس انتخاب شود؟")
 
-    video_file = models.FileField(upload_to="Course/VideoCourse/tutorials", verbose_name="فایل ویدئو", blank=True, null=True)
+    video_file = models.FileField(upload_to="Course/VideoCourse/tutorials", verbose_name="فایل ویدئو", blank=True,
+                                  null=True)
 
     attachment = models.FileField(upload_to="Course/VideoCourse/attachments", verbose_name="فایل ضمیمه", blank=True,
                                   null=True)
 
-    duration = models.CharField(max_length=20, default=0, verbose_name="زمان فیلم")
+    duration = models.PositiveIntegerField(default=0, verbose_name="زمان فیلم")
 
     def __str__(self):
         return f"{self.title}"
