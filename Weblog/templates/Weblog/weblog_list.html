@@ -19,7 +19,7 @@
                                         <div class="relative z-10">
                                             <a href="{% url 'weblog:detail' weblog.slug %}" class="block">
                                                 <img src="{{ weblog.cover_image.url }}" class="max-w-full rounded-3xl"
-                                                     alt="تصویر اخبار {{ weblog.title }}"/>
+                                                     alt="تصویر وبلاگ {{ weblog.title }}"/>
                                             </a>
                                             <a href=""
                                                class="absolute left-3 top-3 h-11 inline-flex items-center justify-center gap-1 bg-black/20 rounded-full text-white transition-all hover:opacity-80 px-4">
@@ -79,7 +79,7 @@
                                                 <div class="flex gap-3 mt-3">
                                                     <a href="{% url 'weblog:detail' weblog.slug %}"
                                                        class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
-                                                        <span class="line-clamp-1 font-semibold text-sm">مطالعه خبر</span>
+                                                        <span class="line-clamp-1 font-semibold text-sm">مطالعه وبلاگ</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                              fill="currentColor" class="w-5 h-5">
                                                             <path fill-rule="evenodd"

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load ratings %}
 {% load filters %}
 {% load static %}
 {% load hitcount_tags %}
@@ -100,7 +101,17 @@
                                                     {{ weblog.content|safe }}
                                                 </div>
                                                 <!-- end course:description -->
-                                            </div><!-- end tabs:contents:tabOne -->
+                                            </div>
+                                            <!-- end tabs:contents:tabOne -->
+
+                                            <div class="slider-parent-2 text-center">
+                                                <div class="blog-single-rating-post text-center">
+                                                    <h3 class="h2">این مقاله چقدر براتون مفید بود؟</h3>
+                                                    <div class="blog-single-rating-post-rating">
+                                                        {% ratings weblog %}
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             <!-- tabs:contents:tabThree -->
                                             <div class="bg-background rounded-3xl p-5" id="tabThree">
@@ -359,7 +370,7 @@
                     <div class="md:w-4/12 w-full md:sticky md:top-24 space-y-8">
                         <div class="space-y-5">
                             <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
-                                <span class="font-black text-xl py-2">اخرین اخبار</span>
+                                <span class="font-black text-xl py-2">اخرین وبلاگ‌ها</span>
                                 <li>
                                     <a href=""
                                        class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">

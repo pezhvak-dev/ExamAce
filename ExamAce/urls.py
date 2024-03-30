@@ -8,6 +8,7 @@ urlpatterns = ([
                    path('admin/', admin.site.urls),
                    path("ckeditor5/", include('django_ckeditor_5.urls'), name="ck_editor_5_upload_file"),
                    path("__debug__/", include("debug_toolbar.urls")),
+                   path('ratings/', include('star_ratings.urls', namespace='ratings')),
                    path('', include('Home.urls')),
                    path('account/', include('Account.urls')),
                    path('course/', include('Course.urls')),

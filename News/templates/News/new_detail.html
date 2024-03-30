@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load filters %}
 {% load static %}
+{% load ratings %}
 {% load hitcount_tags %}
 
 {% block content %}
@@ -100,7 +101,18 @@
                                                     {{ new.content|safe }}
                                                 </div>
                                                 <!-- end course:description -->
-                                            </div><!-- end tabs:contents:tabOne -->
+                                            </div>
+                                            <!-- end tabs:contents:tabOne -->
+
+                                            <div class="slider-parent-2 text-center">
+                                                <div class="blog-single-rating-post text-center">
+                                                    <h3 class="h2">این خبر چقدر براتون مفید بود؟</h3>
+                                                    <div class="blog-single-rating-post-rating">
+                                                        {% ratings new %}
+                                                    </div>
+                                                </div>
+                                            </div>
+
 
                                             <!-- tabs:contents:tabThree -->
                                             <div class="bg-background rounded-3xl p-5" id="tabThree">

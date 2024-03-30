@@ -51,8 +51,13 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "django_cleanup",
     "hitcount",
-
+    "star_ratings",
 ]
+
+STAR_RATINGS_RERATE = True
+STAR_RATINGS_RERATE_SAME_DELETE = True
+STAR_RATINGS_STAR_HEIGHT = 24
+STAR_RATINGS_STAR_WIDTH = 24
 
 customColorPalette = [
     {
@@ -152,7 +157,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
-
 
 INTERNAL_IPS = [
     # ...

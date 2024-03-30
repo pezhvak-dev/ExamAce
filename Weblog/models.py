@@ -3,6 +3,7 @@ from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 from hitcount.models import HitCount
+from star_ratings.models import Rating
 
 
 class Tag(models.Model):
@@ -55,6 +56,8 @@ class Weblog(models.Model):
 
     hit_count_generic = GenericRelation(HitCount, object_id_field='object_pk',
                                         related_query_name='hit_count_generic_relation')
+
+    ratings = GenericRelation(to=Rating, related_query_name='weblogs')
 
     cover_image = models.ImageField(upload_to='News/News/cover_images', verbose_name='تصویر کاور')
 
