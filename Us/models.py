@@ -33,6 +33,10 @@ class Message(models.Model):
 
 
 class SocialMedia(models.Model):
+    phone_1 = models.CharField(max_length=11, blank=True, null=True, verbose_name='شماره تلفن اول')
+
+    phone_2 = models.CharField(max_length=11, blank=True, null=True, verbose_name='شماره تلفن دوم')
+
     telegram_url = models.URLField(blank=True, null=True, verbose_name='لینک تلگرام')
 
     telegram_icon = models.ImageField(upload_to="Us/SocialMedia/icons", blank=True, null=True,

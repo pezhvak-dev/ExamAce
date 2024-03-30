@@ -167,51 +167,45 @@
                                 <div class="font-black text-foreground">شبکه های اجتماعی</div>
                             </div>
                             <ul class="flex flex-wrap items-center gap-5">
+
                                 <li>
-                                    <a href="#"
+                                    <a href="{{ social_media.telegram_url }}"
                                        class="flex items-center justify-center w-12 h-12 bg-secondary rounded-full text-foreground transition-colors hover:text-primary">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                             stroke-linejoin="round" class="w-5 h-5">
-                                            <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
-                                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                            <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
-                                        </svg>
+                                        {% if social_media.telegram_icon %}
+                                            <img src="{{ social_media.telegram_icon.url }}" alt="">
+                                        {% else %}
+                                            <img src="{% static 'images/avatars/teacher.JPG' %}" alt="">
+                                        {% endif %}
                                     </a>
                                 </li>
+
                                 <li>
-                                    <a href="#"
+                                    <a href="{{ social_media.whats_App_url }}"
                                        class="flex items-center justify-center w-12 h-12 bg-secondary rounded-full text-foreground transition-colors hover:text-primary">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                             stroke-linejoin="round" class="w-5 h-5">
-                                            <path d="m22 2-7 20-4-9-9-4Z"></path>
-                                            <path d="M22 2 11 13"></path>
-                                        </svg>
+                                        {% if social_media.whats_App_icon %}
+                                            <img src="{{ social_media.whats_App_icon.url }}" alt="">
+                                        {% else %}
+                                            <img src="{% static 'images/avatars/teacher.JPG' %}" alt="">
+                                        {% endif %}
                                     </a>
                                 </li>
+
                                 <li>
-                                    <a href="#"
+                                    <a href="{{ social_media.instagram_url }}"
                                        class="flex items-center justify-center w-12 h-12 bg-secondary rounded-full text-foreground transition-colors hover:text-primary">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                             stroke-linejoin="round" class="w-5 h-5">
-                                            <path
-                                                    d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17">
-                                            </path>
-                                            <path d="m10 15 5-3-5-3z"></path>
-                                        </svg>
+                                        {% if social_media.instagram_icon %}
+                                            <img src="{{ social_media.instagram_icon.url }}" alt="">
+                                        {% else %}
+                                            <img src="{% static 'images/avatars/teacher.JPG' %}" alt="">
+                                        {% endif %}
                                     </a>
                                 </li>
+
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="flex items-center gap-3 py-5">
-            <p class="text-xs text-muted">&#169; کليه حقوق محفوظ است</p>
-            <div class="flex-grow border-t border-border border-dashed"></div>
         </div>
     </div>
 </footer>
