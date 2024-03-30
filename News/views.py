@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.utils.encoding import uri_to_iri
 from django.views.generic import ListView, DetailView
 from hitcount.views import HitCountDetailView
@@ -31,3 +31,16 @@ class NewDetail(HitCountDetailView, DetailView):
         slug = uri_to_iri(self.kwargs.get(self.slug_url_kwarg))
         queryset = self.get_queryset()
         return get_object_or_404(queryset, **{self.slug_field: slug})
+
+
+class NewsByCategory(ListView):
+    model = News
+    context_object_name = 'news'
+    template_name = 'News/news_by_category.html'
+
+    def get_queryset(self):
+        slug = uri_to_iri(self.kwargs.get('slug'))
+
+        weblogs = get_list_or_404(News, category__slug=slug)
+
+        return weblogs
