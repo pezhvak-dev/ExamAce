@@ -1,9 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.utils.encoding import uri_to_iri
-from django.views.generic import ListView, DetailView, FormView
+from django.views.generic import ListView, DetailView
 
-from Course.forms import VideoCourseForm
-from Course.models import VideoCourse, VideoCourseObject
+from Course.models import VideoCourse
 
 
 class AllVideoCourses(ListView):

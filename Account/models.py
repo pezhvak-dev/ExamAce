@@ -44,6 +44,8 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=75, unique=True, verbose_name='نام کاربری')
 
+    slug = models.SlugField(unique=True, verbose_name='اسلاگ')
+
     mobile_phone = models.CharField(max_length=11, unique=True, verbose_name='شمارع تلفن')
 
     authentication_token = models.UUIDField(unique=True, default=uuid4, verbose_name="یو یو آی دی")
@@ -56,8 +58,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     about_me = models.TextField(blank=True, null=True, verbose_name='درباره من')
 
     image = models.ImageField(upload_to='Account/Users/profiles/', verbose_name="تصویر پروفایل", blank=True, null=True)
-
-    slug = models.SlugField(max_length=75, unique=True, verbose_name='اسلاگ')
 
     is_staff = models.BooleanField(default=False, verbose_name='آیا کارمند است؟')
 
@@ -93,6 +93,8 @@ class OTP(models.Model):
 
     username = models.CharField(max_length=75, blank=True, null=True, verbose_name='نام کاربری')
 
+    slug = models.SlugField(blank=True, null=True, verbose_name='اسلاگ')
+
     mobile_phone = models.CharField(max_length=11, verbose_name='شمارع تلفن')
 
     password = models.CharField(max_length=100, verbose_name='رمز عبور')
@@ -100,8 +102,6 @@ class OTP(models.Model):
     sms_code = models.CharField(max_length=4, verbose_name='کد تایید')
 
     authentication_token = models.UUIDField(blank=True, null=True, verbose_name="یو یو آی دی")
-
-    slug = models.SlugField(max_length=75, blank=True, null=True, verbose_name='اسلاگ')
 
     otp_type = models.CharField(max_length=1, choices=otp_type_choices)
 
@@ -134,7 +134,7 @@ class Wallet(models.Model):
     usage_count = models.PositiveSmallIntegerField(default=0, verbose_name="دفعات استفاده")
 
     class Meta:
-        db_table = "wallet"
+        db_table = "account__wallet"
         verbose_name = "کیف پول"
         verbose_name_plural = "کیف‌های پول"
 
@@ -149,7 +149,7 @@ class WalletUsage(models.Model):
     created_at = jDateTimeField(auto_now_add=True, editable=False, verbose_name="ایجاد شده در تاریخ")
 
     class Meta:
-        db_table = "wallet_usage"
+        db_table = "account__wallet_usage"
         verbose_name = "مورد استفاده از کیف پول"
         verbose_name_plural = "موارد استفاده از کیف پول"
 
@@ -208,6 +208,6 @@ class Notification(models.Model):
         return self.title
 
     class Meta:
-        db_table = 'notification'
+        db_table = 'account__notification'
         verbose_name = "اعلانیه"
         verbose_name_plural = "اعلانیه‌ها"

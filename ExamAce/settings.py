@@ -36,15 +36,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Apps in project
     "Home.apps.HomeConfig",
     "Account.apps.AccountConfig",
-    "widget_tweaks",
-    "django_cleanup",
     "Weblog.apps.WeblogConfig",
     "Ticket.apps.TicketConfig",
     "Course.apps.CourseConfig",
     "django_ckeditor_5",
     "debug_toolbar",
+    "News.apps.NewsConfig",
+
+    # Third party packages
+    "widget_tweaks",
+    "django_cleanup",
+    "hitcount"
 
 ]
 

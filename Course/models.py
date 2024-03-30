@@ -8,7 +8,11 @@ from moviepy.editor import VideoFileClip
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name='نام')
 
-    icon = models.ImageField(upload_to='Course/Category/icons/', verbose_name='آیکون')
+    slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
+
+    icon = models.ImageField(upload_to='Course/Category/icons/', verbose_name='آیکون', blank=True, null=True)
+
+    cover_image = models.ImageField(upload_to='Course/Category/images', verbose_name='تصویر', blank=True, null=True)
 
     description = CKEditor5Field(config_name="extends", verbose_name='درباره دسته بندی')
 
@@ -16,7 +20,7 @@ class Category(models.Model):
         return f"{self.name}"
 
     class Meta:
-        db_table = 'category'
+        db_table = 'course__category'
         verbose_name = 'دسته بندی'
         verbose_name_plural = 'دسته بندی‌ها'
 
@@ -34,6 +38,8 @@ class VideoCourse(models.Model):
     )
 
     name = models.CharField(max_length=100, unique=True, verbose_name='نام دوره')
+
+    slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
 
     category = models.ForeignKey(to=Category, on_delete=models.PROTECT, verbose_name='دسته بندی')
 
@@ -71,8 +77,6 @@ class VideoCourse(models.Model):
 
     price_after_discount = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
 
-    slug = models.SlugField(allow_unicode=True, unique=True, verbose_name='اسلاگ')
-
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
     updated_at = jDateTimeField(auto_now=True, verbose_name='تاریخ آخرین به‌روز‌رسانی')
@@ -89,7 +93,7 @@ class VideoCourse(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        db_table = 'video_course'
+        db_table = 'course__video_course'
         verbose_name = 'دوره ویدئویی'
         verbose_name_plural = 'دوره‌های ویدئویی'
 
@@ -105,7 +109,7 @@ class VideoSeason(models.Model):
         return f"{self.course.name} - {self.name} - {self.number}"
 
     class Meta:
-        db_table = 'video_season'
+        db_table = 'course__video_season'
         verbose_name = 'فصل ویدئو'
         verbose_name_plural = 'فصل‌های ویدئو'
 
@@ -149,6 +153,6 @@ class VideoCourseObject(models.Model):
             print(f"An error occurred while getting the duration of the video file: {e}")
 
     class Meta:
-        db_table = 'video_course_object'
+        db_table = 'course__video_course_object'
         verbose_name = 'جزئیات فیلم'
         verbose_name_plural = 'جزئیات فیلم'
