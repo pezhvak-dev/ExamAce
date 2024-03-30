@@ -14,3 +14,7 @@ class About(TemplateView):
         context['about'] = about
 
         return context
+
+
+class Contact(TemplateView):
+    template_name = "Us/contact.html"
