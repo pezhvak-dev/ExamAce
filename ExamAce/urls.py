@@ -12,6 +12,7 @@ urlpatterns = ([
                    path('account/', include('Account.urls')),
                    path('course/', include('Course.urls')),
                    path('news/', include('News.urls')),
+                   path('weblog/', include('Weblog.urls')),
                    path('us/', include('Us.urls')),
                ]
                + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))

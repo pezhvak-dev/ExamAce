@@ -1,6 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.utils.encoding import uri_to_iri
 from django.views.generic import ListView, DetailView
+from hitcount.views import HitCountDetailView
 
 from News.models import News
 
@@ -16,10 +17,11 @@ class AllNews(ListView):
         return news
 
 
-class NewDetail(DetailView):
+class NewDetail(HitCountDetailView, DetailView):
     model = News
     context_object_name = 'new'
     template_name = 'News/new_detail.html'
+    count_hit = True
 
     def get_queryset(self):
         queryset = super().get_queryset()

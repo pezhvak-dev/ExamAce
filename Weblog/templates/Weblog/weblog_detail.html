@@ -14,14 +14,14 @@
                             <div class="relative z-10">
                                 <!-- course:thumbnail -->
                                 <div>
-                                    <img src="{{ new.cover_image.url }}" class="max-w-full rounded-3xl"
+                                    <img src="{{ weblog.cover_image.url }}" class="max-w-full rounded-3xl"
                                          alt="..."/>
                                 </div>
                                 <!-- end course:thumbnail -->
                             </div>
                             <div class="-mt-12 pt-12">
                                 <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
-                                    <h1 class="font-bold text-xl text-foreground">{{ new.title }}</h1>
+                                    <h1 class="font-bold text-xl text-foreground">{{ weblog.title }}</h1>
                                 </div>
                                 <div class="space-y-10 py-5">
                                     <div class="grid lg:grid-cols-4 grid-cols-2 gap-5">
@@ -36,7 +36,7 @@
                                             </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">تاریخ ایجاد</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ new.created_at|j_date_formatter }}</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ weblog.created_at|j_date_formatter }}</span>
                                             </div>
                                         </div>
 
@@ -51,7 +51,7 @@
                                             </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">آخرین به‌روز‌رسانی</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ new.updated_at|j_date_formatter }}</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ weblog.updated_at|j_date_formatter }}</span>
                                             </div>
                                         </div>
 
@@ -65,7 +65,7 @@
                                         </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">نویسنده</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ new.author.full_name }}
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ weblog.author.full_name }}
                                                 </span>
                                             </div>
                                         </div>
@@ -82,7 +82,7 @@
                                         </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">تعداد بازدید</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{% get_hit_count for new %}
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{% get_hit_count for weblog %}
                                                 </span>
                                             </div>
                                         </div>
@@ -97,7 +97,7 @@
                                             <div class="bg-background rounded-3xl p-5" id="tabOne">
                                                 <!-- course:description -->
                                                 <div class="description">
-                                                    {{ new.content|safe }}
+                                                    {{ weblog.content|safe }}
                                                 </div>
                                                 <!-- end course:description -->
                                             </div><!-- end tabs:contents:tabOne -->

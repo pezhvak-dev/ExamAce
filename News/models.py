@@ -40,7 +40,8 @@ class Category(models.Model):
 
 
 class News(models.Model):
-    author = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name='نویسنده')
+    author = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name='نویسنده',
+                               editable=False, related_name='news')
 
     title = models.CharField(max_length=100, verbose_name='عنوان')
 
@@ -60,6 +61,9 @@ class News(models.Model):
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
     updated_at = jDateTimeField(auto_now=True, verbose_name='تاریخ آخرین به‌روز‌رسانی')
+
+    def __str__(self):
+        return f"{self.title}"
 
     class Meta:
         db_table = 'news__news'

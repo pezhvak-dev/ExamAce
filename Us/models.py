@@ -8,7 +8,7 @@ from Account.models import CustomUser
 class Message(models.Model):
     user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name='messages', blank=True, null=True)
 
-    mobile_number = models.CharField(max_length=11, blank=True, null=True)
+    mobile_phone = models.CharField(max_length=11, blank=True, null=True)
 
     email = models.EmailField(max_length=254, blank=True, null=True)
 
@@ -23,7 +23,7 @@ class Message(models.Model):
             return f"{self.user.username}"
 
         else:
-            sender_name = ", ".join(filter(None, [self.full_name, self.mobile_number, self.email]))
+            sender_name = ", ".join(filter(None, [self.full_name, self.mobile_phone, self.email]))
             return f"{sender_name}" if sender_name else "ناشناس"
 
     class Meta:
