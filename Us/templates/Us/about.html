@@ -25,9 +25,31 @@
                             <span class="block flex-grow h-px bg-border"></span>
                         </div>
                     </div>
-                    <p class="font-semibold text-sm text-center text-muted">
+
+                    {% comment %} Really?! :)) {% endcomment %}
+                    {% comment %} <p class="font-semibold text-sm text-center text-muted">
                         {{ about.short_description|safe }}
-                    </p>
+                    </p> {% endcomment %}
+
+                    <div class="flex md:flex-nowrap justify-center flex-wrap items-center gap-10">
+                        <div class="md:w-9/12 w-full text-justify space-y-5">
+                            <div
+                                class="inline-block font-black text-base text-foreground relative before:content-[''] before:absolute before:right-0 before:-bottom-2 before:w-2/3 before:h-1 before:bg-primary">
+                                استعداد سنجی و ارزیابی</div>
+                            <div class="font-semibold text-sm text-muted space-y-3">
+                                <p>
+
+                                    {{ about.short_description|safe }}
+                                    
+                                </p>
+                                
+                            </div>
+                        </div>
+
+                    </div>
+
+
+
                 </div>
                 <div class="max-w-5xl space-y-10 mx-auto">
                     <div class="flex flex-col items-center justify-center space-y-3">
