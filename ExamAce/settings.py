@@ -45,11 +45,12 @@ INSTALLED_APPS = [
     "django_ckeditor_5",
     "debug_toolbar",
     "News.apps.NewsConfig",
+    "Us.apps.UsConfig",
 
     # Third party packages
     "widget_tweaks",
     "django_cleanup",
-    "hitcount"
+    "hitcount",
 
 ]
 
