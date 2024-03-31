@@ -1,5 +1,8 @@
+from itertools import chain
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.db.models import Count
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 from hitcount.models import HitCount
@@ -64,6 +67,32 @@ class Weblog(models.Model):
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
     updated_at = jDateTimeField(auto_now=True, verbose_name='تاریخ آخرین به‌روز‌رسانی')
+
+    def get_related_weblogs(self, max_results=5):
+        """
+        Returns related weblogs based on shared tags and categories, ranked by shared tags and then publication date.
+        """
+
+        related_weblogs = (
+            Weblog.objects.filter(tags__in=self.tags.all())
+            .exclude(id=self.id)  # Exclude the current weblog
+            .annotate(tag_count=Count('tags'))  # Count shared tags
+            .order_by('-tag_count', '-created_at')  # Rank by shared tags, then date
+        )
+
+        # If not enough results from tags, try categories:
+        if related_weblogs.count() < max_results:
+            category_weblogs = Weblog.objects.filter(category=self.category)
+            category_weblogs = category_weblogs.exclude(id=self.id)  # Exclude the current weblog
+            category_weblogs = category_weblogs.order_by('-created_at')[:max_results - related_weblogs.count()]
+            related_weblogs = list(chain(related_weblogs, category_weblogs))  # Convert to list
+
+        return list(set(related_weblogs))[:max_results]  # Ensure related_weblogs is a list before slicing
+
+    def get_latest_weblogs(self):
+        latest_weblogs = Weblog.objects.all().order_by('-created_at')
+
+        return latest_weblogs
 
     def __str__(self):
         return f"{self.title}"

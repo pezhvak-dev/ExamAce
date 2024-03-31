@@ -15,14 +15,14 @@
                             <div class="relative z-10">
                                 <!-- course:thumbnail -->
                                 <div>
-                                    <img src="{{ new.cover_image.url }}" class="max-w-full rounded-3xl"
+                                    <img src="{{ news.cover_image.url }}" class="max-w-full rounded-3xl"
                                          alt="..."/>
                                 </div>
                                 <!-- end course:thumbnail -->
                             </div>
                             <div class="-mt-12 pt-12">
                                 <div class="bg-gradient-to-b from-background to-secondary rounded-b-3xl space-y-2 p-5 mx-5">
-                                    <h1 class="font-bold text-xl text-foreground">{{ new.title }}</h1>
+                                    <h1 class="font-bold text-xl text-foreground">{{ news.title }}</h1>
                                 </div>
                                 <div class="space-y-10 py-5">
                                     <div class="grid lg:grid-cols-4 grid-cols-2 gap-5">
@@ -37,7 +37,7 @@
                                             </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">تاریخ ایجاد</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ new.created_at|j_date_formatter }}</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ news.created_at|j_date_formatter }}</span>
                                             </div>
                                         </div>
 
@@ -52,7 +52,7 @@
                                             </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">آخرین به‌روز‌رسانی</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ new.updated_at|j_date_formatter }}</span>
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ news.updated_at|j_date_formatter }}</span>
                                             </div>
                                         </div>
 
@@ -66,7 +66,7 @@
                                         </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">نویسنده</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ new.author.full_name }}
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{{ news.author.full_name }}
                                                 </span>
                                             </div>
                                         </div>
@@ -83,7 +83,7 @@
                                         </span>
                                             <div class="flex flex-col items-center justify-center text-center space-y-1">
                                                 <span class="font-bold text-xs text-muted line-clamp-1">تعداد بازدید</span>
-                                                <span class="font-bold text-sm text-foreground line-clamp-1">{% get_hit_count for new %}
+                                                <span class="font-bold text-sm text-foreground line-clamp-1">{% get_hit_count for news %}
                                                 </span>
                                             </div>
                                         </div>
@@ -98,7 +98,7 @@
                                             <div class="bg-background rounded-3xl p-5" id="tabOne">
                                                 <!-- course:description -->
                                                 <div class="description">
-                                                    {{ new.content|safe }}
+                                                    {{ news.content|safe }}
                                                 </div>
                                                 <!-- end course:description -->
                                             </div>
@@ -108,7 +108,7 @@
                                                 <div class="blog-single-rating-post text-center">
                                                     <h3 class="h2">این خبر چقدر براتون مفید بود؟</h3>
                                                     <div class="blog-single-rating-post-rating">
-                                                        {% ratings new %}
+                                                        {% ratings news %}
                                                     </div>
                                                 </div>
                                             </div>
@@ -371,52 +371,32 @@
                     <div class="md:w-4/12 w-full md:sticky md:top-24 space-y-8">
                         <div class="space-y-5">
                             <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
-                                <span class="font-black text-xl py-2">اخرین اخبار</span>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                <span class="font-black text-xl py-2">وبلاگ‌های مشابه</span>
 
-                                        <span class="font-semibold text-xs">لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                {% for news in related_news %}
+                                    <li>
+                                        <a href="{% url 'news:detail' news.slug %}"
+                                           class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                            <span class="font-semibold text-xs">{{ news.title }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
 
-                                        <span class="font-semibold text-xs"> لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                            </ul>
+                        </div>
+                        <div class="space-y-5">
+                            <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
+                                <span class="font-black text-xl py-2">وبلاگ‌های اخیر</span>
 
-                                        <span class="font-semibold text-xs"> لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
-                                        <span class="font-semibold text-xs">لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
-                                        <span class="font-semibold text-xs">لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
-                                        <span class="font-semibold text-xs">لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <button type="button"
-                                            class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
-                                        <span class="font-semibold text-xs"> لورم </span>
-                                    </button>
-                                </li>
+                                {% for news in latest_news %}
+                                    <li>
+                                        <a href="{% url 'news:detail' news.slug %}"
+                                           class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                            <span class="font-semibold text-xs">{{ news.title }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+
                             </ul>
                         </div>
                     </div>

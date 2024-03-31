@@ -1,5 +1,8 @@
+from itertools import chain
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.db.models import Count
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 from hitcount.models import HitCount
@@ -64,6 +67,32 @@ class News(models.Model):
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
     updated_at = jDateTimeField(auto_now=True, verbose_name='تاریخ آخرین به‌روز‌رسانی')
+
+    def get_related_news(self, max_results=5):
+        """
+        Returns related news based on shared tags and categories, ranked by shared tags and then publication date.
+        """
+
+        related_news = (
+            News.objects.filter(tags__in=self.tags.all())
+            .exclude(id=self.id)  # Exclude the current new
+            .annotate(tag_count=Count('tags'))  # Count shared tags
+            .order_by('-tag_count', '-created_at')  # Rank by shared tags, then date
+        )
+
+        # If not enough results from tags, try categories:
+        if related_news.count() < max_results:
+            category_news = News.objects.filter(category=self.category)
+            category_news = category_news.exclude(id=self.id)  # Exclude the current new
+            category_news = category_news.order_by('-created_at')[:max_results - related_news.count()]
+            related_news = list(chain(related_news, category_news))  # Convert to list
+
+        return list(set(related_news))[:max_results]  # Ensure related_news is a list before slicing
+
+    def get_latest_news(self):
+        latest_news = News.objects.all().order_by('-created_at')
+
+        return latest_news
 
     def __str__(self):
         return f"{self.title}"

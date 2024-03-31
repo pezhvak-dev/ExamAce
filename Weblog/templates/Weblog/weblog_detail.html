@@ -25,7 +25,7 @@
                                     <h1 class="font-bold text-xl text-foreground">{{ weblog.title }}</h1>
                                 </div>
                                 <div class="space-y-10 py-5">
-                                    <div class="grid lg:grid-cols-4 grid-cols-2 gap-5">
+                                    <div class="grid lg:grid-cols-2 grid-cols-2 gap-5">
                                         <div class="flex flex-col items-center justify-center gap-3 bg-secondary border border-border rounded-2xl cursor-default p-3">
                                             <span class="flex items-center justify-center w-12 h-12 bg-background rounded-full text-primary">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -370,52 +370,32 @@
                     <div class="md:w-4/12 w-full md:sticky md:top-24 space-y-8">
                         <div class="space-y-5">
                             <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
-                                <span class="font-black text-xl py-2">اخرین وبلاگ‌ها</span>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                <span class="font-black text-xl py-2">وبلاگ‌های مشابه</span>
 
-                                        <span class="font-semibold text-xs">لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                {% for weblog in related_weblogs %}
+                                    <li>
+                                        <a href="{% url 'weblog:detail' weblog.slug %}"
+                                           class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                            <span class="font-semibold text-xs">{{ weblog.title }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
 
-                                        <span class="font-semibold text-xs"> لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                            </ul>
+                        </div>
+                        <div class="space-y-5">
+                            <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
+                                <span class="font-black text-xl py-2">وبلاگ‌های اخیر</span>
 
-                                        <span class="font-semibold text-xs"> لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
-                                        <span class="font-semibold text-xs">لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
-                                        <span class="font-semibold text-xs">لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                       class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
-                                        <span class="font-semibold text-xs">لورم</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <button type="button"
-                                            class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
-                                        <span class="font-semibold text-xs"> لورم </span>
-                                    </button>
-                                </li>
+                                {% for weblog in latest_weblogs %}
+                                    <li>
+                                        <a href="{% url 'weblog:detail' weblog.slug %}"
+                                           class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                            <span class="font-semibold text-xs">{{ weblog.title }}</span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+
                             </ul>
                         </div>
                     </div>
