@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.views.generic import TemplateView
 
 from Course.models import VideoCourse
+from News.models import News
 
 
 class HomeView(TemplateView):
@@ -19,7 +20,10 @@ class HomeView(TemplateView):
                                                           "name", "status").order_by('-created_at').filter(
             Q(status="F") | Q(status="IP"))[:6]
 
+        latest_news = News.objects.all().order_by('-created_at')
+
         context['latest_video_courses'] = latest_video_courses
+        context['latest_news'] = latest_news
 
         return context
 

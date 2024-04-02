@@ -90,7 +90,7 @@ class News(models.Model):
         return list(set(related_news))[:max_results]  # Ensure related_news is a list before slicing
 
     def get_latest_news(self):
-        latest_news = News.objects.all().order_by('-created_at')
+        latest_news = News.objects.all().order_by('-created_at').exclude(id=self.id)
 
         return latest_news
 

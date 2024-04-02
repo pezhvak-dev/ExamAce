@@ -90,7 +90,7 @@ class Weblog(models.Model):
         return list(set(related_weblogs))[:max_results]  # Ensure related_weblogs is a list before slicing
 
     def get_latest_weblogs(self):
-        latest_weblogs = Weblog.objects.all().order_by('-created_at')
+        latest_weblogs = Weblog.objects.all().order_by('-created_at').exclude(id=self.id)
 
         return latest_weblogs
 
