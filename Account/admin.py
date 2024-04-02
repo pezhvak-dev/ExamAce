@@ -5,7 +5,7 @@ from Account.models import CustomUser, OTP, Wallet, WalletUsage, Notification
 
 
 class CustomUserAdmin(UserAdmin):
-    list_display = ('mobile_phone', 'username', 'is_staff', 'is_superuser', 'authentication_token', 'date_joined')
+    list_display = ('mobile_phone', 'username', 'is_staff', 'is_superuser', 'date_joined')
 
     list_editable = ('is_staff', 'is_superuser',)
 

@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -12,16 +13,10 @@ class NonAuthenticatedUsersOnlyMixin:
 class AuthenticatedUsersOnlyMixin:
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            referring_url = request.META.get('HTTP_REFERER', None)
-            request.session['referring_url'] = referring_url
+            messages.error(request, "ابتدار وارد حساب کاربری خود شوید.")
 
-            redirect_url = reverse("home:temp_info")
-            message = "ابتدار وارد حساب کاربری خود شوید."
-            success = "no"
-            failure = "yes"
-            next_url = reverse('account:login')
-            return redirect(
-                redirect_url + f'?message={message}&success={success}&failure={failure}&next_url={next_url}')
+            return redirect("home:home")
+
         return super(AuthenticatedUsersOnlyMixin, self).dispatch(request, *args, **kwargs)
 
 

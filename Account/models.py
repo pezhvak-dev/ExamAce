@@ -101,7 +101,7 @@ class OTP(models.Model):
 
     sms_code = models.CharField(max_length=4, verbose_name='کد تایید')
 
-    authentication_token = models.UUIDField(blank=True, null=True, verbose_name="یو یو آی دی")
+    uuid = models.UUIDField(blank=True, null=True, verbose_name="یو یو آی دی")
 
     otp_type = models.CharField(max_length=1, choices=otp_type_choices)
 

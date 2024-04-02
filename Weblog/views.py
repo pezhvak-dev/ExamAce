@@ -3,10 +3,11 @@ from django.utils.encoding import uri_to_iri
 from django.views.generic import ListView, DetailView
 from hitcount.views import HitCountDetailView
 
+from Home.mixins import URLStorageMixin
 from Weblog.models import Weblog
 
 
-class AllWeblogs(ListView):
+class AllWeblogs(URLStorageMixin, ListView):
     model = Weblog
     context_object_name = 'weblogs'
     template_name = 'Weblog/weblog_list.html'
@@ -17,7 +18,7 @@ class AllWeblogs(ListView):
         return weblogs
 
 
-class WeblogDetail(HitCountDetailView, DetailView):
+class WeblogDetail(URLStorageMixin, HitCountDetailView, DetailView):
     model = Weblog
     context_object_name = 'weblog'
     template_name = 'Weblog/weblog_detail.html'
@@ -44,7 +45,7 @@ class WeblogDetail(HitCountDetailView, DetailView):
         return get_object_or_404(queryset, **{self.slug_field: slug})
 
 
-class WeblogsByCategory(ListView):
+class WeblogsByCategory(URLStorageMixin, ListView):
     model = Weblog
     context_object_name = 'weblogs'
     template_name = 'Weblog/weblogs_by_category.html'

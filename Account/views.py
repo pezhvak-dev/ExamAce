@@ -1,6 +1,7 @@
 import random
 from uuid import uuid4
 
+from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
@@ -10,10 +11,11 @@ from django.views.generic import FormView, TemplateView, UpdateView, ListView
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
 from Account.models import CustomUser, OTP, Notification, Wallet
+from Home.mixins import URLStorageMixin
 from Home.sms import send_register_sms, send_forget_password_sms
 
 
-class OTPRegisterView(FormView):
+class OTPRegisterView(URLStorageMixin, FormView):
     template_name = "Account/register.html"
     form_class = OTPRegisterForm
 
@@ -63,6 +65,13 @@ class LogInView(NonAuthenticatedUsersOnlyMixin, FormView):
 
             return self.form_invalid(form)
 
+        redirect_url = request.session.get('current_url')
+
+        if redirect_url is not None:
+            messages.success(request, f"{user.username} عزیز، خوش آمدید.")
+
+            return redirect(redirect_url)
+
         return redirect(reverse("account:profile", kwargs={"slug": request.user.username}))
 
     def get_success_url(self):
@@ -72,19 +81,18 @@ class LogInView(NonAuthenticatedUsersOnlyMixin, FormView):
 
 class LogOutView(View):
     def get(self, request):
+        redirect_url = request.session.get('current_url')
+
         logout(request=request)
-        next_url = request.GET.get("next")
 
-        if next_url is not None:
-            return redirect(next_url)
+        messages.success(request, f"شما با موفقیت از حساب کاربری خود خارج شدید.")
 
-        else:
-            try:
-                home_url = reverse('home:home')
+        print(redirect_url)
 
-                return redirect(home_url)
-            except:
-                return redirect(to="home:home")
+        if redirect_url is not None:
+            return redirect(redirect_url)
+
+        return redirect(to="home:home")
 
 
 class ChangePasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
@@ -177,10 +185,18 @@ class CheckOTPView(FormView):
             otp = OTP.objects.get(uuid=uuid)
             otp.delete()
 
+            redirect_url = request.session.get('current_url')
+
+            print(redirect_url)
+
+            messages.success(request, f"{user.username} عزیز، حساب کاربری شما با موفقیت ایجاد شد.")
+
+            if redirect_url is not None:
+                return redirect(redirect_url)
+
             return redirect(to="account:profile")
 
         elif OTP.objects.filter(uuid=uuid, sms_code=sms_code, otp_type="F").exists():
-
             return redirect(reverse(viewname="account:change_password") + f"?uuid={uuid}")
 
         elif OTP.objects.filter(uuid=uuid, sms_code=sms_code, otp_type="D").exists():
@@ -203,7 +219,7 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class ProfileDetailView(AuthenticatedUsersOnlyMixin, TemplateView):
+class ProfileDetailView(URLStorageMixin, AuthenticatedUsersOnlyMixin, TemplateView):
     template_name = 'Account/profile.html'
 
 
@@ -222,7 +238,7 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, UpdateView):
         return reverse('account:profile', kwargs={'slug': self.request.user.username})
 
 
-class NotificationListView(ListView):
+class NotificationListView(URLStorageMixin, AuthenticatedUsersOnlyMixin, ListView):
     model = Notification
     template_name = "Account/notifications.html"
     context_object_name = "notifications"

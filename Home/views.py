@@ -2,10 +2,12 @@ from django.db.models import Q
 from django.views.generic import TemplateView
 
 from Course.models import VideoCourse
+from Home.mixins import URLStorageMixin
 from News.models import News
+from Weblog.models import Weblog
 
 
-class HomeView(TemplateView):
+class HomeView(URLStorageMixin, TemplateView):
     template_name = 'Home/index.html'
 
     def get_context_data(self, **kwargs):
@@ -22,11 +24,10 @@ class HomeView(TemplateView):
 
         latest_news = News.objects.all().order_by('-created_at')
 
+        latest_weblogs = Weblog.objects.all().order_by('-created_at')
+
         context['latest_video_courses'] = latest_video_courses
         context['latest_news'] = latest_news
+        context['latest_weblogs'] = latest_weblogs
 
         return context
-
-
-class TempInfo(TemplateView):
-    template_name = "Home/temp_info.html"
