@@ -11,3 +11,11 @@ def social_media(request):
     }
 
     return context
+
+
+def custom_user(request):
+    user = request.user
+
+    return {
+        'user': user
+    }
