@@ -4,11 +4,12 @@ from django.urls import reverse
 from django.views.generic import TemplateView, FormView
 
 from Account.models import CustomUser
+from Home.mixins import URLStorageMixin
 from Us.forms import ContactForm
 from Us.models import AboutUs
 
 
-class About(TemplateView):
+class About(URLStorageMixin,TemplateView):
     template_name = "Us/about.html"
 
     def get_context_data(self, **kwargs):
@@ -21,7 +22,7 @@ class About(TemplateView):
         return context
 
 
-class Contact(FormView):
+class Contact(URLStorageMixin,FormView):
     form_class = ContactForm
     template_name = "Us/contact.html"
     success_url = "/"
