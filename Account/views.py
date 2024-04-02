@@ -10,12 +10,12 @@ from django.views.generic import FormView, TemplateView, UpdateView, ListView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
-from Account.models import CustomUser, OTP, Notification, Wallet
+from Account.models import CustomUser, OTP, Notification, Wallet, Newsletter
 from Home.mixins import URLStorageMixin
 from Home.sms import send_register_sms, send_forget_password_sms
 
 
-class OTPRegisterView(URLStorageMixin, FormView):
+class RegisterView(FormView):
     template_name = "Account/register.html"
     form_class = OTPRegisterForm
 
@@ -87,8 +87,6 @@ class LogOutView(View):
 
         messages.success(request, f"شما با موفقیت از حساب کاربری خود خارج شدید.")
 
-        print(redirect_url)
-
         if redirect_url is not None:
             return redirect(redirect_url)
 
@@ -116,13 +114,15 @@ class ChangePasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
 
         otp.delete()
 
-        redirect_url = reverse("home:temp_info")
-        message = "رمز عبور با موفقیت تغییر یافت."
-        success = "yes"
-        failure = "no"
-        next_url = reverse('account:profile')
-        return redirect(
-            redirect_url + f'?message={message}&success={success}&failure={failure}&next_url={next_url}')
+        redirect_url = request.session.get('current_url')
+
+        messages.success(request, f"رمز عبور شما با موفقیت تغییر یافت.")
+
+        if redirect_url is not None:
+            return redirect(redirect_url)
+
+        else:
+            return redirect(reverse('account:profile', kwargs={'slug': self.request.user.username}))
 
     def form_invalid(self, form):
         return super().form_invalid(form)
@@ -150,7 +150,8 @@ class ForgetPasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
         OTP.objects.create(username=username, mobile_phone=mobile_phone, sms_code=sms_code, uuid=uuid,
                            otp_type="F")
 
-        send_forget_password_sms(receptor=mobile_phone, sms_code=sms_code)
+        # send_forget_password_sms(receptor=mobile_phone, sms_code=sms_code)
+        print(sms_code)
 
         return redirect(reverse(viewname="account:check_otp") + f"?uuid={uuid}&mobile_phone={mobile_phone}")
 
@@ -187,14 +188,12 @@ class CheckOTPView(FormView):
 
             redirect_url = request.session.get('current_url')
 
-            print(redirect_url)
-
             messages.success(request, f"{user.username} عزیز، حساب کاربری شما با موفقیت ایجاد شد.")
 
             if redirect_url is not None:
                 return redirect(redirect_url)
 
-            return redirect(to="account:profile")
+            return redirect(to="account:profile", kwargs={"slug": request.user.username})
 
         elif OTP.objects.filter(uuid=uuid, sms_code=sms_code, otp_type="F").exists():
             return redirect(reverse(viewname="account:change_password") + f"?uuid={uuid}")
@@ -247,3 +246,32 @@ class NotificationListView(URLStorageMixin, AuthenticatedUsersOnlyMixin, ListVie
         user = self.request.user
 
         return Notification.objects.filter(users=user).order_by("-created_at")
+
+
+class EnterNewsletters(View):
+    def post(self, request, *args, **kwargs):
+        email = request.POST.get("email")
+        user = None
+
+        redirect_url = request.session.get('current_url')
+
+        if request.user.is_authenticated:
+            user = request.user
+
+        if Newsletter.objects.filter(user=user, email=email).exists():
+            messages.error(request, f"این آدرس ایمیل قبلا در خبرنامه ثبت شده است.")
+
+            if redirect_url is not None:
+                return redirect(redirect_url)
+
+            return redirect("home:home")
+
+        else:
+            Newsletter.objects.create(user=user, email=email)
+
+            messages.success(request, f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد.")
+
+            if redirect_url is not None:
+                return redirect(redirect_url)
+
+            return redirect("home:home")

@@ -1,7 +1,6 @@
 from django.contrib import admin
-from django.urls import reverse
 
-from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason
+from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason, Exam
 
 
 @admin.register(VideoCourseObject)
@@ -11,9 +10,16 @@ class VideoCourseObjectAdmin(admin.ModelAdmin):
 
 @admin.register(VideoCourse)
 class VideoCourseAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = (
+        'name', 'category', 'description',
+        'status', 'type', 'price', 'has_discount',
+        'discount_percentage', 'price_after_discount'
+    )
+
     search_fields = ('name', 'description', 'teacher')
+
     autocomplete_fields = ('teacher',)
+
     prepopulated_fields = {'slug': ('name',)}
 
 
@@ -28,3 +34,12 @@ class VideoSeasonAdmin(admin.ModelAdmin):
     list_display = ('course', 'number')
     list_filter = ('course',)
     search_fields = ('course__name',)
+
+
+@admin.register(Exam)
+class ExamAdmin(admin.ModelAdmin):
+    list_display = (
+        'name', 'category', 'description',
+        'type', 'price', 'has_discount',
+        'discount_percentage', 'price_after_discount'
+    )

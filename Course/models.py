@@ -156,3 +156,51 @@ class VideoCourseObject(models.Model):
         db_table = 'course__video_course_object'
         verbose_name = 'جزئیات فیلم'
         verbose_name_plural = 'جزئیات فیلم'
+
+
+class Exam(models.Model):
+    exam_payment_types = (
+        ('F', 'رایگان'),
+        ('P', 'پولی'),
+    )
+
+    name = models.CharField(max_length=100, unique=True, verbose_name='نام دوره')
+
+    slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
+
+    category = models.ForeignKey(to=Category, on_delete=models.PROTECT, verbose_name='دسته بندی')
+
+    description = CKEditor5Field(config_name="extends", verbose_name='درباره آزمون')
+
+    participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده')
+
+    type = models.CharField(max_length=1, choices=exam_payment_types, default='F', verbose_name='نوع دوره')
+
+    price = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت')
+
+    has_discount = models.BooleanField(default=False, verbose_name='تخفیف دارد؟')
+
+    discount_percentage = models.PositiveSmallIntegerField(default=0, verbose_name='درصد تخفیف',
+                                                           validators=[MaxValueValidator(100)])
+
+    price_after_discount = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
+
+    updated_at = jDateTimeField(auto_now=True, verbose_name='تاریخ آخرین به‌روز‌رسانی')
+
+    def __str__(self):
+        return f"{self.name}"
+
+    def save(self, *args, **kwargs):
+        if self.type == "F":
+            self.price = self.price_after_discount = self.discount_percentage = self.has_discount = 0
+
+        if self.has_discount:
+            self.price_after_discount = self.price - (self.price * (self.discount_percentage / 100))
+        super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'course__exam'
+        verbose_name = 'آزمون'
+        verbose_name_plural = 'آزمون‌ها'

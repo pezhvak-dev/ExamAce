@@ -55,6 +55,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     full_name = models.CharField(max_length=100, verbose_name="نام و نام خانوادگی")
 
+    stars = models.PositiveIntegerField(default=0, verbose_name='تعداد ستاره')
+
     about_me = models.TextField(blank=True, null=True, verbose_name='درباره من')
 
     image = models.ImageField(upload_to='Account/Users/profiles/', verbose_name="تصویر پروفایل", blank=True, null=True)
@@ -133,6 +135,9 @@ class Wallet(models.Model):
 
     usage_count = models.PositiveSmallIntegerField(default=0, verbose_name="دفعات استفاده")
 
+    def __str__(self):
+        return f"{self.owner.username}"
+
     class Meta:
         db_table = "account__wallet"
         verbose_name = "کیف پول"
@@ -147,6 +152,9 @@ class WalletUsage(models.Model):
     video_course = models.ForeignKey(to=VideoCourse, on_delete=models.CASCADE, verbose_name="دوره ویدئویی")
 
     created_at = jDateTimeField(auto_now_add=True, editable=False, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.wallet.owner}"
 
     class Meta:
         db_table = "account__wallet_usage"
@@ -211,3 +219,19 @@ class Notification(models.Model):
         db_table = 'account__notification'
         verbose_name = "اعلانیه"
         verbose_name_plural = "اعلانیه‌ها"
+
+
+class Newsletter(models.Model):
+    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, blank=True, null=True)
+
+    email = models.EmailField(max_length=254, verbose_name="آدرس ایمیل", unique=True)
+
+    created_at = jDateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.email}"
+
+    class Meta:
+        db_table = 'account__newsletter'
+        verbose_name = "خبرنامه"
+        verbose_name_plural = "خبرنامه‌ها"
