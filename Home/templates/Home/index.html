@@ -872,10 +872,9 @@
                                 </a>
                             {% endfor %}
                         </ul>
+                        <br>
                         <!-- end user:menus -->
-                    </div>
 
-                    <div class="lg:col-span-3 md:col-span-4 md:sticky md:top-24">
                         <!-- user:menus -->
                         <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
                             <span class="font-black text-xl py-2">آخرین وبلاگ‌ها</span>
@@ -884,7 +883,9 @@
                                 <a href="{% url 'weblog:detail' weblog.slug %}">
                                     <li>
                                         <button type="button"
-                                                class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
+                                                class="w-full h-11 inline-flex items-center text-right gap-3 bg-background
+                                                rounded-full text-muted transition-colors hover:bg-primary
+                                                hover:text-primary-foreground px-4">
                                             <span class="font-semibold text-xs"> {{ weblog.title }} </span>
                                         </button>
                                     </li>
@@ -892,7 +893,9 @@
                             {% endfor %}
                         </ul>
                         <!-- end user:menus -->
+
                     </div>
+
 
                 </div>
             </div>

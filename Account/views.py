@@ -258,7 +258,7 @@ class EnterNewsletters(View):
         if request.user.is_authenticated:
             user = request.user
 
-        if Newsletter.objects.filter(user=user, email=email).exists():
+        if Newsletter.objects.filter(email=email).exists():
             messages.error(request, f"این آدرس ایمیل قبلا در خبرنامه ثبت شده است.")
 
             if redirect_url is not None:
