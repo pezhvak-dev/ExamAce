@@ -48,7 +48,7 @@ class VideoCourse(models.Model):
     what_we_will_learn = CKEditor5Field(config_name="extends", max_length=500, verbose_name='چی یاد میگیریم؟')
 
     teacher = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name='مدرس',
-                                related_name='video_courses')
+                                related_name='teacher_video_courses')
 
     cover_image = models.ImageField(upload_to='Course/VideoCourse/cover_images', verbose_name='عکس کاور')
 
@@ -64,7 +64,8 @@ class VideoCourse(models.Model):
 
     prerequisites = models.ManyToManyField(to="self", blank=True, verbose_name='پیش نیاز دوره')
 
-    participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده')
+    participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
+                                                related_name='user_video_courses')
 
     type = models.CharField(max_length=1, choices=course_payment_types, default='F', verbose_name='نوع دوره')
 
@@ -172,7 +173,8 @@ class Exam(models.Model):
 
     description = CKEditor5Field(config_name="extends", verbose_name='درباره آزمون')
 
-    participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده')
+    participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
+                                                related_name='user_exams')
 
     type = models.CharField(max_length=1, choices=exam_payment_types, default='F', verbose_name='نوع دوره')
 

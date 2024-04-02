@@ -6,7 +6,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import FormView, TemplateView, UpdateView, ListView
+from django.views.generic import FormView, TemplateView, UpdateView, ListView, DetailView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
@@ -218,8 +218,10 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class ProfileDetailView(URLStorageMixin, AuthenticatedUsersOnlyMixin, TemplateView):
+class ProfileDetailView(URLStorageMixin, AuthenticatedUsersOnlyMixin, DetailView):
+    model = CustomUser
     template_name = 'Account/profile.html'
+    context_object_name = 'user'
 
 
 class ProfileEditView(AuthenticatedUsersOnlyMixin, UpdateView):
