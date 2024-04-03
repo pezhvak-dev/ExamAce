@@ -1,4 +1,4 @@
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, FileExtensionValidator
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
@@ -159,11 +159,79 @@ class VideoCourseObject(models.Model):
         verbose_name_plural = 'جزئیات فیلم'
 
 
+class ExamUnit(models.Model):
+    name = models.CharField(max_length=100, verbose_name="نام")
+
+    slug = models.SlugField(allow_unicode=True, unique=True, verbose_name="اسلاگ")
+
+    description = CKEditor5Field(config_name="extends", verbose_name="توضیحات")
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        db_table = 'course__exam_unit'
+        verbose_name = 'درس آزمون'
+        verbose_name_plural = 'درس‌های آزمون'
+
+
+class ExamSection(models.Model):
+    name = models.CharField(max_length=100, verbose_name="نام")
+
+    slug = models.SlugField(allow_unicode=True, unique=True, verbose_name="اسلاگ")
+
+    description = CKEditor5Field(config_name="extends", verbose_name="توضیحات", blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        db_table = 'course__exam_section'
+        verbose_name = 'بخش آزمون'
+        verbose_name_plural = 'بخش‌های آزمون'
+
+
+class Answer(models.Model):
+    answer_choices = (
+        ("1", "گزینه 1"),
+        ("2", "گزینه 2"),
+        ("3", "گزینه 3"),
+        ("4", "گزینه 4"),
+    )
+
+    exam_unit = models.ForeignKey(to=ExamUnit, on_delete=models.CASCADE, verbose_name="درس آزمون",
+                                  related_name="answers")
+
+    exam = models.ForeignKey(to="Exam", on_delete=models.CASCADE, verbose_name="آزمون")
+
+    section = models.ForeignKey(to="ExamSection", on_delete=models.CASCADE, verbose_name="بخش")
+
+    choice_1 = models.CharField(max_length=100, verbose_name="گزینه 1")
+
+    choice_2 = models.CharField(max_length=100, verbose_name="گزینه 2")
+
+    choice_3 = models.CharField(max_length=100, verbose_name="گزینه 3")
+
+    choice_4 = models.CharField(max_length=100, verbose_name="گزینه 4")
+
+    true_answer = models.CharField(max_length=1, choices=answer_choices, verbose_name="گزینه صحیح")
+
+    def __str__(self):
+        return f"{self.true_answer}"
+
+    class Meta:
+        db_table = 'course__answer'
+        verbose_name = 'پاسخ آزمون'
+        verbose_name_plural = 'پاسخ‌های آزمون'
+
+
 class Exam(models.Model):
     exam_payment_types = (
         ('F', 'رایگان'),
         ('P', 'پولی'),
     )
+
+    designer = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="طراح", editable=False)
 
     name = models.CharField(max_length=100, unique=True, verbose_name='نام دوره')
 
@@ -171,7 +239,12 @@ class Exam(models.Model):
 
     category = models.ForeignKey(to=Category, on_delete=models.PROTECT, verbose_name='دسته بندی')
 
+    questions_file = models.FileField(upload_to='Course/Exam/pdf', verbose_name='فایل سوالات آزمون',
+                                      validators=[FileExtensionValidator(allowed_extensions=["png", "pdf"])])
+
     description = CKEditor5Field(config_name="extends", verbose_name='درباره آزمون')
+
+    cover_image = models.ImageField(upload_to='Course/Exam/cover_images', verbose_name='عکس کاور')
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
                                                 related_name='user_exams')
@@ -186,6 +259,8 @@ class Exam(models.Model):
                                                            validators=[MaxValueValidator(100)])
 
     price_after_discount = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
+
+    duration = models.DurationField(default=0, verbose_name='مدت آزمون')
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
