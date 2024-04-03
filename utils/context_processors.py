@@ -1,3 +1,4 @@
+from Account.models import CustomUser
 from Us.models import SocialMedia, AboutUs
 
 
@@ -13,9 +14,17 @@ def social_media(request):
     return context
 
 
-def custom_user(request):
+def custom_user_info(request):
     user = request.user
 
-    return {
-        'user': user
-    }
+    if user.is_authenticated:
+        custom_user = CustomUser.objects.get(username=user.username)
+
+        return {
+            'custom_user': custom_user
+        }
+
+    else:
+        return {
+            'custom_user': None
+        }
