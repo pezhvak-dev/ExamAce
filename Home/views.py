@@ -3,7 +3,9 @@ from django.views.generic import TemplateView
 
 from Course.models import VideoCourse
 from Home.mixins import URLStorageMixin
+from Home.models import HeroBanner, Banner1, Banner2, Banner3
 from News.models import News
+from Us.models import Message
 from Weblog.models import Weblog
 
 
@@ -26,8 +28,23 @@ class HomeView(URLStorageMixin, TemplateView):
 
         latest_weblogs = Weblog.objects.all().order_by('-created_at')
 
-        context['latest_video_courses'] = latest_video_courses
-        context['latest_news'] = latest_news
-        context['latest_weblogs'] = latest_weblogs
+        hero_banners = HeroBanner.objects.filter(can_be_shown=True).order_by('-created_at')
+
+        banner_1 = Banner1.objects.filter(can_be_shown=True).order_by('-created_at')[:2]
+
+        banner_2 = Banner2.objects.filter(can_be_shown=True).last()
+
+        banner_3 = Banner3.objects.filter(can_be_shown=True).order_by('-created_at')[:2]
+
+        attitudes = Message.objects.filter(can_be_shown=True).order_by('-created_at')
+
+        context['latest_video_courses'] = latest_video_courses  # Is a queryset
+        context['latest_news'] = latest_news  # Is a queryset
+        context['latest_weblogs'] = latest_weblogs  # Is a queryset
+        context['hero_banners'] = hero_banners  # Is a queryset
+        context['banner_1'] = banner_1  # Is a queryset
+        context['banner_2'] = banner_2  # Is a single object
+        context['banner_3'] = banner_3  # Is a queryset
+        context['attitudes'] = attitudes  # Is a queryset
 
         return context

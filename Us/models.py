@@ -6,17 +6,20 @@ from Account.models import CustomUser
 
 
 class Message(models.Model):
-    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, related_name='messages', blank=True, null=True)
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, related_name='messages', blank=True,
+                             null=True, verbose_name="کاربر")
 
-    mobile_phone = models.CharField(max_length=11, blank=True, null=True)
+    mobile_phone = models.CharField(max_length=11, blank=True, null=True, verbose_name="شماره تلفن")
 
-    email = models.EmailField(max_length=254, blank=True, null=True)
+    email = models.EmailField(max_length=254, blank=True, null=True, verbose_name="آدرس ایمیل")
 
-    full_name = models.CharField(max_length=100, blank=True, null=True)
+    full_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="نام و نام خانوادگی")
 
-    message = CKEditor5Field(config_name='extends')
+    can_be_shown = models.BooleanField(default=False, verbose_name="مجوز نشان داده شدن دارد؟")
 
-    created_at = jDateTimeField(auto_now_add=True)
+    message = models.TextField(max_length=500, verbose_name="پیام")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
     def __str__(self):
         if self.user:
