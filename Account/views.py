@@ -186,12 +186,7 @@ class CheckOTPView(FormView):
             otp = OTP.objects.get(uuid=uuid)
             otp.delete()
 
-            redirect_url = request.session.get('current_url')
-
             messages.success(request, f"{user.username} عزیز، حساب کاربری شما با موفقیت ایجاد شد.")
-
-            if redirect_url is not None:
-                return redirect(redirect_url)
 
             return redirect(to="account:profile", kwargs={"slug": request.user.username})
 
