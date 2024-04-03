@@ -368,14 +368,16 @@
                 {% if request.user.is_authenticated %}
                     <div class="relative" x-data="{ isOpen: false }">
                         <button class="flex items-center sm:gap-3 gap-1" x-on:click="isOpen = !isOpen">
+                        
                             {% if custom_user.image %}
                                 <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
                                 <img src="{{ custom_user.image.url }}" class="w-full h-full object-cover"
-                                     alt="..."/>
+                                     alt="تصویر پروفایل"/>
                                 </div>
+                        
                                 {% else %}
-                                <span
-                                        class="inline-flex items-center justify-center w-9 h-9 bg-secondary rounded-full text-foreground">
+                        
+                                <span class="inline-flex items-center justify-center w-9 h-9 bg-secondary rounded-full text-foreground">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                          stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -383,6 +385,7 @@
                                     </svg>
                                 </span>
                             {% endif %}
+                        
                             <span class="xs:flex flex-col items-start hidden text-xs space-y-1">
                                     <span class="font-semibold text-foreground">{{ user.username }}</span>
                                     <span class="font-semibold text-muted">خوش آمـــدید</span>
