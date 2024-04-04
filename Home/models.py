@@ -95,7 +95,7 @@ class Banner4(models.Model):
 
     link = models.URLField(blank=True, null=True, unique=True, verbose_name="لینک")
 
-    file = models.FileField(upload_to="Home/HeroBanner/files", verbose_name="فایل")
+    file = models.FileField(upload_to="Home/HeroBanner/files", verbose_name="فایل", help_text="880x330")
 
     can_be_shown = models.BooleanField(default=True, verbose_name="مجوز نشان داده شدن دارد؟")
 
@@ -117,7 +117,7 @@ class Banner5(models.Model):
 
     link = models.URLField(blank=True, null=True, unique=True, verbose_name="لینک")
 
-    file = models.FileField(upload_to="Home/HeroBanner/files", verbose_name="فایل")
+    file = models.FileField(upload_to="Home/HeroBanner/files", verbose_name="فایل", help_text="280x74")
 
     can_be_shown = models.BooleanField(default=True, verbose_name="مجوز نشان داده شدن دارد؟")
 

@@ -15,6 +15,11 @@ class AuthenticatedUsersOnlyMixin:
         if not request.user.is_authenticated:
             messages.error(request, "ابتدار وارد حساب کاربری خود شوید.")
 
+            redirect_url = request.session.get('current_url')
+
+            if redirect_url is not None:
+                return redirect(redirect_url)
+
             return redirect("home:home")
 
         return super(AuthenticatedUsersOnlyMixin, self).dispatch(request, *args, **kwargs)
