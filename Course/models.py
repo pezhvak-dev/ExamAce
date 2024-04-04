@@ -260,7 +260,7 @@ class Exam(models.Model):
 
     price_after_discount = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
 
-    duration = models.DurationField(default=0, verbose_name='مدت آزمون')
+    total_duration = models.DurationField(default=0, verbose_name='مدت آزمون')
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 

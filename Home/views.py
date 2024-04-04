@@ -37,6 +37,8 @@ class HomeView(URLStorageMixin, TemplateView):
             "name",
             "slug",
             "designer__image",
+            "designer__full_name",
+            "designer__slug",
             "category__name",
             "cover_image",
             "type",
@@ -44,7 +46,7 @@ class HomeView(URLStorageMixin, TemplateView):
             "has_discount",
             "discount_percentage",
             "price_after_discount",
-            "duration",
+            "total_duration",
             "created_at",
         ).order_by('-created_at')[:2]
 
@@ -52,6 +54,8 @@ class HomeView(URLStorageMixin, TemplateView):
             "name",
             "slug",
             "designer__image",
+            "designer__full_name",
+            "designer__slug",
             "category__name",
             "cover_image",
             "type",
@@ -59,7 +63,7 @@ class HomeView(URLStorageMixin, TemplateView):
             "has_discount",
             "discount_percentage",
             "price_after_discount",
-            "duration",
+            "total_duration",
             "created_at",
         ).order_by('-created_at')[2:4]
 

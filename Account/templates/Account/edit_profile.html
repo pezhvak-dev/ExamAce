@@ -4,6 +4,8 @@
 
 {% block content %}
     <div class="flex flex-col min-h-screen bg-background">
+    {% include 'includes/header.html' %}
+
         <main class="flex-auto py-5">
             <div class="max-w-7xl space-y-14 px-4 mx-auto">
                 <div class="grid md:grid-cols-12 grid-cols-1 items-start gap-5">
@@ -538,5 +540,7 @@
                 </div>
             </div>
         </main>
+
+    {% include 'includes/footer.html' %}
     </div>
 {% endblock %}

@@ -50,7 +50,7 @@ class AnswerInline(admin.StackedInline):
 @admin.register(Exam)
 class ExamAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'type', 'price', 'has_discount',
+        'name', 'total_duration', 'type', 'price', 'has_discount',
         'discount_percentage', 'price_after_discount'
     )
 
