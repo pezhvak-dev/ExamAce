@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason, Exam, ExamUnit, Answer, ExamSection
+from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason, Exam, ExamAnswer, ExamSection
 
 
 @admin.register(VideoCourseObject)
@@ -36,14 +36,8 @@ class VideoSeasonAdmin(admin.ModelAdmin):
     search_fields = ('course__name',)
 
 
-@admin.register(ExamUnit)
-class ExamUnitAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug")
-    prepopulated_fields = {'slug': ('name',)}
-
-
-class AnswerInline(admin.StackedInline):
-    model = Answer
+class ExamAnswerInline(admin.StackedInline):
+    model = ExamAnswer
     extra = 1
 
 
@@ -56,7 +50,7 @@ class ExamAdmin(admin.ModelAdmin):
 
     prepopulated_fields = {'slug': ('name',)}
 
-    inlines = [AnswerInline]
+    inlines = [ExamAnswerInline]
 
     def save_model(self, request, obj, form, change):
         if not obj.designer_id:
@@ -67,3 +61,4 @@ class ExamAdmin(admin.ModelAdmin):
 @admin.register(ExamSection)
 class ExamSectionAdmin(admin.ModelAdmin):
     list_display = ("name",)
+    prepopulated_fields = {'slug': ('name',)}

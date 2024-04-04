@@ -159,22 +159,6 @@ class VideoCourseObject(models.Model):
         verbose_name_plural = 'جزئیات فیلم'
 
 
-class ExamUnit(models.Model):
-    name = models.CharField(max_length=100, verbose_name="نام")
-
-    slug = models.SlugField(allow_unicode=True, unique=True, verbose_name="اسلاگ")
-
-    description = CKEditor5Field(config_name="extends", verbose_name="توضیحات")
-
-    def __str__(self):
-        return f"{self.name}"
-
-    class Meta:
-        db_table = 'course__exam_unit'
-        verbose_name = 'درس آزمون'
-        verbose_name_plural = 'درس‌های آزمون'
-
-
 class ExamSection(models.Model):
     name = models.CharField(max_length=100, verbose_name="نام")
 
@@ -191,16 +175,13 @@ class ExamSection(models.Model):
         verbose_name_plural = 'بخش‌های آزمون'
 
 
-class Answer(models.Model):
+class ExamAnswer(models.Model):
     answer_choices = (
         ("1", "گزینه 1"),
         ("2", "گزینه 2"),
         ("3", "گزینه 3"),
         ("4", "گزینه 4"),
     )
-
-    exam_unit = models.ForeignKey(to=ExamUnit, on_delete=models.CASCADE, verbose_name="درس آزمون",
-                                  related_name="answers")
 
     exam = models.ForeignKey(to="Exam", on_delete=models.CASCADE, verbose_name="آزمون")
 
@@ -220,7 +201,7 @@ class Answer(models.Model):
         return f"{self.true_answer}"
 
     class Meta:
-        db_table = 'course__answer'
+        db_table = 'course__exam_answer'
         verbose_name = 'پاسخ آزمون'
         verbose_name_plural = 'پاسخ‌های آزمون'
 
@@ -292,3 +273,9 @@ class Exam(models.Model):
         db_table = 'course__exam'
         verbose_name = 'آزمون'
         verbose_name_plural = 'آزمون‌ها'
+
+
+# class ExamBaseInfo(models.Model):
+#     fr0m = models.SmallIntegerField(verbose_name='از شماره')
+#
+#     t0 = models.SmallIntegerField(verbose_name='تا شماره')

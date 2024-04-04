@@ -225,7 +225,7 @@
                                                             </span><!-- end inactive icon -->
 
                                                             <span
-                                                                    class="font-semibold text-sm whitespace-nowrap">سرفصلها</span>
+                                                                    class="font-semibold text-sm whitespace-nowrap">بخش‌های آزمون</span>
                                                         </button>
                                                     </li><!-- end tabs:list:item -->
 
@@ -255,7 +255,7 @@
                                                         <div class="w-1 h-1 bg-foreground rounded-full"></div>
                                                         <div class="w-2 h-2 bg-foreground rounded-full"></div>
                                                     </div>
-                                                    <div class="font-black text-foreground">معرفی دوره</div>
+                                                    <div class="font-black text-foreground">{{ exam.name }}</div>
                                                 </div>
 
                                                 <!-- course:description -->
@@ -273,136 +273,63 @@
                                                         <div class="w-1 h-1 bg-foreground rounded-full"></div>
                                                         <div class="w-2 h-2 bg-foreground rounded-full"></div>
                                                     </div>
-                                                    <div class="font-black text-foreground">سرفصلها</div>
+                                                    <div class="font-black text-foreground">بخش‌های آزمون</div>
                                                 </div>
                                                 <!-- end section:title -->
 
-                                                <!-- course:sections:wrapper -->
-                                                <div class="flex flex-col space-y-3">
-                                                    <!-- course:section:accordion -->
-                                                    <div class="w-full" x-data="{ open: false }">
-                                                        <!-- accordion:button -->
-                                                        <button type="button"
-                                                                class="w-full h-14 flex items-center justify-between gap-x-2 relative bg-secondary rounded-2xl transition hover:text-foreground px-5"
-                                                                x-bind:class="open ? 'text-foreground' : 'text-muted'"
-                                                                x-on:click="open = !open">
-                                                            <span class="flex items-center gap-3 text-right">
-                                                                <span
-                                                                        class="font-semibold text-xs text-foreground line-clamp-1">
-                                                                    فصل اول
-                                                                </span>
-                                                                <div class="w-1 h-1 bg-muted-foreground rounded-full">
-                                                                </div>
-                                                                <span class="font-semibold text-xs"> معرفی</span>
-                                                            </span>
-                                                            <span x-bind:class="open ? 'rotate-180' : ''">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                     viewBox="0 0 24 24" stroke-width="1.5"
-                                                                     stroke="currentColor" class="w-5 h-5">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                          d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                        <!-- end accordion:button -->
-
-                                                        <!-- accordion:content -->
-                                                        <div class="flex flex-col relative py-3 sm:pr-8 sm:pl-16"
-                                                             x-show="open">
-                                                            <!-- course:section:episodes:wrapper -->
-                                                            <div class="space-y-1">
-                                                                <!-- episode -->
-                                                                <div
-                                                                        class="flex sm:flex-nowrap flex-wrap items-center gap-3 sm:h-12 border border-border rounded-xl p-3">
-                                                                    <span class="text-xs text-muted">۱</span>
-                                                                    <div
-                                                                            class="w-1 h-1 bg-muted-foreground rounded-full">
-                                                                    </div>
-                                                                    <a href="#"
-                                                                       class="font-semibold text-xs text-foreground line-clamp-1 transition-all hover:underline">
-                                                                        معرفی دوره
-                                                                    </a>
-                                                                    <div
-                                                                            class="flex items-center justify-end gap-3 sm:w-auto w-full mr-auto">
-                                                                    </div>
-                                                                </div>
-
+                                                {% for section in sections_names %}
+                                                    <div class="space-y-1 mb-2">
+                                                        <!-- episode -->
+                                                        <div class="flex sm:flex-nowrap flex-wrap items-center gap-3 sm:h-12 border border-border rounded-xl p-3">
+                                                            <span class="text-xs text-muted">{{ forloop.counter }}</span>
+                                                            <div class="w-1 h-1 bg-muted-foreground rounded-full">
                                                             </div>
-                                                            <!-- end course:section:episodes:wrapper -->
+                                                            <p class="font-semibold text-xs text-foreground line-clamp-1 transition-all hover:text-primary">
+                                                                {{ section }}
+                                                            </p>
+                                                            <div class="flex items-center justify-end gap-3 sm:w-auto w-full mr-auto">
+                                                            </div>
                                                         </div>
-                                                        <!-- end accordion:content -->
                                                     </div>
-                                                    <!-- end course:sections:accordion -->
+                                                {% endfor %}
 
-                                                    <!-- course:section:accordion -->
-                                                    <div class="w-full" x-data="{ open: false }">
-                                                        <!-- accordion:button -->
-                                                        <button type="button"
-                                                                class="w-full h-14 flex items-center justify-between gap-x-2 relative bg-secondary rounded-2xl transition hover:text-foreground px-5"
-                                                                x-bind:class="open ? 'text-foreground' : 'text-muted'"
-                                                                x-on:click="open = !open">
-                                                            <span class="flex items-center gap-3 text-right">
-                                                                <span
-                                                                        class="font-semibold text-xs text-foreground line-clamp-1">
-                                                                    فصل دوم
-                                                                </span>
-                                                                <div class="w-1 h-1 bg-muted-foreground rounded-full">
-                                                                </div>
-                                                                <span class="font-semibold text-xs">
-                                                                    پیاده سازی ساختار پروژه
-                                                                </span>
-                                                            </span>
-                                                            <span x-bind:class="open ? 'rotate-180' : ''">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                     viewBox="0 0 24 24" stroke-width="1.5"
-                                                                     stroke="currentColor" class="w-5 h-5">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                          d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
-                                                                </svg>
-                                                            </span>
-                                                        </button><!-- end accordion:button -->
-
-                                                        <!-- accordion:content -->
-                                                        <div class="flex flex-col relative py-3 sm:pr-8 sm:pl-16"
-                                                             x-show="open">
-                                                            <!-- course:section:episodes wrapper -->
-                                                            <div class="space-y-1">
-                                                                <!-- episode -->
-                                                                <div
-                                                                        class="flex sm:flex-nowrap flex-wrap items-center gap-3 sm:h-12 border border-border rounded-xl p-3">
-                                                                    <span class="text-xs text-muted">۱</span>
-                                                                    <div
-                                                                            class="w-1 h-1 bg-muted-foreground rounded-full">
-                                                                    </div>
-                                                                    <a href="#"
-                                                                       class="font-semibold text-xs text-foreground line-clamp-1 transition-all hover:underline">
-                                                                        چه زمانی از next و چه زمانی از react استفاده
-                                                                        کنیم؟
-                                                                    </a>
-
-                                                                </div>
-                                                                <!-- end episode -->
-
-
-                                                            </div>
-                                                            <!-- end course:section:episodes wrapper -->
-                                                        </div><!-- end accordion:content -->
-                                                    </div>
-                                                    <!-- end course:section:accordion -->
-                                                </div>
-                                                <!-- end course:sections:wrapper -->
                                             </div>
                                             <!-- end tabs:contents:tabTwo -->
-                                            <a href="{% url 'course:enter_exam' exam.slug %}"
-                                               class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
-                                                <span class="line-clamp-1 font-semibold text-sm">  شروع آزمون و دانلود سوالات</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                     fill="currentColor" class="w-5 h-5">
-                                                    <path fill-rule="evenodd"
-                                                          d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
-                                                          clip-rule="evenodd"></path>
-                                                </svg>
-                                            </a>
+
+                                            {% if is_user_registered %}
+                                                <a href="{% url 'course:enter_exam' exam.slug %}"
+                                                   class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                    <span class="line-clamp-1 font-semibold text-sm">  دانلود سوالات و شروع آزمون</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                         fill="currentColor" class="w-5 h-5">
+                                                        <path fill-rule="evenodd"
+                                                              d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                              clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </a>
+                                            {% elif exam.type == "F" %}
+                                                <a href="{% url 'course:register_exam' exam.slug %}"
+                                                   class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                    <span class="line-clamp-1 font-semibold text-sm">ثبت نام در آزمون</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                         fill="currentColor" class="w-5 h-5">
+                                                        <path fill-rule="evenodd"
+                                                              d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                              clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'course:register_exam' exam.slug %}"
+                                                   class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                    <span class="line-clamp-1 font-semibold text-sm">افزودن به سبد خرید</span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                         fill="currentColor" class="w-5 h-5">
+                                                        <path fill-rule="evenodd"
+                                                              d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                                              clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </a>
+                                            {% endif %}
 
                                         </div>
                                         <!-- end tabs:contents -->

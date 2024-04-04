@@ -1,10 +1,12 @@
-from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.utils.encoding import uri_to_iri
 from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Course.mixins import CanUserEnterExamMixin
-from Course.models import VideoCourse, Exam
+from Course.models import VideoCourse, Exam, ExamSection, ExamAnswer
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
 
@@ -67,15 +69,39 @@ class ExamDetail(URLStorageMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        user = self.request.user
+
+        sections = ExamAnswer.objects.filter(exam=self.object)
+        section_names = list(set(sections.values_list('section__name', flat=True)))
+
         banner_4 = Banner4.objects.filter(can_be_shown=True).last()  # Returns a single object
         banner_5 = Banner5.objects.filter(can_be_shown=True).last()  # Returns a single object
+        is_user_registered = Exam.objects.filter(participated_users=user, slug=self.object.slug).exists()
 
         context['banner_4'] = banner_4
         context['banner_5'] = banner_5
+        context['is_user_registered'] = is_user_registered
+        context['sections_names'] = section_names
 
         return context
 
 
-class ExamEntrance(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, View):
+class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, View):
     def get(self, request, *args, **kwargs):
         pass
+
+
+class RegisterExam(AuthenticatedUsersOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        slug = kwargs.get("slug")
+        user = request.user
+        exam = Exam.objects.get(slug=slug)
+
+        if exam.type == "F":
+            exam.participated_users.add(user)
+            messages.success(request, f"ثبت نام در آزمون {exam.name} با موفقیت انجام شد.")
+
+        else:
+            messages.warning(request, f"آزمون {exam.name} به سبد خرید شما افزوده شد.")
+
+        return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
