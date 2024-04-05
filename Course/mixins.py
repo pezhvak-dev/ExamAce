@@ -1,11 +1,13 @@
+from datetime import datetime
+
+import pytz
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
-from jdatetime import datetime
 
 from Account.models import CustomUser
 from Course.models import Exam, EnteredExamUser, DownloadedQuestionFile
+from utils.useful_functions import get_time_difference
 
 
 class CanUserEnterExamMixin:
@@ -35,15 +37,21 @@ class CheckForExamTimeMixin:
         user = request.user
 
         exam = Exam.objects.get(slug=slug)
-        downloaded_question_file = DownloadedQuestionFile.objects.get(exam=exam, user=user)
-        start = downloaded_question_file.created_at
-        delta = timezone.now() - start
+        if EnteredExamUser.objects.filter(exam=exam, user=user).exists():
+            entered_exam_user = EnteredExamUser.objects.get(exam=exam, user=user)
 
-        if delta.total_seconds() > exam.total_duration.total_seconds():
-            # Print a message if time is up
-            messages.error(request, f"متاسفانه زمان شما به اتمام رسیده و امکان شرکت در آزمون برای شما فراهم نیست.")
+            date_1 = entered_exam_user.created_at
+            date_2 = datetime.now(pytz.timezone('Iran'))
 
-            return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
+            total_duration = exam.total_duration.total_seconds()
+            difference = get_time_difference(date_1=date_1, date_2=date_2)
+
+            time_left = int(total_duration - difference)
+
+            if time_left < 0:
+                messages.error(request, f"متاسفانه زمان شما به اتمام رسیده و امکان شرکت در آزمون برای شما فراهم نیست.")
+
+                return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -55,5 +63,34 @@ class AllowedExamsOnlyMixin:
 
         if not exam.is_entrance_allowed:
             messages.error(request, f"با عرض پوزش، در حال حاضر شرکت در آزمون {exam.name} امکان پذیر نیست.")
+
+            return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class DownloadedQuestionsFileFirstMixin:
+    def dispatch(self, request, *args, **kwargs):
+        slug = kwargs.get('slug')
+        user = request.user
+
+        if not DownloadedQuestionFile.objects.filter(exam__slug=slug, user=user).exists():
+            messages.error(request, f"جهت ورود به آزمون، ابتدا باید فایل سوالات را دانلود کنید.")
+
+            return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class AllowedFilesDownloadMixin:
+    def dispatch(self, request, *args, **kwargs):
+        slug = kwargs.get('slug')
+
+        exam = Exam.objects.get(slug=slug)
+
+        if not exam.is_downloading_question_files_allowed:
+            messages.error(request, f"متاسفانه امکان دانلود فایل آزمون {exam.name} فراهم نیست.")
+
+            return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
 
         return super().dispatch(request, *args, **kwargs)

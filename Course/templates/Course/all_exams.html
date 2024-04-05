@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="flex flex-col min-h-screen bg-background">
-    {% include 'includes/header.html' %}
+        {% include 'includes/header.html' %}
 
         <main class="flex-auto py-5">
             <div class="max-w-7xl space-y-14 px-4 mx-auto">
@@ -20,8 +20,8 @@
                             </svg>
                         </span>
                         <div class="flex flex-col space-y-2">
-                            <span class="font-black xs:text-2xl text-lg text-primary">دوره های آموزشی</span>
-                            <span class="font-semibold text-xs text-muted">دوره ببین، تمرین کن، برنامه نویس شو</span>
+                            <span class="font-black xs:text-2xl text-lg text-primary">آزمون‌های سایت ما</span>
+                            <span class="font-semibold text-xs text-muted">دوره‌ها رو ببین، آموزشو کامل کن، بیا آزمون بده!</span>
                         </div>
                     </div>
                     <!-- end section:title -->
@@ -115,18 +115,18 @@
                                                             <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
                                                                 <img src="{{ exam.teacher.image.url }}"
                                                                      class="w-full h-full object-cover"
-                                                                     alt="مدرس دوره {{ exam.name }}"/>
+                                                                     alt="طراح آزمون {{ exam.name }}"/>
                                                             </div>
                                                         {% else %}
                                                             <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
                                                                 <img src="{% static 'images/avatars/teacher.JPG' %}"
                                                                      class="w-full h-full object-cover"
-                                                                     alt="مدرس دوره {{ exam.name }}"/>
+                                                                     alt="طراح آزمون {{ exam.name }}"/>
                                                             </div>
                                                         {% endif %}
 
                                                         <div class="flex flex-col items-start space-y-1">
-                                                        <span class="line-clamp-1 font-semibold text-xs text-muted">طراح آزمون</span>
+                                                            <span class="line-clamp-1 font-semibold text-xs text-muted">طراح آزمون</span>
                                                             <a href="{% url 'account:profile' exam.designer.slug %}"
                                                                class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ exam.designer.full_name }}</a>
                                                         </div>
@@ -156,7 +156,7 @@
                                                 <div class="flex gap-3 mt-3">
                                                     <a href="{% url 'course:exam_detail' exam.slug %}"
                                                        class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
-                                                        <span class="line-clamp-1 font-semibold text-sm">مشاهده دوره</span>
+                                                        <span class="line-clamp-1 font-semibold text-sm">مشاهده آزمون</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                              fill="currentColor" class="w-5 h-5">
                                                             <path fill-rule="evenodd"
@@ -188,6 +188,6 @@
             </div>
         </main>
 
-    {% include 'includes/footer.html' %}
+        {% include 'includes/footer.html' %}
     </div>
 {% endblock %}

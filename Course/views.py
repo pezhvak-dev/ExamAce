@@ -1,16 +1,21 @@
+from datetime import datetime
+
+import pytz
 from django.contrib import messages
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import uri_to_iri
-from django.views.generic import ListView, DetailView, View, TemplateView
+from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
-from Course.mixins import CanUserEnterExamMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin
-from Course.models import VideoCourse, Exam, ExamSection, ExamAnswer, DownloadedQuestionFile, EnteredExamUser
+from Course.mixins import CanUserEnterExamMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
+    DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin
+from Course.models import VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
+from utils.useful_functions import get_time_difference
 
 
 class AllVideoCourses(URLStorageMixin, ListView):
@@ -74,15 +79,21 @@ class ExamDetail(URLStorageMixin, DetailView):
         user = self.request.user
 
         #  Checks if user can enter exam anymore or not. (Based on entrance time)
-        can_enter_exam = True
-        if DownloadedQuestionFile.objects.filter(user=user, exam=self.object).exists():
-            downloaded_question_file = DownloadedQuestionFile.objects.get(user=user, exam=self.object)
+        is_time_up = False
+        if EnteredExamUser.objects.filter(user=user, exam=self.object).exists():
+            entered_exam_user = EnteredExamUser.objects.get(user=user, exam=self.object)
 
-            start = downloaded_question_file.created_at
-            delta = timezone.now() - start
+            date_1 = entered_exam_user.created_at
+            date_2 = datetime.now(pytz.timezone('Iran'))
 
-            if delta.total_seconds() > self.object.total_duration.total_seconds():
-                can_enter_exam = False
+            total_duration = self.object.total_duration.total_seconds()
+
+            difference = get_time_difference(date_1=date_1, date_2=date_2)
+
+            time_left = int(total_duration - difference)
+
+            if time_left < 0:
+                is_time_up = True
 
         can_be_continued = False
         if EnteredExamUser.objects.filter(user=user, exam=self.object).exists():
@@ -102,7 +113,7 @@ class ExamDetail(URLStorageMixin, DetailView):
 
         context['banner_4'] = banner_4  # Returns a single object
         context['banner_5'] = banner_5  # Returns a single object
-        context['can_enter_exam'] = can_enter_exam  # Returns a boolean
+        context['is_time_up'] = is_time_up  # Returns a boolean
         context['is_user_registered'] = is_user_registered  # Returns a boolean
         context['can_be_continued'] = can_be_continued  # Returns a boolean
         context['sections_names'] = section_names  # Returns a list
@@ -110,7 +121,7 @@ class ExamDetail(URLStorageMixin, DetailView):
         return context
 
 
-class RegisterExam(AuthenticatedUsersOnlyMixin, URLStorageMixin, View):
+class RegisterExam(AuthenticatedUsersOnlyMixin, AllowedExamsOnlyMixin, URLStorageMixin, View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get("slug")
         user = request.user
@@ -126,7 +137,8 @@ class RegisterExam(AuthenticatedUsersOnlyMixin, URLStorageMixin, View):
         return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
 
 
-class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, URLStorageMixin, View):
+class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, AllowedFilesDownloadMixin,
+                           CanUserEnterExamMixin, URLStorageMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get('slug')
@@ -143,8 +155,8 @@ class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, U
         return response
 
 
-class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, CheckForExamTimeMixin,
-                AllowedExamsOnlyMixin, URLStorageMixin, View):
+class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, AllowedExamsOnlyMixin,
+                CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, URLStorageMixin, View):
     template_name = "Course/multiple_choice_exam.html"
 
     def get(self, request, *args, **kwargs):
@@ -155,3 +167,16 @@ class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, CheckForExam
 
         if not EnteredExamUser.objects.filter(exam=exam, user=user).exists():
             EnteredExamUser.objects.create(exam=exam, user=user)
+
+        entered_exam_user = EnteredExamUser.objects.get(exam=exam, user=user)
+
+        date_1 = entered_exam_user.created_at
+        date_2 = datetime.now(pytz.timezone('Iran'))
+
+        total_duration = exam.total_duration.total_seconds()
+
+        difference = get_time_difference(date_1=date_1, date_2=date_2)
+
+        time_left = int(total_duration - difference)
+
+        return render(request=request, template_name=self.template_name)

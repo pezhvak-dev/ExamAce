@@ -298,15 +298,16 @@
                                                 </a>
                                             {% endif %}
                                             {% if exam.is_entrance_allowed %}
-                                                {% if can_enter_exam %}
+                                                {% if not is_time_up %}
                                                     {% if is_user_registered %}
                                                         {% if can_be_continued %}
                                                             <a href="{% url 'course:enter_exam' exam.slug %}"
-                                                               class="w-full h-11 inline-flex items-center justify-center gap-1 bg-warning rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                               class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
                                                                 <span class="line-clamp-1 font-semibold text-sm">ادامه آزمون</span>
-                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                     viewBox="0 0 20 20"
-                                                                     fill="currentColor" class="w-5 h-5">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                     viewBox="0 0 24 24" stroke-width="1.5"
+                                                                     stroke="currentColor"
+                                                                     class="w-5 h-5">
                                                                     <path fill-rule="evenodd"
                                                                           d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
                                                                           clip-rule="evenodd">
@@ -315,11 +316,12 @@
                                                             </a>
                                                         {% else %}
                                                             <a href="{% url 'course:enter_exam' exam.slug %}"
-                                                               class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                               class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
                                                                 <span class="line-clamp-1 font-semibold text-sm">شروع آزمون</span>
-                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                     viewBox="0 0 20 20"
-                                                                     fill="currentColor" class="w-5 h-5">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                     viewBox="0 0 24 24" stroke-width="1.5"
+                                                                     stroke="currentColor"
+                                                                     class="w-5 h-5">
                                                                     <path fill-rule="evenodd"
                                                                           d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
                                                                           clip-rule="evenodd">
@@ -329,34 +331,45 @@
                                                         {% endif %}
                                                     {% elif exam.type == "F" %}
                                                         <a href="{% url 'course:register_exam' exam.slug %}"
-                                                           class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                           class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
                                                             <span class="line-clamp-1 font-semibold text-sm">ثبت نام در آزمون</span>
-                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                                 fill="currentColor" class="w-5 h-5">
-                                                                <path fill-rule="evenodd"
-                                                                      d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
-                                                                      clip-rule="evenodd">
-                                                                </path>
-                                                            </svg>
-                                                        </a>
-                                                    {% elif exam.type == "P" %}
-                                                        <a href="#"
-                                                           class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
-                                                            <span class="line-clamp-1 font-semibold text-sm">افزودن به سبد خرید</span>
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                                  viewBox="0 0 24 24" stroke-width="1.5"
                                                                  stroke="currentColor" class="w-5 h-5">
                                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                                       d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z">
-
+                                                                </path>
+                                                            </svg>
+                                                        </a>
+                                                    {% elif exam.type == "P" %}
+                                                        <a href="#"
+                                                           class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
+                                                            <span class="line-clamp-1 font-semibold text-sm">ثبت نام در آزمون</span>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                 viewBox="0 0 24 24" stroke-width="1.5"
+                                                                 stroke="currentColor" class="w-5 h-5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z">
                                                                 </path>
                                                             </svg>
                                                         </a>
                                                     {% endif %}
+                                                {% else %}
+                                                    <p class="w-full h-11 inline-flex items-center justify-center gap-1 bg-error rounded-full text-primary-foreground transition-all px-4">
+                                                        <span class="line-clamp-1 font-semibold text-sm">اتمام زمان</span>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                             viewBox="0 0 24 24" stroke-width="1.5"
+                                                             stroke="currentColor"
+                                                             class="w-5 h-5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z">
+                                                            </path>
+                                                        </svg>
+                                                    </p>
                                                 {% endif %}
                                             {% else %}
                                                 <p class="w-full h-11 inline-flex items-center justify-center gap-1 bg-error rounded-full text-primary-foreground transition-all px-4">
-                                                    <span class="line-clamp-1 font-semibold text-sm">غیر مجاز</span>
+                                                    <span class="line-clamp-1 font-semibold text-sm">غیر قابل دسترس</span>
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                          viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                                          class="w-5 h-5">

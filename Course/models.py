@@ -225,7 +225,7 @@ class Exam(models.Model):
 
     designer = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="طراح", editable=False)
 
-    name = models.CharField(max_length=100, unique=True, verbose_name='نام دوره')
+    name = models.CharField(max_length=100, unique=True, verbose_name='نام آزمون')
 
     slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
 
@@ -291,7 +291,7 @@ class DownloadedQuestionFile(models.Model):
 
     exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
 
-    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
     def __str__(self):
         return f"{self.user.username} - {self.exam.name}"
@@ -308,7 +308,7 @@ class EnteredExamUser(models.Model):
 
     exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
 
-    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
     def __str__(self):
         return f"{self.user} - {self.exam.name}"

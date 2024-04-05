@@ -1,6 +1,9 @@
 import os
 import secrets
 import string
+from datetime import datetime
+
+import pytz
 
 
 def generate_token(token_length):
@@ -24,3 +27,37 @@ def duration_hour_to_seconds(duration_str):
 
 def get_file_size(file_path):
     return os.path.getsize(file_path)
+
+
+
+def get_time_difference(date_1, date_2):
+    """
+    Calculates the time difference in seconds between two dates,
+    handling potential timezone information.
+
+    Args:
+        date_1 (datetime): The first date.
+        date_2 (datetime): The second date.
+
+    Returns:
+        float: The time difference in seconds.
+
+    Raises:
+        TypeError: If either input is not a datetime object.
+    """
+
+    if not isinstance(date_1, datetime) or not isinstance(date_2, datetime):
+        raise TypeError("ورودی‌ها از یک نوع نمی‌باشد.")
+
+    if not date_1.tzinfo:
+        date_1 = date_1.replace(tzinfo=pytz.utc)
+
+    if not date_2.tzinfo:
+        date_2 = date_2.replace(tzinfo=pytz.utc)
+
+    date1_utc = date_1.astimezone(pytz.utc)
+    date2_utc = date_2.astimezone(pytz.utc)
+
+    time_difference = (date2_utc - date1_utc).total_seconds()
+
+    return time_difference
