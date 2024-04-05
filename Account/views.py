@@ -234,7 +234,7 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, UpdateView):
         return reverse('account:profile', kwargs={'slug': self.request.user.username})
 
 
-class NotificationListView(URLStorageMixin, AuthenticatedUsersOnlyMixin, ListView):
+class NotificationListView(AuthenticatedUsersOnlyMixin, ListView):
     model = Notification
     template_name = "Account/notifications.html"
     context_object_name = "notifications"
