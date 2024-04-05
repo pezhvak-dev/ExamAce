@@ -81,7 +81,7 @@ class LogInView(NonAuthenticatedUsersOnlyMixin, FormView):
 
 class LogOutView(View):
     def get(self, request):
-        redirect_url = request.session.get('current_url')
+        redirect_url = request.session.pop('current_url')
 
         logout(request=request)
 
@@ -213,7 +213,7 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class ProfileDetailView(URLStorageMixin, AuthenticatedUsersOnlyMixin, DetailView):
+class ProfileDetailView(AuthenticatedUsersOnlyMixin, DetailView):
     model = CustomUser
     template_name = 'Account/profile.html'
     context_object_name = 'user'

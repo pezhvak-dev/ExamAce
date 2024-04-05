@@ -92,7 +92,7 @@ class ExamDetail(URLStorageMixin, DetailView):
         return context
 
 
-class RegisterExam(AuthenticatedUsersOnlyMixin, View):
+class RegisterExam(AuthenticatedUsersOnlyMixin, URLStorageMixin, View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get("slug")
         user = request.user
@@ -108,7 +108,7 @@ class RegisterExam(AuthenticatedUsersOnlyMixin, View):
         return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
 
 
-class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, View):
+class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, URLStorageMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get('slug')
@@ -125,5 +125,5 @@ class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, V
         return response
 
 
-class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, TemplateView):
+class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, URLStorageMixin, TemplateView):
     template_name = "Course/multiple_choice_exam.html"
