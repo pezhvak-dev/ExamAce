@@ -232,7 +232,10 @@ class Exam(models.Model):
     category = models.ForeignKey(to=Category, on_delete=models.PROTECT, verbose_name='دسته بندی')
 
     questions_file = models.FileField(upload_to='Course/Exam/pdf', verbose_name='فایل سوالات آزمون',
-                                      validators=[FileExtensionValidator(allowed_extensions=["png", "pdf"])])
+                                      validators=[FileExtensionValidator(allowed_extensions=["pdf"])])
+
+    is_downloading_question_files_allowed = models.BooleanField(default=True,
+                                                                verbose_name='آیا دانلود سوالات آزمون مجاز است؟')
 
     question_file_name = models.CharField(max_length=100, unique=True, verbose_name='نام فایل', help_text="فقط انگلیسی",
                                           validators=[english_language_validator])
@@ -258,6 +261,8 @@ class Exam(models.Model):
     price_after_discount = models.PositiveSmallIntegerField(default=0, verbose_name='قیمت بعد از تخفیف')
 
     total_duration = models.DurationField(default=0, verbose_name='مدت آزمون')
+
+    is_entrance_allowed = models.BooleanField(default=True, verbose_name='آیا ورود به آزمون مجاز است؟')
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 

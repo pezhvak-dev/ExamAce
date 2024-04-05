@@ -2,11 +2,12 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.encoding import uri_to_iri
 from django.views.generic import ListView, DetailView, View, TemplateView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
-from Course.mixins import CanUserEnterExamMixin
+from Course.mixins import CanUserEnterExamMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin
 from Course.models import VideoCourse, Exam, ExamSection, ExamAnswer, DownloadedQuestionFile, EnteredExamUser
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
@@ -72,11 +73,26 @@ class ExamDetail(URLStorageMixin, DetailView):
 
         user = self.request.user
 
-        sections = ExamAnswer.objects.filter(exam=self.object)
-        section_names = list(set(sections.values_list('section__name', flat=True)))  # Returns a queryset
+        #  Checks if user can enter exam anymore or not. (Based on entrance time)
+        can_enter_exam = True
+        if DownloadedQuestionFile.objects.filter(user=user, exam=self.object).exists():
+            downloaded_question_file = DownloadedQuestionFile.objects.get(user=user, exam=self.object)
 
-        banner_4 = Banner4.objects.filter(can_be_shown=True).last()  # Returns a single object
-        banner_5 = Banner5.objects.filter(can_be_shown=True).last()  # Returns a single object
+            start = downloaded_question_file.created_at
+            delta = timezone.now() - start
+
+            if delta.total_seconds() > self.object.total_duration.total_seconds():
+                can_enter_exam = False
+
+        can_be_continued = False
+        if EnteredExamUser.objects.filter(user=user, exam=self.object).exists():
+            can_be_continued = True
+
+        sections = ExamAnswer.objects.filter(exam=self.object)
+
+        section_names = list(set(sections.values_list('section__name', flat=True)))
+        banner_4 = Banner4.objects.filter(can_be_shown=True).last()
+        banner_5 = Banner5.objects.filter(can_be_shown=True).last()
 
         try:
             is_user_registered = Exam.objects.filter(participated_users=user, slug=self.object.slug).exists()
@@ -84,10 +100,12 @@ class ExamDetail(URLStorageMixin, DetailView):
         except TypeError:
             is_user_registered = False
 
-        context['banner_4'] = banner_4
-        context['banner_5'] = banner_5
-        context['is_user_registered'] = is_user_registered
-        context['sections_names'] = section_names
+        context['banner_4'] = banner_4  # Returns a single object
+        context['banner_5'] = banner_5  # Returns a single object
+        context['can_enter_exam'] = can_enter_exam  # Returns a boolean
+        context['is_user_registered'] = is_user_registered  # Returns a boolean
+        context['can_be_continued'] = can_be_continued  # Returns a boolean
+        context['sections_names'] = section_names  # Returns a list
 
         return context
 
@@ -125,7 +143,8 @@ class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, U
         return response
 
 
-class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, URLStorageMixin, View):
+class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, CheckForExamTimeMixin,
+                AllowedExamsOnlyMixin, URLStorageMixin, View):
     template_name = "Course/multiple_choice_exam.html"
 
     def get(self, request, *args, **kwargs):
