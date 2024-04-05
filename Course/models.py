@@ -289,9 +289,26 @@ class DownloadedQuestionFile(models.Model):
     created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
 
     def __str__(self):
-        return f"{self.user.username} - {self.exam.name} - {self.created_at}"
+        return f"{self.user.username} - {self.exam.name}"
 
     class Meta:
         db_table = 'course__downloaded_question_file'
         verbose_name = "فایل دانلود شده"
         verbose_name_plural = "فایل‌های دانلود شده"
+
+
+class EnteredExamUser(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
+                             verbose_name="کاربر")
+
+    exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.user} - {self.exam.name}"
+
+    class Meta:
+        db_table = 'course__entered_exam_user'
+        verbose_name = "کاربر شرکت کرده در آزمون"
+        verbose_name_plural = "کاربران شرکت کرده در آزمون"

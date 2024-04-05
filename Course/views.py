@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView, View, TemplateView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Course.mixins import CanUserEnterExamMixin
-from Course.models import VideoCourse, Exam, ExamSection, ExamAnswer, DownloadedQuestionFile
+from Course.models import VideoCourse, Exam, ExamSection, ExamAnswer, DownloadedQuestionFile, EnteredExamUser
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
 
@@ -125,5 +125,14 @@ class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, U
         return response
 
 
-class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, URLStorageMixin, TemplateView):
+class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, URLStorageMixin, View):
     template_name = "Course/multiple_choice_exam.html"
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get('slug')
+
+        exam = Exam.objects.get(slug=slug)
+
+        if not EnteredExamUser.objects.filter(exam=exam, user=user).exists():
+            EnteredExamUser.objects.create(exam=exam, user=user)

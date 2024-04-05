@@ -24,3 +24,11 @@ class CanUserEnterExamMixin:
             return redirect("home:home")
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class CheckForExamTimeMixin:
+    def dispatch(self, request, *args, **kwargs):
+        slug = kwargs.get('slug')
+        user = request.user
+
+        exam = Exam.objects.get(slug=slug)
