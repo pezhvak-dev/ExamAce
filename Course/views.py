@@ -1,12 +1,13 @@
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.encoding import uri_to_iri
-from django.views.generic import ListView, DetailView, View
+from django.views.generic import ListView, DetailView, View, TemplateView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Course.mixins import CanUserEnterExamMixin
-from Course.models import VideoCourse, Exam, ExamSection, ExamAnswer
+from Course.models import VideoCourse, Exam, ExamSection, ExamAnswer, DownloadedQuestionFile
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
 
@@ -72,7 +73,7 @@ class ExamDetail(URLStorageMixin, DetailView):
         user = self.request.user
 
         sections = ExamAnswer.objects.filter(exam=self.object)
-        section_names = list(set(sections.values_list('section__name', flat=True)))
+        section_names = list(set(sections.values_list('section__name', flat=True)))  # Returns a queryset
 
         banner_4 = Banner4.objects.filter(can_be_shown=True).last()  # Returns a single object
         banner_5 = Banner5.objects.filter(can_be_shown=True).last()  # Returns a single object
@@ -84,11 +85,6 @@ class ExamDetail(URLStorageMixin, DetailView):
         context['sections_names'] = section_names
 
         return context
-
-
-class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, View):
-    def get(self, request, *args, **kwargs):
-        pass
 
 
 class RegisterExam(AuthenticatedUsersOnlyMixin, View):
@@ -105,3 +101,24 @@ class RegisterExam(AuthenticatedUsersOnlyMixin, View):
             messages.warning(request, f"آزمون {exam.name} به سبد خرید شما افزوده شد.")
 
         return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
+
+
+class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get('slug')
+        exam = Exam.objects.get(slug=slug)
+        questions_file = exam.questions_file
+
+        # Set headers for file download
+        response = HttpResponse(questions_file, content_type='application/force-download')
+        response['Content-Disposition'] = f'attachment; filename="{exam.question_file_name}.pdf"'
+
+        if not DownloadedQuestionFile.objects.filter(exam=exam, user=user).exists():
+            DownloadedQuestionFile.objects.create(exam=exam, user=user)
+
+        return response
+
+
+class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, TemplateView):
+    template_name = "Course/multiple_choice_exam.html"

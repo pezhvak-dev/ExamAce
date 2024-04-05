@@ -4,6 +4,8 @@ from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 from moviepy.editor import VideoFileClip
 
+from Home.validators import english_language_validator
+
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name='نام')
@@ -232,6 +234,9 @@ class Exam(models.Model):
     questions_file = models.FileField(upload_to='Course/Exam/pdf', verbose_name='فایل سوالات آزمون',
                                       validators=[FileExtensionValidator(allowed_extensions=["png", "pdf"])])
 
+    question_file_name = models.CharField(max_length=100, unique=True, verbose_name='نام فایل', help_text="فقط انگلیسی",
+                                          validators=[english_language_validator])
+
     description = CKEditor5Field(config_name="extends", verbose_name='درباره آزمون')
 
     cover_image = models.ImageField(upload_to='Course/Exam/cover_images', verbose_name='عکس کاور')
@@ -275,7 +280,18 @@ class Exam(models.Model):
         verbose_name_plural = 'آزمون‌ها'
 
 
-# class ExamBaseInfo(models.Model):
-#     fr0m = models.SmallIntegerField(verbose_name='از شماره')
-#
-#     t0 = models.SmallIntegerField(verbose_name='تا شماره')
+class DownloadedQuestionFile(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
+                             verbose_name="کاربر")
+
+    exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.exam.name} - {self.created_at}"
+
+    class Meta:
+        db_table = 'course__downloaded_question_file'
+        verbose_name = "فایل دانلود شده"
+        verbose_name_plural = "فایل‌های دانلود شده"
