@@ -77,7 +77,12 @@ class ExamDetail(URLStorageMixin, DetailView):
 
         banner_4 = Banner4.objects.filter(can_be_shown=True).last()  # Returns a single object
         banner_5 = Banner5.objects.filter(can_be_shown=True).last()  # Returns a single object
-        is_user_registered = Exam.objects.filter(participated_users=user, slug=self.object.slug).exists()
+
+        try:
+            is_user_registered = Exam.objects.filter(participated_users=user, slug=self.object.slug).exists()
+
+        except TypeError:
+            is_user_registered = False
 
         context['banner_4'] = banner_4
         context['banner_5'] = banner_5
