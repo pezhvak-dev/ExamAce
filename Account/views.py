@@ -213,13 +213,13 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class ProfileDetailView(AuthenticatedUsersOnlyMixin, DetailView):
+class ProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, DetailView):
     model = CustomUser
     template_name = 'Account/profile.html'
     context_object_name = 'user'
 
 
-class ProfileEditView(AuthenticatedUsersOnlyMixin, UpdateView):
+class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
     model = CustomUser
     template_name = 'Account/edit_profile.html'
     fields = ("full_name", "email", "about_me")
@@ -234,7 +234,7 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, UpdateView):
         return reverse('account:profile', kwargs={'slug': self.request.user.username})
 
 
-class NotificationListView(AuthenticatedUsersOnlyMixin, ListView):
+class NotificationListView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
     model = Notification
     template_name = "Account/notifications.html"
     context_object_name = "notifications"
