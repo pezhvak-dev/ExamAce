@@ -202,7 +202,7 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
 
 class FinalExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin,
                       CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, NonFinishedExamsOnlyMixin,
-                      URLStorageMixin, View):
+                      View):
 
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -254,7 +254,7 @@ class FinalExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, A
 
 class TempExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin,
                      CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, NonFinishedExamsOnlyMixin,
-                     URLStorageMixin, View):
+                     View):
     def post(self, request, *args, **kwargs):
         user = request.user
         exam_slug = self.kwargs['slug']
