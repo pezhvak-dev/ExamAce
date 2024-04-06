@@ -185,6 +185,8 @@ class ExamAnswer(models.Model):
         ("4", "گزینه 4"),
     )
 
+    question_number = models.PositiveSmallIntegerField(verbose_name="شماره سوال")
+
     exam = models.ForeignKey(to="Exam", on_delete=models.CASCADE, verbose_name="آزمون")
 
     section = models.ForeignKey(to="ExamSection", on_delete=models.CASCADE, verbose_name="بخش")
@@ -319,7 +321,34 @@ class EnteredExamUser(models.Model):
         verbose_name_plural = "کاربران شرکت کرده در آزمون"
 
 
-class UserAnswer(models.Model):
+class UserFinalAnswer(models.Model):
+    selected_answer_choices = (
+        ("1", "گزینه 1"),
+        ("2", "گزینه 2"),
+        ("3", "گزینه 3"),
+        ("4", "گزینه 4"),
+    )
+
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
+                             verbose_name="کاربر")
+
+    exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
+
+    question_number = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="شماره سوال")
+
+    selected_answer = models.CharField(max_length=10, blank=True, choices=selected_answer_choices, null=True,
+                                       verbose_name="گزینه انتخاب شده")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.exam.name} - {self.question_number} - {self.get_selected_answer_display()}"
+
+    class Meta:
+        db_table = 'course__user_final_answer'
+        verbose_name = "پاسخ نهایی کاربر"
+        verbose_name_plural = "پاسخ‌های نهایی کابران"
+
+
+class UserTempAnswer(models.Model):
     selected_answer_choices = (
         ("1", "گزینه 1"),
         ("2", "گزینه 2"),
@@ -340,6 +369,6 @@ class UserAnswer(models.Model):
         return f"{self.user.username} - {self.exam.name} - {self.question_number} - {self.get_selected_answer_display()}"
 
     class Meta:
-        db_table = 'course__user_answer'
-        verbose_name = "پاسخ کاربر"
-        verbose_name_plural = "پاسخ‌های کابران"
+        db_table = 'course__user_temp_answer'
+        verbose_name = "پاسخ موقت کاربر"
+        verbose_name_plural = "پاسخ‌های موقت کابران"

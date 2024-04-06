@@ -14,4 +14,5 @@ urlpatterns = [
     path('exam/<slug>', views.ExamDetail.as_view(), name='exam_detail'),
     path('books', views.AllBookCourses.as_view(), name='all_book_courses'),
     path('exam/<slug>/submit/final', views.FinalExamSubmit.as_view(), name='final_exam_submit'),
+    path('exam/<slug>/submit/temp', views.TempExamSubmit.as_view(), name='temp_exam_submit'),
 ]

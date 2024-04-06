@@ -1,11 +1,16 @@
 from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason, Exam, ExamAnswer, ExamSection, \
-    DownloadedQuestionFile, EnteredExamUser, UserAnswer
+    DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, UserTempAnswer
 
 
-class UserAnswerInline(admin.StackedInline):
-    model = UserAnswer
+class UserFinalAnswerInline(admin.StackedInline):
+    model = UserFinalAnswer
+    extra = 1
+
+
+class UserTempAnswerInline(admin.StackedInline):
+    model = UserTempAnswer
     extra = 1
 
 
@@ -69,7 +74,7 @@ class ExamAdmin(admin.ModelAdmin):
 
     prepopulated_fields = {'slug': ('name',)}
 
-    inlines = [ExamAnswerInline, UserAnswerInline, DownloadedQuestionFileInline, EnteredExamUserInline]
+    inlines = [ExamAnswerInline, UserTempAnswerInline,UserFinalAnswerInline]
 
     def save_model(self, request, obj, form, change):
         if not obj.designer_id:

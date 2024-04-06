@@ -6,11 +6,11 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from Account.models import CustomUser
-from Course.models import Exam, EnteredExamUser, DownloadedQuestionFile, UserAnswer
+from Course.models import Exam, EnteredExamUser, DownloadedQuestionFile, UserFinalAnswer
 from utils.useful_functions import get_time_difference
 
 
-class CanUserEnterExamMixin:
+class ParticipatedUsersOnlyMixin:
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         user = request.user
@@ -21,7 +21,7 @@ class CanUserEnterExamMixin:
         if not can_user_participate:
             redirect_url = request.session.get('current_url')
 
-            messages.error(request, f"جهت ورود به آزمون، ابتدا باید در آن ثبت نام کنید.")
+            messages.error(request, f"ابتدا در آزمون ثبت نام کنید!")
 
             if redirect_url is not None:
                 return redirect(redirect_url)
@@ -102,7 +102,7 @@ class NonFinishedExamsOnlyMixin:
         user = request.user
         exam = Exam.objects.get(slug=slug)
 
-        if UserAnswer.objects.filter(user=user, exam=exam).exists():
+        if UserFinalAnswer.objects.filter(user=user, exam=exam).exists():
             messages.error(request, f"شما قبلا پاسخنامه آزمون {exam.name} را ثبت کرده اید!")
 
             return redirect(reverse('course:exam_detail', kwargs={'slug': slug}))
