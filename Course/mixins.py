@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from Account.models import CustomUser
-from Course.models import Exam, EnteredExamUser, DownloadedQuestionFile
+from Course.models import Exam, EnteredExamUser, DownloadedQuestionFile, UserAnswer
 from utils.useful_functions import get_time_difference
 
 
@@ -92,5 +92,19 @@ class AllowedFilesDownloadMixin:
             messages.error(request, f"متاسفانه امکان دانلود فایل آزمون {exam.name} فراهم نیست.")
 
             return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class NonFinishedExamsOnlyMixin:
+    def dispatch(self, request, *args, **kwargs):
+        slug = kwargs.get('slug')
+        user = request.user
+        exam = Exam.objects.get(slug=slug)
+
+        if UserAnswer.objects.filter(user=user, exam=exam).exists():
+            messages.error(request, f"شما قبلا پاسخنامه آزمون {exam.name} را ثبت کرده اید!")
+
+            return redirect(reverse('course:exam_detail', kwargs={'slug': slug}))
 
         return super().dispatch(request, *args, **kwargs)

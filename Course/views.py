@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytz
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -11,8 +11,8 @@ from django.views.generic import ListView, DetailView, View
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Course.mixins import CanUserEnterExamMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
-    DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin
-from Course.models import VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser
+    DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin, NonFinishedExamsOnlyMixin
+from Course.models import VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser, UserAnswer
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
 from utils.useful_functions import get_time_difference
@@ -99,6 +99,10 @@ class ExamDetail(URLStorageMixin, DetailView):
         if EnteredExamUser.objects.filter(user=user, exam=self.object).exists():
             can_be_continued = True
 
+        has_finished_exam = False
+        if UserAnswer.objects.filter(user=user, exam=self.object).exists():
+            has_finished_exam = True
+
         sections = ExamAnswer.objects.filter(exam=self.object)
 
         section_names = list(set(sections.values_list('section__name', flat=True)))
@@ -116,6 +120,7 @@ class ExamDetail(URLStorageMixin, DetailView):
         context['is_time_up'] = is_time_up  # Returns a boolean
         context['is_user_registered'] = is_user_registered  # Returns a boolean
         context['can_be_continued'] = can_be_continued  # Returns a boolean
+        context['has_finished_exam'] = has_finished_exam  # Returns a boolean
         context['sections_names'] = section_names  # Returns a list
 
         return context
@@ -156,7 +161,9 @@ class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, AllowedFilesDownloadMixi
 
 
 class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, AllowedExamsOnlyMixin,
-                CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, URLStorageMixin, View):
+                CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, NonFinishedExamsOnlyMixin,
+                URLStorageMixin,View):
+
     template_name = "Course/multiple_choice_exam.html"
 
     def get(self, request, *args, **kwargs):
@@ -179,4 +186,38 @@ class EnterExam(AuthenticatedUsersOnlyMixin, CanUserEnterExamMixin, AllowedExams
 
         time_left = int(total_duration - difference)
 
-        return render(request=request, template_name=self.template_name)
+        answers = ExamAnswer.objects.values(
+            "choice_1", "choice_2",
+            "choice_3", "choice_4"
+        )
+
+        context = {
+            'time_left': time_left,
+            'answers': answers,
+            'slug': exam.slug
+        }
+
+        return render(request=request, template_name=self.template_name, context=context)
+
+
+class FinalExamSubmit(AuthenticatedUsersOnlyMixin, NonFinishedExamsOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        slug = self.kwargs.get("slug")
+        exam = get_object_or_404(Exam, slug=slug)
+
+        for key, value in request.POST.items():
+            if key.startswith('question_'):
+                question_number = int(key.replace('question_', ''))
+                selected_answer = value
+
+                UserAnswer.objects.create(
+                    user=user,
+                    exam=exam,
+                    question_number=question_number,
+                    defaults={'selected_answer': selected_answer}
+                )
+
+            messages.success(request, f"پاسخ نامه آزمون{exam.name} با موفقیت ثبت شد.")
+
+            return redirect(reverse('course:exam_detail', kwargs={'slug': slug}))

@@ -1,7 +1,12 @@
 from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason, Exam, ExamAnswer, ExamSection, \
-    DownloadedQuestionFile, EnteredExamUser
+    DownloadedQuestionFile, EnteredExamUser, UserAnswer
+
+
+class UserAnswerInline(admin.StackedInline):
+    model = UserAnswer
+    extra = 1
 
 
 class DownloadedQuestionFileInline(admin.StackedInline):
@@ -37,13 +42,16 @@ class VideoCourseAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
+
     prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(VideoSeason)
 class VideoSeasonAdmin(admin.ModelAdmin):
     list_display = ('course', 'number')
+
     list_filter = ('course',)
+
     search_fields = ('course__name',)
 
 
@@ -61,15 +69,17 @@ class ExamAdmin(admin.ModelAdmin):
 
     prepopulated_fields = {'slug': ('name',)}
 
-    inlines = [ExamAnswerInline, DownloadedQuestionFileInline, EnteredExamUserInline]
+    inlines = [ExamAnswerInline, UserAnswerInline, DownloadedQuestionFileInline, EnteredExamUserInline]
 
     def save_model(self, request, obj, form, change):
         if not obj.designer_id:
             obj.designer = request.user
+
         super().save_model(request, obj, form, change)
 
 
 @admin.register(ExamSection)
 class ExamSectionAdmin(admin.ModelAdmin):
     list_display = ("name",)
+
     prepopulated_fields = {'slug': ('name',)}

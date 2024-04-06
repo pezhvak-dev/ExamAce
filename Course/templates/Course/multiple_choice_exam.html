@@ -1,10 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block content %}
+    {% include 'includes/header.html' %}
+
+    <form id="examForm" method="post" action="{% url 'course:final_exam_submit' slug %}">
+        {% csrf_token %}
+
+        {% for answer in answers %}
+            <fieldset>
+                <legend>Question</legend>
+                {% for key, value in answer.items %}
+                    <div>
+                        <input type="radio" id="{{ key }}" name="question_{{ forloop.parentloop.counter }}"
+                               value="{{ value }}">
+                        <label for="{{ key }}">{{ value }}</label>
+                    </div>
+                {% endfor %}
+            </fieldset>
+            <hr>
+        {% endfor %}
+
+        <button type="button" id="submitBtn"
+                class="w-full h-11 inline-flex items-center justify-center gap-1 bg-red-500 rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
+            <span class="line-clamp-1 font-semibold text-sm">ثبت نهایی</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                 viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor"
+                 class="w-5 h-5">
+                <path fill-rule="evenodd"
+                      d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                      clip-rule="evenodd">
+                </path>
+            </svg>
+        </button>
+    </form>
+
+    {% include 'includes/footer.html' %}
+
+    <script src="{% static 'js/sweetalert2.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('examForm');
+            const submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.addEventListener('click', function () {
+                Swal.fire({
+                    title: 'آیا از ثبت نهایی اطمینان دارید؟',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'بله',
+                    cancelButtonText: 'لغو'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

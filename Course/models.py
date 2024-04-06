@@ -317,3 +317,29 @@ class EnteredExamUser(models.Model):
         db_table = 'course__entered_exam_user'
         verbose_name = "کاربر شرکت کرده در آزمون"
         verbose_name_plural = "کاربران شرکت کرده در آزمون"
+
+
+class UserAnswer(models.Model):
+    selected_answer_choices = (
+        ("1", "گزینه 1"),
+        ("2", "گزینه 2"),
+        ("3", "گزینه 3"),
+        ("4", "گزینه 4"),
+    )
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
+                             verbose_name="کاربر")
+
+    exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
+
+    question_number = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="شماره سوال")
+
+    selected_answer = models.CharField(max_length=10, blank=True, choices=selected_answer_choices, null=True,
+                                       verbose_name="گزینه انتخاب شده")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.exam.name} - {self.question_number} - {self.get_selected_answer_display()}"
+
+    class Meta:
+        db_table = 'course__user_answer'
+        verbose_name = "پاسخ کاربر"
+        verbose_name_plural = "پاسخ‌های کابران"
