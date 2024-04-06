@@ -252,7 +252,9 @@ class FinalExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, A
         return redirect(reverse("course:exam_detail", kwargs={"slug": exam_slug}))
 
 
-class TempExamSubmit(AuthenticatedUsersOnlyMixin, NonFinishedExamsOnlyMixin, View):
+class TempExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin,
+                     CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, NonFinishedExamsOnlyMixin,
+                     URLStorageMixin, View):
     def post(self, request, *args, **kwargs):
         user = request.user
         exam_slug = self.kwargs['slug']
