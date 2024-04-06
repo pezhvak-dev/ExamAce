@@ -5,9 +5,12 @@ from django.urls import reverse
 
 class NonAuthenticatedUsersOnlyMixin:
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect("account:profile")
-        return super(NonAuthenticatedUsersOnlyMixin, self).dispatch(request, *args, **kwargs)
+        redirect_url = request.session.get('current_url')
+
+        if redirect_url is not None:
+            return redirect(redirect_url)
+
+        return redirect("home:home")
 
 
 class AuthenticatedUsersOnlyMixin:

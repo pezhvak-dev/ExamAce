@@ -15,7 +15,7 @@ from Home.mixins import URLStorageMixin
 from Home.sms import send_register_sms, send_forget_password_sms
 
 
-class RegisterView(FormView):
+class RegisterView(NonAuthenticatedUsersOnlyMixin, FormView):
     template_name = "Account/register.html"
     form_class = OTPRegisterForm
 
@@ -79,7 +79,7 @@ class LogInView(NonAuthenticatedUsersOnlyMixin, FormView):
         return referring_url or reverse_lazy("account:profile")
 
 
-class LogOutView(View):
+class LogOutView(AuthenticatedUsersOnlyMixin, View):
     def get(self, request):
         redirect_url = request.session.pop('current_url')
 
@@ -90,7 +90,7 @@ class LogOutView(View):
         if redirect_url is not None:
             return redirect(redirect_url)
 
-        return redirect(to="home:home")
+        return redirect("home:home")
 
 
 class ChangePasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
@@ -188,7 +188,7 @@ class CheckOTPView(FormView):
 
             messages.success(request, f"{user.username} عزیز، حساب کاربری شما با موفقیت ایجاد شد.")
 
-            return redirect(to="account:profile", kwargs={"slug": request.user.username})
+            return redirect(reverse("account:profile", kwargs={"slug": user.username}))
 
         elif OTP.objects.filter(uuid=uuid, sms_code=sms_code, otp_type="F").exists():
             return redirect(reverse(viewname="account:change_password") + f"?uuid={uuid}")
@@ -202,7 +202,7 @@ class CheckOTPView(FormView):
             user_to_be_deleted.delete()
             otp.delete()
 
-            return redirect(to="home:home")
+            return redirect("home:home")
 
         else:
             form.add_error(field="sms_code", error="کد تایید نامعتبر است.")
