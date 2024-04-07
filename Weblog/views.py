@@ -74,3 +74,16 @@ class AddComment(AuthenticatedUsersOnlyMixin, View):
         messages.success(request, f"نظر شما با موفقیت ثبت شد.")
 
         return redirect(reverse("weblog:detail", kwargs={'slug': slug}))
+
+
+class DeleteComment(AuthenticatedUsersOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get('id')
+
+        comment = Comment.objects.get(id=id)
+        weblog = Weblog.objects.get(comments=comment)
+        comment.delete()
+
+        messages.success(request, f"نظر شما با موفقیت حذف شد.")
+
+        return redirect(reverse("weblog:detail", kwargs={'slug': weblog.slug}))
