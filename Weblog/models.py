@@ -101,3 +101,40 @@ class Weblog(models.Model):
         db_table = 'weblog__weblog'
         verbose_name = 'وبلاگ'
         verbose_name_plural = 'وبلاگ‌ها'
+
+
+class Comment(models.Model):
+    text = models.TextField(max_length=1000, verbose_name="متن")
+
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+
+    parent = models.ForeignKey(to="self", on_delete=models.CASCADE, verbose_name="والد", blank=True, null=True)
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
+
+    updated_at = jDateTimeField(auto_now=True, verbose_name='به‌روز‌رسانی شده در تاریخ')
+
+    def __str__(self):
+        return f"{self.user.username}"
+
+    class Meta:
+        db_table = 'weblog__comment'
+        verbose_name = 'کامنت'
+        verbose_name_plural = 'کامنت‌ها'
+
+
+class CommentLike(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, related_name='liked_comments',
+                             verbose_name='کاربر')
+
+    comment = models.ForeignKey(to=Comment, on_delete=models.CASCADE, verbose_name='وبلاگ')
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='ایجاد شده در تاریخ')
+
+    def __str__(self):
+        return f"{self.user.username}"
+
+    class Meta:
+        db_table = "weblog__comment_like"
+        verbose_name = "لایک کامنت"
+        verbose_name_plural = "لایک‌های کامنت"
