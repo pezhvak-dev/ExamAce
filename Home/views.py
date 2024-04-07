@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from Course.models import VideoCourse, Exam
@@ -93,3 +94,35 @@ class HomeView(URLStorageMixin, TemplateView):
         context['attitudes'] = attitudes  # Is a queryset
 
         return context
+
+
+class SearchView(TemplateView):
+    template_name = "Home/search_result.html"
+
+    def get(self, request, *args, **kwargs):
+        q = request.GET.get('q')
+
+        weblog_result = Weblog.objects.filter(
+            Q(title__icontains=q) |
+            Q(content__icontains=q))
+
+        news_result = News.objects.filter(
+            Q(title__icontains=q) |
+            Q(content__icontains=q))
+
+        video_course_result = VideoCourse.objects.filter(
+            Q(name__icontains=q) |
+            Q(description__icontains=q))
+
+        exams_result = Exam.objects.filter(
+            Q(name__icontains=q) |
+            Q(description__icontains=q))
+
+        context = {
+            'weblog_result': weblog_result,
+            'news_result': news_result,
+            'exams_result': exams_result,
+            'video_course_result': video_course_result,
+        }
+
+        return render(request=request, template_name=self.template_name, context=context)

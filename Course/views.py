@@ -21,7 +21,7 @@ from utils.useful_functions import get_time_difference
 
 class AllVideoCourses(URLStorageMixin, ListView):
     model = VideoCourse
-    context_object_name = 'courses'
+    context_object_name = 'video_courses'
     template_name = 'Course/all_video_courses.html'
 
     def get_queryset(self):
