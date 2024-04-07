@@ -369,8 +369,9 @@
                                                         </p>
                                                     {% endif %}
                                                 {% else %}
-                                                    <p class="w-full h-11 inline-flex items-center justify-center gap-1 bg-error rounded-full text-primary-foreground transition-all px-4">
-                                                        <span class="line-clamp-1 font-semibold text-sm">قبلا شرکت کرده اید</span>
+                                                    <a href="{% url 'course:calculate_exam_result' exam.slug %}"
+                                                       class="w-full h-11 inline-flex items-center justify-center gap-1 bg-error rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
+                                                        <span class="line-clamp-1 font-semibold text-sm">محاسبه جواب</span>
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                              viewBox="0 0 24 24" stroke-width="1.5"
                                                              stroke="currentColor"
@@ -379,7 +380,7 @@
                                                                   d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z">
                                                             </path>
                                                         </svg>
-                                                    </p>
+                                                    </a>
                                                 {% endif %}
                                             {% else %}
                                                 <p class="w-full h-11 inline-flex items-center justify-center gap-1 bg-error rounded-full text-primary-foreground transition-all px-4">

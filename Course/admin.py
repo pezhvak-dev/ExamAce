@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason, Exam, ExamAnswer, ExamSection, \
-    DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, UserTempAnswer
+    DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, UserTempAnswer, ExamUnit
 
 
 class UserFinalAnswerInline(admin.StackedInline):
@@ -85,6 +85,13 @@ class ExamAdmin(admin.ModelAdmin):
 
 @admin.register(ExamSection)
 class ExamSectionAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(ExamUnit)
+class ExamUnitAdmin(admin.ModelAdmin):
     list_display = ("name",)
 
     prepopulated_fields = {'slug': ('name',)}

@@ -2,10 +2,9 @@ from datetime import datetime
 
 import pytz
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.encoding import uri_to_iri
 from django.views.generic import ListView, DetailView, View
 
@@ -13,7 +12,7 @@ from Account.mixins import AuthenticatedUsersOnlyMixin
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin, NonFinishedExamsOnlyMixin
 from Course.models import VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, \
-    UserTempAnswer
+    UserTempAnswer, ExamSection, ExamUnit
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
 from utils.useful_functions import get_time_difference
@@ -253,8 +252,7 @@ class FinalExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, A
 
 
 class TempExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin,
-                     CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, NonFinishedExamsOnlyMixin,
-                     View):
+                     CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, View):
     def post(self, request, *args, **kwargs):
         user = request.user
         exam_slug = self.kwargs['slug']
@@ -286,3 +284,75 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Al
                 )
 
         return JsonResponse(data={}, status=200)
+
+
+class CalculateExamResult(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        slug = kwargs.get('slug')
+        user = request.user
+        exam = get_object_or_404(Exam, slug=slug)
+
+        user_final_answers = UserFinalAnswer.objects.filter(user=user, exam=exam).values("question_number",
+                                                                                         "selected_answer")
+
+        correct_answers = ExamAnswer.objects.filter(exam=exam).values("question_number", "true_answer",
+                                                                      "true_answer_explanation", "section_id",
+                                                                      "unit_id")
+
+        section_mapping = {section.id: section for section in
+                           ExamSection.objects.filter(examanswer__exam=exam).distinct()}
+
+        unit_mapping = {unit.id: unit for unit in ExamUnit.objects.filter(examanswer__exam=exam).distinct()}
+
+        # Create a dictionary to store the comparison results
+        answer_comparison = {}
+
+        # Convert querysets to dictionaries for easier lookup
+        user_final_answers_dict = {answer['question_number']: answer['selected_answer'] for answer in
+                                   user_final_answers}
+        correct_answers_dict = {answer['question_number']: {'true_answer': answer['true_answer'],
+                                                            'true_answer_explanation': answer[
+                                                                'true_answer_explanation'],
+                                                            'section_id': answer['section_id'],
+                                                            'unit_id': answer['unit_id']}
+                                for answer in correct_answers}
+
+        # Iterate over each question number in correct_answers_dict to populate answer_comparison
+        for question_number in correct_answers_dict:
+            correct_answer_info = correct_answers_dict[question_number]
+            correct_answer = correct_answer_info['true_answer']
+            true_answer_explanation = correct_answer_info['true_answer_explanation']
+            section_id = correct_answer_info['section_id']
+            unit_id = correct_answer_info['unit_id']
+            user_selected_answer = user_final_answers_dict.get(question_number)
+
+            # Fetch ExamSection and ExamUnit details using section_id and unit_id from the mappings
+            if section_id in section_mapping:
+                section = section_mapping[section_id]
+                section_name = section.name
+            else:
+                section_name = None
+
+            if unit_id in unit_mapping:
+                unit = unit_mapping[unit_id]
+                unit_coefficient = unit.coefficient
+            else:
+                unit_coefficient = None
+
+            # Check if user has not answered a question (selected_answer is None)
+            if user_selected_answer is None:
+                user_selected_answer = None
+                answered_correctly = False
+            else:
+                answered_correctly = (user_selected_answer == correct_answer)
+
+            answer_comparison[question_number] = {
+                'correct_answer': correct_answer,
+                'user_selected_answer': user_selected_answer,
+                'true_answer_explanation': true_answer_explanation,
+                'answered_correctly': answered_correctly,
+                'section_name': section_name,
+                'unit_coefficient': unit_coefficient
+            }
+
+        return JsonResponse(answer_comparison)

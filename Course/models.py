@@ -168,6 +168,8 @@ class ExamSection(models.Model):
 
     description = CKEditor5Field(config_name="extends", verbose_name="توضیحات", blank=True, null=True)
 
+    coefficient = models.SmallIntegerField(default=1, verbose_name="ضریب")
+
     def __str__(self):
         return f"{self.name}"
 
@@ -175,6 +177,24 @@ class ExamSection(models.Model):
         db_table = 'course__exam_section'
         verbose_name = 'بخش آزمون'
         verbose_name_plural = 'بخش‌های آزمون'
+
+
+class ExamUnit(models.Model):
+    name = models.CharField(max_length=100, verbose_name="نام")
+
+    slug = models.SlugField(allow_unicode=True, unique=True, verbose_name="اسلاگ")
+
+    description = CKEditor5Field(config_name="extends", verbose_name="توضیحات", blank=True, null=True)
+
+    coefficient = models.SmallIntegerField(default=1, verbose_name="ضریب درس")
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        db_table = 'course__exam_unit'
+        verbose_name = 'درس آزمون'
+        verbose_name_plural = 'دروس آزمون'
 
 
 class ExamAnswer(models.Model):
@@ -191,6 +211,8 @@ class ExamAnswer(models.Model):
 
     section = models.ForeignKey(to="ExamSection", on_delete=models.CASCADE, verbose_name="بخش")
 
+    unit = models.ForeignKey(to="ExamUnit", on_delete=models.CASCADE, verbose_name="درس")
+
     choice_1 = models.CharField(max_length=100, verbose_name="گزینه 1")
 
     choice_2 = models.CharField(max_length=100, verbose_name="گزینه 2")
@@ -200,6 +222,9 @@ class ExamAnswer(models.Model):
     choice_4 = models.CharField(max_length=100, verbose_name="گزینه 4")
 
     true_answer = models.CharField(max_length=1, choices=answer_choices, verbose_name="گزینه صحیح")
+
+    true_answer_explanation = CKEditor5Field(config_name="extends", blank=True, null=True,
+                                             verbose_name="توضیحات اضافه پاسخ صحیح")
 
     def __str__(self):
         return f"{self.true_answer}"
@@ -340,7 +365,7 @@ class UserFinalAnswer(models.Model):
                                        verbose_name="گزینه انتخاب شده")
 
     def __str__(self):
-        return f"{self.user.username} - {self.exam.name} - {self.question_number} - {self.get_selected_answer_display()}"
+        return f"{self.user.username} - {self.exam.name}"
 
     class Meta:
         db_table = 'course__user_final_answer'
@@ -366,7 +391,7 @@ class UserTempAnswer(models.Model):
                                        verbose_name="گزینه انتخاب شده")
 
     def __str__(self):
-        return f"{self.user.username} - {self.exam.name} - {self.question_number} - {self.get_selected_answer_display()}"
+        return f"{self.user.username} - {self.exam.name}"
 
     class Meta:
         db_table = 'course__user_temp_answer'
