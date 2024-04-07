@@ -1,10 +1,13 @@
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, get_list_or_404, redirect
+from django.urls import reverse
 from django.utils.encoding import uri_to_iri
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, View
 from hitcount.views import HitCountDetailView
 
+from Account.mixins import AuthenticatedUsersOnlyMixin
 from Home.mixins import URLStorageMixin
-from Weblog.models import Weblog
+from Weblog.models import Weblog, Comment
 
 
 class AllWeblogs(URLStorageMixin, ListView):
@@ -56,3 +59,18 @@ class WeblogsByCategory(URLStorageMixin, ListView):
         weblogs = get_list_or_404(Weblog, category__slug=slug)
 
         return weblogs
+
+
+class AddComment(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        text = request.POST.get('text')
+        parent_id = request.POST.get('parent_id')
+        slug = kwargs.get('slug')
+
+        weblog = get_object_or_404(Weblog, slug=slug)
+
+        Comment.objects.create(user=user, text=text, weblog=weblog, parent_id=parent_id)
+        messages.success(request, f"نظر شما با موفقیت ثبت شد.")
+
+        return redirect(reverse("weblog:detail", kwargs={'slug': slug}))

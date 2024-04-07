@@ -124,6 +124,7 @@ class Comment(models.Model):
         db_table = 'weblog__comment'
         verbose_name = 'کامنت'
         verbose_name_plural = 'کامنت‌ها'
+        ordering = ('-created_at',)
 
 
 class CommentLike(models.Model):
