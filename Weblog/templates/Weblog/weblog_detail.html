@@ -118,7 +118,7 @@
                                             <!-- tabs:contents:tabThree -->
                                             <div class="bg-background rounded-3xl p-5" id="tabThree">
                                                 <!-- section:title -->
-                                                <div class="flex items-center gap-3 mb-5">
+                                                <div id="reply_section" class="flex items-center gap-3 mb-5">
                                                     <div class="flex items-center gap-1">
                                                         <div class="w-1 h-1 bg-foreground rounded-full"></div>
                                                         <div class="w-2 h-2 bg-foreground rounded-full"></div>
@@ -140,8 +140,7 @@
                                                     </div>
                                                     <div class="flex flex-wrap items-center gap-3 mb-5">
                                                         <div class="flex items-center gap-3 sm:w-auto w-full">
-                                                            <div
-                                                                    class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
+                                                            <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
                                                                 <img src="{% static 'images/avatars/default_user.JPG' %}"
                                                                      class="w-full h-full object-cover" alt="..."/>
                                                             </div>
@@ -153,15 +152,14 @@
                                                             </div>
                                                         </div>
                                                         <span class="block w-1 h-1 bg-border rounded-full"></span>
-                                                        <span class="font-semibold text-xs text-muted">در پاسخ به</span>
+                                                        <span id="cancel_reply_to?" style="display: none" class="font-semibold text-xs text-muted">در پاسخ به</span>
                                                         <span class="block w-1 h-1 bg-border rounded-full"></span>
-                                                        <a href="#"
-                                                           class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary">جلال
-                                                            بهرامی راد</a>
-                                                        <button type="button"
-                                                                class="line-clamp-1 font-semibold text-sm text-red-500 mr-auto">
-                                                            لغو
-                                                            پاسخ
+                                                        <p id="reply_comment_id"
+                                                           class="line-clamp-1 font-semibold text-sm text-foreground hover:text-primary"></p>
+
+                                                        <button id="cancel_reply_btn" type="button" style="display: none"
+                                                                class="line-clamp-1 font-semibold text-sm text-red-500 mr-auto"
+                                                                onclick="cancelReply()">لغو پاسخ
                                                         </button>
                                                     </div>
 
@@ -178,8 +176,7 @@
                                                                   placeholder="متن مورد نظر خود را وارد کنید ..."></textarea>
                                                         <button type="submit"
                                                                 class="h-10 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4 mr-auto">
-                                                            <span class="font-semibold text-sm">ثبت دیدگاه یا
-                                                                پرسش</span>
+                                                            <span class="font-semibold text-sm">ثبت دیدگاه</span>
                                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                                                  fill="currentColor" class="w-5 h-5">
                                                                 <path fill-rule="evenodd"
@@ -221,8 +218,8 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="flex items-center gap-3 sm:mr-0 mr-auto">
-                                                                            <button onclick="setValue({{ comment.id }})"
-                                                                               class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
+                                                                            <button onclick="setValue('{{ comment.id }}', '{{ comment.user.username }}')"
+                                                                                    class="flex items-center h-9 gap-1 bg-secondary rounded-full text-muted transition-colors hover:text-primary px-4">
                                                                                 <span class="text-xs">پاسخ</span>
                                                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                                                      viewBox="0 0 20 20"
@@ -362,10 +359,32 @@
     </div>
 
     <script>
-        function setValue(id) {
+        function setValue(id, name) {
+            document.getElementById('cancel_reply_btn').style.display = "inline"
+            document.getElementById('cancel_reply_to?').style.display = "inline"
             document.getElementById('parent_id').value = id;
-            window.location.href = "#text"
+
+            // Set the reply_comment_id paragraph text to the username
+            document.getElementById('reply_comment_id').innerText = name;
+
+            // Scroll to the anchor point #reply_section with smooth animation
+            const replySection = document.getElementById('reply_section');
+            if (replySection) {
+                replySection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        function cancelReply() {
+            // Disable further reply functionality
+            document.getElementById('parent_id').value = ''; // Clear the parent_id value
+            document.getElementById('reply_comment_id').innerText = ''; // Clear the reply_comment_id text
+            document.getElementById('cancel_reply_btn').style.display = 'none'; // Hide the entire reply container
+            document.getElementById('cancel_reply_to?').style.display = 'none'; // Hide the entire reply container
         }
     </script>
+
 
 {% endblock %}
