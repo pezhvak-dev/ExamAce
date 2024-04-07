@@ -1,4 +1,5 @@
 from datetime import datetime
+from io import BytesIO
 
 import pytz
 from django.contrib import messages
@@ -355,4 +356,8 @@ class CalculateExamResult(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixi
                 'unit_coefficient': unit_coefficient
             }
 
-        return JsonResponse(answer_comparison)
+        context = {
+            "answer_comparison": answer_comparison,
+        }
+
+        return render(request, "Course/answer_results.html", context=context)

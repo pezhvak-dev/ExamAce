@@ -2988,3 +2988,12 @@ body, html {
     content: var(--tw-content);
     right: .75rem
 }
+
+
+.correct {
+    background-color: #ccffcc; /* Light green background for correct sections */
+}
+
+.incorrect {
+    background-color: #ffcccc; /* Light red background for incorrect sections */
+}
