@@ -23,7 +23,7 @@ class AllWeblogs(URLStorageMixin, ListView):
         return weblogs
 
 
-class WeblogDetail(URLStorageMixin,HitCountDetailView, DetailView):
+class WeblogDetail(URLStorageMixin, HitCountDetailView, DetailView):
     model = Weblog
     context_object_name = 'weblog'
     template_name = 'Weblog/weblog_detail.html'
@@ -114,4 +114,3 @@ class LikeComment(AuthenticatedUsersOnlyMixin, View):
             CommentLike.objects.create(comment=comment, user=user)
 
             return JsonResponse({"response": "liked"})
-
