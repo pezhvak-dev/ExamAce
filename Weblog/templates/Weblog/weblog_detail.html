@@ -193,8 +193,7 @@
                                                     <!-- course:comment -->
                                                     <div class="space-y-3">
 
-                                                        {% for comment in weblog.comments.all %}
-
+                                                        {% for comment in comments %}
                                                             {% if comment.parent == None %}
                                                                 <div class="bg-background border border-border rounded-3xl space-y-3 p-5">
                                                                     <div class="flex sm:flex-nowrap flex-wrap sm:flex-row flex-col sm:items-center sm:justify-between gap-5 border-b border-border pb-3">
@@ -245,25 +244,46 @@
                                                                                     </svg>
                                                                                 </button>
                                                                             {% endif %}
-                                                                            <button type="button"
-                                                                                    class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
-                                                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                                                     viewBox="0 0 20 20"
-                                                                                     fill="currentColor"
-                                                                                     class="w-5 h-5">
-                                                                                    <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
-                                                                                    </path>
-                                                                                </svg>
-                                                                                <span class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
-                                                                            {{ comment.comment_likes.all.count }}
-                                                                        </span>
-                                                                            </button>
+
+                                                                            {% if comment.id in user_likes %}
+                                                                                <button onclick="like({{ comment.id }})"
+                                                                                        id="like"
+                                                                                        type="button"
+                                                                                        class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-muted transition-colors text-red-500">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                         viewBox="0 0 20 20"
+                                                                                         fill="currentColor"
+                                                                                         class="w-5 h-5">
+                                                                                        <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                        </path>
+                                                                                    </svg>
+                                                                                    <span id="count" class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                        {{ comment.comment_likes.all.count }}
+                                                                                        </span>
+                                                                                </button>
+                                                                            {% else %}
+                                                                                <button onclick="like({{ comment.id }})"
+                                                                                        id="like"
+                                                                                        type="button"
+                                                                                        class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                         viewBox="0 0 20 20"
+                                                                                         fill="currentColor"
+                                                                                         class="w-5 h-5">
+                                                                                        <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                        </path>
+                                                                                    </svg>
+                                                                                    <span id="count" class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                        {{ comment.comment_likes.all.count }}
+                                                                                        </span>
+                                                                                </button>
+                                                                            {% endif %}
+
                                                                         </div>
                                                                     </div>
                                                                     <p class="text-sm text-muted">{{ comment.text }}
                                                                     </p>
                                                                 </div>
-
                                                                 {% for reply in comment.replies.all %}
                                                                     <!-- course:comment replies -->
                                                                     <div class="relative before:content-[''] before:absolute before:-top-3 before:right-8 before:w-px before:h-[calc(100%-24px)] before:bg-border after:content-[''] after:absolute after:bottom-9 after:right-8 after:w-8 after:h-px after:bg-border space-y-3 pr-16">
@@ -304,19 +324,34 @@
                                                                                             </svg>
                                                                                         </button>
                                                                                     {% endif %}
-                                                                                    <button type="button"
-                                                                                            class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
-                                                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                                                             viewBox="0 0 20 20"
-                                                                                             fill="currentColor"
-                                                                                             class="w-5 h-5">
-                                                                                            <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
-                                                                                            </path>
-                                                                                        </svg>
-                                                                                        <span class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
-                                                                                {{ reply.comment_likes.all.count }}
-                                                                            </span>
-                                                                                    </button>
+                                                                                    <form method="post"
+                                                                                          action="{% url 'weblog:like_comment' comment.id %}">
+                                                                                        {% csrf_token %}
+
+                                                                                        {% if reply.id in user_likes %}
+                                                                                            <button type="submit"
+                                                                                                    class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-muted transition-colors text-red-500">
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                                     viewBox="0 0 20 20"
+                                                                                                     fill="currentColor"
+                                                                                                     class="w-5 h-5">
+                                                                                                    <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                                    </path>
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                        {% else %}
+                                                                                            <button type="submit"
+                                                                                                    class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                                     viewBox="0 0 20 20"
+                                                                                                     fill="currentColor"
+                                                                                                     class="w-5 h-5">
+                                                                                                    <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                                    </path>
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                        {% endif %}
+                                                                                    </form>
                                                                                 </div>
                                                                             </div>
                                                                             <p class="text-sm text-muted">{{ reply.text }}
@@ -325,14 +360,9 @@
                                                                         <!-- end course:comment reply -->
                                                                     </div>
                                                                     <!-- end course:comment replies -->
-
                                                                 {% endfor %}
-
                                                             {% endif %}
-
                                                         {% endfor %}
-
-
                                                     </div>
                                                     <!-- end course:comment -->
                                                 </div>
@@ -390,7 +420,7 @@
     <script>
 
         function submit_deletion(id) {
-            const deleteUrl = "{% url 'weblog:delete_item' 0 %}#reply_section".replace('0', id);
+            const deleteUrl = "{% url 'weblog:delete_comment' 0 %}#reply_section".replace('0', id);
 
             Swal.fire({
                 title: 'حذف نظر',
