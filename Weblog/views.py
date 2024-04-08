@@ -23,10 +23,11 @@ class AllWeblogs(URLStorageMixin, ListView):
         return weblogs
 
 
-class WeblogDetail(URLStorageMixin, DetailView):
+class WeblogDetail(URLStorageMixin,HitCountDetailView, DetailView):
     model = Weblog
     context_object_name = 'weblog'
     template_name = 'Weblog/weblog_detail.html'
+    count_hit = True
 
     def get_queryset(self):
         return super().get_queryset().select_related('category', 'author')
