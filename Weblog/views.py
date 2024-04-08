@@ -23,7 +23,7 @@ class AllWeblogs(URLStorageMixin, ListView):
         return weblogs
 
 
-class WeblogDetail(DetailView):
+class WeblogDetail(URLStorageMixin, DetailView):
     model = Weblog
     context_object_name = 'weblog'
     template_name = 'Weblog/weblog_detail.html'
