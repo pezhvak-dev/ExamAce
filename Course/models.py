@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, FileExtensionValidator
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
@@ -297,6 +298,13 @@ class Exam(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+
+    def clean(self):
+        if self.total_duration.total_seconds() < 900:
+            raise ValidationError(
+                message=".زمان آزمون نمی‌تواند کمتر از 15 دقیقه باشد",
+                code="invalid_total_duration"
+            )
 
     def save(self, *args, **kwargs):
         if self.type == "F":
