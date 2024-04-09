@@ -18,6 +18,7 @@ class HomeView(URLStorageMixin, TemplateView):
 
         latest_video_courses = VideoCourse.objects.values("teacher__image",
                                                           "category__name",
+                                                          "category__slug",
                                                           "cover_image",
                                                           "teacher__username",
                                                           "teacher__slug",
@@ -41,6 +42,7 @@ class HomeView(URLStorageMixin, TemplateView):
             "designer__full_name",
             "designer__slug",
             "category__name",
+            "category__slug",
             "cover_image",
             "type",
             "price",
@@ -58,6 +60,7 @@ class HomeView(URLStorageMixin, TemplateView):
             "designer__full_name",
             "designer__slug",
             "category__name",
+            "category__slug",
             "cover_image",
             "type",
             "price",

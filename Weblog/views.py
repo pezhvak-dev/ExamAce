@@ -60,6 +60,7 @@ class WeblogsByCategory(URLStorageMixin, ListView):
     model = Weblog
     context_object_name = 'weblogs'
     template_name = 'Weblog/weblogs_by_category.html'
+    paginate_by = 6
 
     def get_queryset(self):
         slug = uri_to_iri(self.kwargs.get('slug'))

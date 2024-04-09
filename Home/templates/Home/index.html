@@ -291,7 +291,7 @@
                                                                  class="max-w-full rounded-3xl"
                                                                  alt="{{ course.name }}"/>
                                                         </a>
-                                                        <a href="#"
+                                                        <a href="{% url 'course:videos_by_category' course.category__slug %}"
                                                            class="absolute left-3 top-3 h-11 inline-flex items-center justify-center gap-1 bg-black/20 rounded-full text-white transition-all hover:opacity-80 px-4">
                                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                                                  fill="currentColor" class="w-6 h-6">
@@ -612,7 +612,7 @@
                                                                              class="w-full h-full object-cover"
                                                                              alt="تصویر طراح آزمون">
                                                                     {% else %}
-                                                                        <img src="{% static 'images/avatars/author.JPG' %}"
+                                                                        <img src="{% static 'images/avatars/default_exam_designer.JPG' %}"
                                                                              class="w-full h-full object-cover"
                                                                              alt="تصویر طراح آزمون">
                                                                     {% endif %}
@@ -620,23 +620,21 @@
                                                                 <a href="{% url 'account:profile' exam.designer__slug %}"
                                                                    class="line-clamp-1 font-bold text-xs text-foreground transition-colors hover:text-primary">{{ exam.designer__full_name }}</a>
                                                             </div>
-                                                            <a href="#"
+                                                            <a href="{% url 'course:exams_by_category' exam.category__slug %}"
                                                                class="bg-primary/10 rounded-full text-primary transition-all hover:opacity-80 py-1 px-4">
                                                                 <span class="font-bold text-xxs">{{ exam.category__name }}</span>
                                                             </a>
                                                         </div>
-                                                        <div class="flex justify-end">
-                                                            <div class="flex items-center gap-1 text-muted">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                     viewBox="0 0 24 24" stroke-width="1.5"
-                                                                     stroke="currentColor"
-                                                                     class="w-5 h-5">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                          d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
-                                                                </svg>
-                                                                <span class="font-semibold text-xs text-muted">زمان آزمون</span>
-                                                                <span class="font-semibold text-xs text-foreground">{{ exam.total_duration.seconds|format_seconds_to_time }}</span>
-                                                            </div>
+                                                        <div class="flex items-center gap-1 text-muted">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                 viewBox="0 0 24 24" stroke-width="1.5"
+                                                                 stroke="currentColor"
+                                                                 class="w-5 h-5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
+                                                            </svg>
+                                                            <span class="font-semibold text-xs text-muted">زمان آزمون</span>
+                                                            <span class="font-semibold text-xs text-foreground">{{ exam.total_duration.seconds|format_seconds_to_time }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -680,7 +678,7 @@
                                                                              class="w-full h-full object-cover"
                                                                              alt="تصویر طراح آزمون">
                                                                     {% else %}
-                                                                        <img src="{% static 'images/avatars/author.JPG' %}"
+                                                                        <img src="{% static 'images/avatars/default_exam_designer.JPG' %}"
                                                                              class="w-full h-full object-cover"
                                                                              alt="تصویر طراح آزمون">
                                                                     {% endif %}
@@ -688,23 +686,21 @@
                                                                 <a href="{% url 'account:profile' exam.designer__slug %}"
                                                                    class="line-clamp-1 font-bold text-xs text-foreground transition-colors hover:text-primary">{{ exam.designer__full_name }}</a>
                                                             </div>
-                                                            <a href="#"
+                                                            <a href="{% url 'course:exams_by_category' exam.category__slug %}"
                                                                class="bg-primary/10 rounded-full text-primary transition-all hover:opacity-80 py-1 px-4">
                                                                 <span class="font-bold text-xxs">{{ exam.category__name }}</span>
                                                             </a>
                                                         </div>
-                                                        <div class="flex justify-end">
-                                                            <div class="flex items-center gap-1 text-muted">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                     viewBox="0 0 24 24" stroke-width="1.5"
-                                                                     stroke="currentColor"
-                                                                     class="w-5 h-5">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                          d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
-                                                                </svg>
-                                                                <span class="font-semibold text-xs text-muted">زمان آزمون</span>
-                                                                <span class="font-semibold text-xs text-foreground">{{ exam.total_duration.seconds|format_seconds_to_time }}</span>
-                                                            </div>
+                                                        <div class="flex items-center gap-1 text-muted">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                 viewBox="0 0 24 24" stroke-width="1.5"
+                                                                 stroke="currentColor"
+                                                                 class="w-5 h-5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
+                                                            </svg>
+                                                            <span class="font-semibold text-xs text-muted">زمان آزمون</span>
+                                                            <span class="font-semibold text-xs text-foreground">{{ exam.total_duration.seconds|format_seconds_to_time }}</span>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="flex flex-col min-h-screen bg-background">
-        {% include 'includes/header.html' %}
+    {% include 'includes/header.html' %}
 
         <main class="flex-auto py-5">
             <div class="max-w-7xl space-y-14 px-4 mx-auto">
@@ -46,10 +46,8 @@
                                     <!-- course:card -->
                                     <div class="relative">
                                         <div class="relative z-10">
-                                            <a href="{% url 'course:video_course_detail' video_course.slug %}"
-                                               class="block">
-                                                <img src="{{ video_course.cover_image.url }}"
-                                                     class="max-w-full rounded-3xl"
+                                            <a href="{% url 'course:video_course_detail' video_course.slug %}" class="block">
+                                                <img src="{{ video_course.cover_image.url }}" class="max-w-full rounded-3xl"
                                                      alt="{{ video_course.name }}"/>
                                             </a>
                                             <a href="{% url 'course:videos_by_category' video_course.category.slug %}"
@@ -191,6 +189,6 @@
             </div>
         </main>
 
-        {% include 'includes/footer.html' %}
+    {% include 'includes/footer.html' %}
     </div>
 {% endblock %}

@@ -3,8 +3,9 @@ from io import BytesIO
 
 import pytz
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, get_list_or_404
 from django.urls import reverse
 from django.utils.encoding import uri_to_iri
 from django.views.generic import ListView, DetailView, View
@@ -45,6 +46,19 @@ class VideoCourseDetail(URLStorageMixin, DetailView):
         return get_object_or_404(queryset, **{self.slug_field: slug})
 
 
+class VideoCourseByCategory(URLStorageMixin, ListView):
+    model = VideoCourse
+    context_object_name = 'video_courses'
+    template_name = 'Course/video_courses_by_category.html'
+
+    def get_queryset(self):
+        slug = uri_to_iri(self.kwargs.get('slug'))
+
+        video_courses = get_list_or_404(VideoCourse, category__slug=slug)
+
+        return video_courses
+
+
 class AllBookCourses(URLStorageMixin, ListView):
     pass
 
@@ -53,6 +67,7 @@ class AllExams(URLStorageMixin, ListView):
     model = Exam
     context_object_name = 'exams'
     template_name = 'Course/all_exams.html'
+    paginate_by = 1
 
     def get_queryset(self):
         exams = Exam.objects.select_related('category', 'designer').order_by('-created_at')
@@ -361,3 +376,69 @@ class CalculateExamResult(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixi
         }
 
         return render(request, "Course/answer_results.html", context=context)
+
+
+class ExamsByCategory(URLStorageMixin, ListView):
+    model = Exam
+    context_object_name = 'exams'
+    template_name = 'Course/exams_by_category.html'
+
+    def get_queryset(self):
+        slug = uri_to_iri(self.kwargs.get('slug'))
+
+        exams = get_list_or_404(Exam, category__slug=slug)
+
+        return exams
+
+# class FilterExams(View):
+#     template_name = "Course/filter_exams.html"
+#
+#     def post(self, request):
+#         path = request.path
+#         store_slug = request.session.get('store_slug', None)
+#         category_id = False
+#
+#         if "search" in path:
+#             query = request.POST.get('query')
+#             products = Product.objects.filter(
+#                 Q(name__icontains=query) | Q(description__icontains=query),
+#                 can_be_shown=True, is_available_in_stock=True, category__store_parent__slug=store_slug)
+#
+#         elif "category" in path:
+#             category_id = path.split("/category/")[1]
+#             products = Product.objects.filter(category__store_parent__slug=store_slug, category_id=category_id)
+#
+#         elif "brand" in path:
+#             brand_id = path.split("/brand/")[1]
+#             products = Product.objects.filter(category__store_parent__slug=store_slug, brand_id=brand_id)
+#
+#         elif "company" in path:
+#             brand_id = path.split("/company/")[1]
+#             products = Product.objects.filter(category__store_parent__slug=store_slug, brand_id=brand_id)
+#
+#         else:
+#             uuids = request.POST.get("uuids")
+#             print(uuids)
+#             if uuids is not "":
+#                 uuids_list = ast.literal_eval(uuids)
+#                 products = Product.objects.filter(uuid__in=uuids_list)
+#
+#             else:
+#                 products = Product.objects.all()
+#
+#         if category_id:
+#             category = ProductCategory.objects.filter(id=category_id)
+#             category = category.children_categories.all()
+#
+#         else:
+#             category = ProductCategory.objects.filter(category_parent=None, store_parent__slug=store_slug)
+#
+#         product_filter = ProductFilter(request.POST, queryset=products)
+#
+#         context = {
+#             "children_categories": category,
+#             'form': product_filter.form,
+#             'products': product_filter.qs
+#         }
+#
+#         return render(request=request, template_name=self.template_name, context=context)
