@@ -67,7 +67,7 @@ class AllExams(URLStorageMixin, ListView):
     model = Exam
     context_object_name = 'exams'
     template_name = 'Course/all_exams.html'
-    paginate_by = 1
+    paginate_by = 10
 
     def get_queryset(self):
         exams = Exam.objects.select_related('category', 'designer').order_by('-created_at')

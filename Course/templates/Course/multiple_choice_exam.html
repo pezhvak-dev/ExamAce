@@ -4,45 +4,54 @@
 {% block content %}
     {% include 'includes/header.html' %}
 
-    <form id="examForm" method="post" action="{% url 'course:final_exam_submit' slug %}">
-        {% csrf_token %}
+    <div class="flex flex-col min-h-screen bg-background">
 
-        {% for answer in answers %}
-            <fieldset>
-                <legend>سوال {{ forloop.counter }}</legend>
-                {% for key, value in answer.items %}
-                    <div>
-                        <input type="radio" id="{{ key }}" name="question_{{ forloop.parentloop.counter }}"
-                               value="{{ value }}">
-                        <label for="{{ key }}">{{ value }}</label>
-                    </div>
-                {% endfor %}
-            </fieldset>
-            <hr>
-        {% endfor %}
 
-        <br>
+        <main class="flex-auto py-5">
+            <div class="max-w-7xl space-y-14 px-4 mx-auto">
 
-        <a href="#" id="saveTempBtn">
-            ذخیره سازی موقت
-        </a>
+                <form id="examForm" method="post" action="{% url 'course:final_exam_submit' slug %}">
+                    {% csrf_token %}
 
-        <button type="button" id="submitBtn"
-                class="w-full h-11 inline-flex items-center justify-center gap-1 bg-red-500 rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
-            <span class="line-clamp-1 font-semibold text-sm">ثبت نهایی</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                 viewBox="0 0 24 24" stroke-width="1.5"
-                 stroke="currentColor"
-                 class="w-5 h-5">
-                <path fill-rule="evenodd"
-                      d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
-                      clip-rule="evenodd">
-                </path>
-            </svg>
-        </button>
-    </form>
+                    {% for answer in answers %}
+                        <fieldset>
+                            <legend>سوال {{ forloop.counter }}</legend>
+                            {% for key, value in answer.items %}
+                                <div>
+                                    <input type="radio" id="{{ key }}" name="question_{{ forloop.parentloop.counter }}"
+                                           value="{{ value }}">
+                                    <label for="{{ key }}">{{ value }}</label>
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                        <hr>
+                    {% endfor %}
 
-    {% include 'includes/footer.html' %}
+                    <br>
+
+                    <a href="#" id="saveTempBtn">
+                        ذخیره سازی موقت
+                    </a>
+
+                    <button type="button" id="submitBtn"
+                            class="w-full h-11 inline-flex items-center justify-center gap-1 bg-red-500 rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
+                        <span class="line-clamp-1 font-semibold text-sm">ثبت نهایی</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor"
+                             class="w-5 h-5">
+                            <path fill-rule="evenodd"
+                                  d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                  clip-rule="evenodd">
+                            </path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </main>
+        {% include 'includes/footer.html' %}
+
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
