@@ -2,23 +2,29 @@
 
 <div class="md:block hidden lg:col-span-3 md:col-span-4 md:sticky md:top-24">
 
-    <div class="w-full h-11 flex items-center bg-secondary rounded-2xl px-3">
-        <label class="relative w-full flex items-center justify-between cursor-pointer">
-            <span class="font-bold text-sm text-foreground">در حال برگزاری</span>
-            <input type="checkbox" value="" class="sr-only peer"/>
-            <div class="w-11 h-5 relative bg-background border-2 border-border peer-focus:outline-none rounded-full peer peer-checked:after:left-[26px] peer-checked:after:bg-background after:content-[''] after:absolute after:left-0.5 after:top-0.5 after:bg-border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary peer-checked:border-primary">
+    <form action="{% url 'course:filter_exams' %}" method="post">
+        {% csrf_token %}
+
+        {% if request.resolver_match.url_name != "all_exams" %}
+            <div class="w-full h-11 flex items-center bg-secondary rounded-2xl px-3">
+                <label for="ongoing" class="relative w-full flex items-center justify-between cursor-pointer">
+                    <span class="font-bold text-sm text-foreground">در حال برگزاری</span>
+                    <input type="checkbox" name="ongoing" id="ongoing" value="IP" class="sr-only peer"/>
+                    <div class="w-11 h-5 relative bg-background border-2 border-border peer-focus:outline-none rounded-full peer peer-checked:after:left-[26px] peer-checked:after:bg-background after:content-[''] after:absolute after:left-0.5 after:top-0.5 after:bg-border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary peer-checked:border-primary">
+                    </div>
+                </label>
             </div>
-        </label>
-    </div>
-    <!-- accordion:container -->
-    <div class="flex flex-col divide-y divide-border">
-        <!-- accordion -->
-        <div class="w-full space-y-2 py-3" x-data="{ open: false }">
-            <!-- accordion:button -->
-            <button type="button"
-                    class="w-full h-11 flex items-center justify-between gap-x-2 relative bg-secondary rounded-2xl transition hover:text-primary px-3"
-                    x-bind:class="open ? 'text-primary' : 'text-foreground'"
-                    x-on:click="open = !open">
+        {% endif %}
+
+        <!-- accordion:container -->
+        <div class="flex flex-col divide-y divide-border">
+            <!-- accordion -->
+            <div class="w-full space-y-2 py-3" x-data="{ open: false }">
+                <!-- accordion:button -->
+                <button type="button"
+                        class="w-full h-11 flex items-center justify-between gap-x-2 relative bg-secondary rounded-2xl transition hover:text-primary px-3"
+                        x-bind:class="open ? 'text-primary' : 'text-foreground'"
+                        x-on:click="open = !open">
                                         <span class="flex items-center gap-x-2">
                                             <span class="flex-shrink-0">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -29,41 +35,98 @@
                                             </span>
                                             <span class="font-semibold text-sm text-right">نوع</span>
                                         </span>
-                <span class="" x-bind:class="open ? 'rotate-180' : ''">
+                    <span class="" x-bind:class="open ? 'rotate-180' : ''">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                  stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                       d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
                                             </svg>
                                         </span>
-            </button><!-- end accordion:button -->
+                </button><!-- end accordion:button -->
 
-            <!-- accordion:content -->
-            <div class="bg-secondary rounded-2xl relative p-3" x-show="open">
-                <div class="space-y-2">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="type"
-                               class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
-                        <span class="text-sm text-muted">رایگان</span>
-                        <span class="text-sm text-muted mr-auto">۱۸</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="type"
-                               class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
-                        <span class="text-sm text-muted">پولی</span>
-                        <span class="text-sm text-muted mr-auto">۹</span>
-                    </label>
+                <!-- accordion:content -->
+                <div class="bg-secondary rounded-2xl relative p-3" x-show="open">
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="payment_type" id="free" value="F"
+                                   class="form-radio !ring-0 !ring-offset-0 bg-border border-0">
+                            <span class="text-sm text-muted">رایگان</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="payment_type" id="paid" value="P"
+                                   class="form-radio !ring-0 !ring-offset-0 bg-border border-0">
+                            <span class="text-sm text-muted">پولی</span>
+                        </label>
+                    </div>
                 </div>
-            </div><!-- end accordion:content -->
-        </div><!-- accordion -->
+                <!-- end accordion:content -->
 
-        <!-- accordion -->
-        <div class="w-full space-y-2 py-3" x-data="{ open: false }">
-            <!-- accordion:button -->
-            <button type="button"
-                    class="w-full h-11 flex items-center justify-between gap-x-2 relative bg-secondary rounded-2xl transition hover:text-primary px-3"
-                    x-bind:class="open ? 'text-primary' : 'text-foreground'"
-                    x-on:click="open = !open">
+            </div><!-- accordion -->
+
+            <!-- accordion -->
+            <div class="w-full space-y-2 py-3" x-data="{ open: false }">
+                <!-- accordion:button -->
+                <button type="button"
+                        class="w-full h-11 flex items-center justify-between gap-x-2 relative bg-secondary rounded-2xl transition hover:text-primary px-3"
+                        x-bind:class="open ? 'text-primary' : 'text-foreground'"
+                        x-on:click="open = !open">
+                                        <span class="flex items-center gap-x-2">
+                                            <span class="flex-shrink-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z"></path>
+                                                    </svg>
+                                            </span>
+                                            <span class="font-semibold text-sm text-right">میزان سختی</span>
+                                        </span>
+                    <span class="" x-bind:class="open ? 'rotate-180' : ''">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                 stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
+                                            </svg>
+                                        </span>
+                </button><!-- end accordion:button -->
+
+
+                <!-- accordion:content -->
+                <div class="bg-secondary rounded-2xl relative p-3" x-show="open">
+                    <div class="space-y-2">
+
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="level" value="E"
+                                   class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
+                            <span class="text-sm text-muted">ساده</span>
+                        </label>
+
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="level" value="M"
+                                   class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
+                            <span class="text-sm text-muted">متوسط</span>
+                        </label>
+
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="level" value="H"
+                                   class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
+                            <span class="text-sm text-muted">پیچیده</span>
+                        </label>
+
+                    </div>
+                </div>
+                <!-- end accordion:content -->
+
+
+            </div>
+            <!-- accordion -->
+
+            <!-- accordion -->
+            <div class="w-full space-y-2 py-3" x-data="{ open: false }">
+                <!-- accordion:button -->
+                <button type="button"
+                        class="w-full h-11 flex items-center justify-between gap-x-2 relative bg-secondary rounded-2xl transition hover:text-primary px-3"
+                        x-bind:class="open ? 'text-primary' : 'text-foreground'"
+                        x-on:click="open = !open">
                                         <span class="flex items-center gap-x-2">
                                             <span class="flex-shrink-0">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -74,45 +137,43 @@
                                             </span>
                                             <span class="font-semibold text-sm text-right">دسته بندی</span>
                                         </span>
-                <span class="" x-bind:class="open ? 'rotate-180' : ''">
+                    <span class="" x-bind:class="open ? 'rotate-180' : ''">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                  stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                       d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
                                             </svg>
                                         </span>
-            </button><!-- end accordion:button -->
+                </button><!-- end accordion:button -->
 
-            <!-- accordion:content -->
-            <div class="bg-secondary rounded-2xl relative p-3" x-show="open">
-                <div class="space-y-2">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="category"
-                               class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
-                        <span class="text-sm text-muted">لاراول</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="category"
-                               class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
-                        <span class="text-sm text-muted">وردپرس</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="category"
-                               class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
-                        <span class="text-sm text-muted">جاوااسکریپت</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="category"
-                               class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
-                        <span class="text-sm text-muted">اندروید</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="category"
-                               class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
-                        <span class="text-sm text-muted">پایتون</span>
-                    </label>
+
+                <!-- accordion:content -->
+                <div class="bg-secondary rounded-2xl relative p-3" x-show="open">
+                    <div class="space-y-2">
+
+                        {% for category in filter_categories %}
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="category" value="{{ category.slug }}"
+                                       class="form-radio !ring-0 !ring-offset-0 bg-border border-0"/>
+                                <span class="text-sm text-muted">{{ category.name }}</span>
+                            </label>
+                        {% endfor %}
+
+                    </div>
                 </div>
-            </div><!-- end accordion:content -->
-        </div><!-- accordion -->
-    </div><!-- end accordion:container -->
+                <!-- end accordion:content -->
+
+
+            </div>
+            <!-- accordion -->
+
+
+        </div>
+        <!-- end accordion:container -->
+
+        <button class="flex items-center justify-center gap-1 w-full h-10 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4"
+                type="submit">اعمال فیلتر
+        </button>
+    </form>
+
 </div>

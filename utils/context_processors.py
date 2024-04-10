@@ -1,4 +1,5 @@
 from Account.models import CustomUser
+from Course.models import Category
 from Us.models import SocialMedia, AboutUs
 
 
@@ -28,3 +29,16 @@ def custom_user_info(request):
         return {
             'custom_user': None
         }
+
+
+from django.urls import resolve
+
+
+def filter_categories(request):
+    categories = Category.objects.all()
+
+    context = {
+        'filter_categories': categories
+    }
+
+    return context
