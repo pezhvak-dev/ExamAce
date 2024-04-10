@@ -275,7 +275,7 @@ class Exam(models.Model):
 
     cover_image = models.ImageField(upload_to='Course/Exam/cover_images', verbose_name='عکس کاور')
 
-    level = models.CharField(max_length=1, choices=level_choices_types, verbose_name='درجه سختی', default="N")
+    level = models.CharField(max_length=1, choices=level_choices_types, verbose_name='میزان سختی', default="N")
 
     participated_users = models.ManyToManyField(to="Account.CustomUser", blank=True, verbose_name='کاربران ثبت نام شده',
                                                 related_name='user_exams')

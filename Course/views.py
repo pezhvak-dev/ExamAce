@@ -1,3 +1,4 @@
+import ast
 from datetime import datetime
 
 import pytz
@@ -10,6 +11,7 @@ from django.views.generic import ListView, DetailView, View
 from django_filters.views import FilterView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
+from Course.filters import ExamFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin, NonFinishedExamsOnlyMixin
 from Course.models import VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, \
@@ -399,14 +401,15 @@ class ExamsByCategory(URLStorageMixin, ListView):
         return exams
 
 
-class ExamFilterView(FilterView):
-    def post(self, request, *args, **kwargs):
-        payment_type = request.POST.get("payment_type", "F")
-        level = request.POST.get("level", "M")
-        category = request.POST.get("category", None)
+class ExamFilterView(View):
+    template_name = "Course/exam_filter.html"
 
-        print(payment_type)
-        print(level)
-        print(category)
+    def get(self, request):
+        exams = Exam.objects.all()
+        exam_filter = ExamFilter(request.GET, queryset=exams)
 
-        return render(request, "Course/filter_exams.html")
+        context = {
+            'exams': exam_filter.qs
+        }
+
+        return render(request=request, template_name=self.template_name, context=context)

@@ -68,13 +68,13 @@ class ExamAnswerInline(admin.StackedInline):
 @admin.register(Exam)
 class ExamAdmin(admin.ModelAdmin):
     list_display = (
-        'name', 'total_duration', 'type', 'price', 'has_discount',
-        'discount_percentage', 'price_after_discount'
+        'name', 'total_duration', 'category', 'type', 'level',
+        'price', 'has_discount', 'discount_percentage', 'price_after_discount'
     )
 
     prepopulated_fields = {'slug': ('name',)}
 
-    inlines = [ExamAnswerInline, UserTempAnswerInline,UserFinalAnswerInline]
+    inlines = [ExamAnswerInline, UserTempAnswerInline, UserFinalAnswerInline, EnteredExamUserInline]
 
     def save_model(self, request, obj, form, change):
         if not obj.designer_id:

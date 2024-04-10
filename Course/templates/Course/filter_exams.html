@@ -1,8 +1,0 @@
-<!-- Display filtered exam results -->
-<ul>
-    {% for exam in filter.qs %}
-        <li>{{ exam }}</li>
-    {% empty %}
-        <li>No exams found.</li>
-    {% endfor %}
-</ul>

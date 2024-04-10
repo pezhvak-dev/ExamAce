@@ -1,5 +1,6 @@
 from Account.models import CustomUser
-from Course.models import Category
+from Course.filters import ExamFilter
+from Course.models import Category, Exam
 from Us.models import SocialMedia, AboutUs
 
 
@@ -31,14 +32,23 @@ def custom_user_info(request):
         }
 
 
-from django.urls import resolve
-
-
 def filter_categories(request):
     categories = Category.objects.all()
 
     context = {
         'filter_categories': categories
+    }
+
+    return context
+
+
+def filter_exams(request):
+    exams = Exam.objects.all()
+
+    exam_filter = ExamFilter(request.GET, queryset=exams)
+
+    context = {
+        'exam_filter_form': exam_filter.form
     }
 
     return context
