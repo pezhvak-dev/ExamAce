@@ -93,42 +93,51 @@ class ExamDetail(URLStorageMixin, DetailView):
 
         user = self.request.user
 
-        #  Checks if user can enter exam anymore or not. (Based on entrance time)
-        is_time_up = False
-        if EnteredExamUser.objects.filter(user=user, exam=self.object).exists():
-            entered_exam_user = EnteredExamUser.objects.get(user=user, exam=self.object)
-
-            date_1 = entered_exam_user.created_at
-            date_2 = datetime.now(pytz.timezone('Iran'))
-
-            total_duration = self.object.total_duration.total_seconds()
-
-            difference = get_time_difference(date_1=date_1, date_2=date_2)
-
-            time_left = int(total_duration - difference)
-
-            if time_left < 0:
-                is_time_up = True
-
-        can_be_continued = False
-        if EnteredExamUser.objects.filter(user=user, exam=self.object).exists():
-            can_be_continued = True
-
-        has_finished_exam = False
-        if UserFinalAnswer.objects.filter(user=user, exam=self.object).exists():
-            has_finished_exam = True
-
         sections = ExamAnswer.objects.filter(exam=self.object)
 
         section_names = list(set(sections.values_list('section__name', flat=True)))
         banner_4 = Banner4.objects.filter(can_be_shown=True).last()
         banner_5 = Banner5.objects.filter(can_be_shown=True).last()
 
-        try:
-            is_user_registered = Exam.objects.filter(participated_users=user, slug=self.object.slug).exists()
+        #  Checks if user can enter exam anymore or not. (Based on entrance time)
+        is_time_up = False
 
-        except TypeError:
+        if self.request.user.is_authenticated:
+            if EnteredExamUser.objects.filter(
+                    user=user, exam=self.object
+            ).exists():
+                entered_exam_user = EnteredExamUser.objects.get(user=user, exam=self.object)
+
+                date_1 = entered_exam_user.created_at
+                date_2 = datetime.now(pytz.timezone('Iran'))
+
+                total_duration = self.object.total_duration.total_seconds()
+
+                difference = get_time_difference(date_1=date_1, date_2=date_2)
+
+                time_left = int(total_duration - difference)
+
+                if time_left < 0:
+                    is_time_up = True
+
+            can_be_continued = False
+            if EnteredExamUser.objects.filter(user=user, exam=self.object).exists():
+                can_be_continued = True
+
+            has_finished_exam = False
+            if UserFinalAnswer.objects.filter(user=user, exam=self.object).exists():
+                has_finished_exam = True
+
+            try:
+                is_user_registered = Exam.objects.filter(participated_users=user, slug=self.object.slug).exists()
+
+            except TypeError:
+                is_user_registered = False
+
+        else:
             is_user_registered = False
+            can_be_continued = False
+            has_finished_exam = False
 
         context['banner_4'] = banner_4  # Returns a single object
         context['banner_5'] = banner_5  # Returns a single object
