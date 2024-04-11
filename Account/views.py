@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -249,25 +250,13 @@ class EnterNewsletters(View):
         email = request.POST.get("email")
         user = None
 
-        redirect_url = request.session.get('current_url')
-
         if request.user.is_authenticated:
             user = request.user
 
         if NewsLetter.objects.filter(email=email).exists():
-            messages.error(request, f"این آدرس ایمیل قبلا در خبرنامه ثبت شده است.")
-
-            if redirect_url is not None:
-                return redirect(redirect_url)
-
-            return redirect("home:home")
+            return JsonResponse({'message': f"این آدرس ایمیل قبلا در خبرنامه ثبت شده است."}, status=400)
 
         else:
             NewsLetter.objects.create(user=user, email=email)
 
-            messages.success(request, f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد.")
-
-            if redirect_url is not None:
-                return redirect(redirect_url)
-
-            return redirect("home:home")
+            return JsonResponse({'message': f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد."}, status=200)

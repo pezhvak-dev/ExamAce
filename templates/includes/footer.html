@@ -130,7 +130,7 @@
                             </p>
                             <form action="{% url 'account:enter_newsletters' %}" method="post">
                                 {% csrf_token %}
-                                
+
                                 <div class="flex items-center gap-3 relative">
                                             <span class="absolute right-3 text-muted">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -206,3 +206,51 @@
     </div>
 </footer>
 <!-- end footer -->
+<script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'js/sweetalert2.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        // Intercept form submission
+        $('form').submit(function (event) {
+            event.preventDefault();  // Prevent normal form submission
+
+            // Serialize form data
+            var formData = $(this).serialize();
+
+            // Send AJAX request
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),  // Get form action URL
+                data: formData,
+                success: function (response) {
+                    // Handle successful response from the server
+                    console.log(response);  // Log the response to the console
+
+                    // Show success message using SweetAlert2
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ثبت نام در خبرنامه',
+                        text: response.message,
+                        confirmButtonText: 'باشه',
+                        timer: 3000
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle errors
+                    console.log(xhr.responseText);  // Log the response to the console
+
+                    // Show error message using SweetAlert2
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ثبت نام در خبرنامه',
+                        text: xhr.responseJSON.message,
+                        confirmButtonText: 'باشه',
+                        confirmButtonColor: '#d33',
+                        timer: 3000
+                    });
+                }
+            });
+        });
+    });
+</script>
