@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from Account.models import CustomUser, OTP, Wallet, WalletUsage, Notification, Newsletter
+from Account.models import CustomUser, OTP, Wallet, WalletUsage, Notification, NewsLetter
 
 
 class CustomUserAdmin(UserAdmin):
@@ -51,6 +51,6 @@ class NotificationAdmin(admin.ModelAdmin):
     list_display = ('uuid', 'title', 'created_at', 'mode', 'visibility', 'has_been_read')
 
 
-@admin.register(Newsletter)
-class NewsletterAdmin(admin.ModelAdmin):
+@admin.register(NewsLetter)
+class NewsLetterAdmin(admin.ModelAdmin):
     list_display = ('email', 'user')
