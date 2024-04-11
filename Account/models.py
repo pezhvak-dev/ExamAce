@@ -221,10 +221,12 @@ class Notification(models.Model):
         verbose_name_plural = "اعلانیه‌ها"
 
 
-class Newsletter(models.Model):
+class NewsLetter(models.Model):
     user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, blank=True, null=True)
 
     email = models.EmailField(max_length=254, verbose_name="آدرس ایمیل", unique=True)
+
+    is_blocked = models.BooleanField(default=False, verbose_name="آیا بلاک شده است؟")
 
     created_at = jDateTimeField(auto_now_add=True)
 

@@ -6,13 +6,12 @@ from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import FormView, TemplateView, UpdateView, ListView, DetailView
+from django.views.generic import FormView, UpdateView, ListView, DetailView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
-from Account.models import CustomUser, OTP, Notification, Wallet, Newsletter
+from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter
 from Home.mixins import URLStorageMixin
-from Home.sms import send_register_sms, send_forget_password_sms
 
 
 class RegisterView(NonAuthenticatedUsersOnlyMixin, FormView):
@@ -255,7 +254,7 @@ class EnterNewsletters(View):
         if request.user.is_authenticated:
             user = request.user
 
-        if Newsletter.objects.filter(email=email).exists():
+        if NewsLetter.objects.filter(email=email).exists():
             messages.error(request, f"این آدرس ایمیل قبلا در خبرنامه ثبت شده است.")
 
             if redirect_url is not None:
@@ -264,7 +263,7 @@ class EnterNewsletters(View):
             return redirect("home:home")
 
         else:
-            Newsletter.objects.create(user=user, email=email)
+            NewsLetter.objects.create(user=user, email=email)
 
             messages.success(request, f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد.")
 
