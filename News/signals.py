@@ -12,4 +12,8 @@ def send_news_created(sender, instance: News, created, **kwargs):
         news_letter_emails = NewsLetter.objects.filter(is_blocked=False)
         emails = list(news_letter_emails.values_list('email', flat=True))
 
-        send_created_news_email_to_news_letter(emails, f"127.0.0.1:8000/news/detail/{instance.slug}")
+        send_created_news_email_to_news_letter(
+            emails,
+            f'{instance.category.name}',
+            f"127.0.0.1:8000/news/detail/{instance.slug}"
+        )
