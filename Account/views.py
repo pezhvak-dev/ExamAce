@@ -274,9 +274,8 @@ class EnterNewsletters(View):
             return JsonResponse({'message': f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد."}, status=200)
 
 
-@login_required
-def follow_user(request, username):
-    if request.method == "POST":
+class FollowUser(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, username):
         user_to_follow = get_object_or_404(CustomUser, username=username)
 
         if request.user == user_to_follow:
@@ -287,13 +286,13 @@ def follow_user(request, username):
         return JsonResponse({'message': f"شما {username} را فالو کردید."}, status=200)
 
 
-@login_required
-def unfollow_user(request, username):
-    user_to_unfollow = get_object_or_404(CustomUser, username=username)
+class UnfollowUser(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, username):
+        user_to_unfollow = get_object_or_404(CustomUser, username=username)
 
-    if request.user == user_to_unfollow:
-        return JsonResponse({'error': 'شما نمی‌توانید خود را آن‌فالو کنید!'}, status=400)
+        if request.user == user_to_unfollow:
+            return JsonResponse({'error': 'شما نمی‌توانید خود را آن‌فالو کنید!'}, status=400)
 
-    request.user.unfollow(user_to_unfollow)
+        request.user.unfollow(user_to_unfollow)
 
-    return JsonResponse({'message': f"شما {username} را آن‌فالو کردید."}, status=200)
+        return JsonResponse({'message': f"شما {username} را آن‌فالو کردید."}, status=200)
