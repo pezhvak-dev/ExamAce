@@ -4,33 +4,12 @@
 
     <form action="{% url 'course:filter_exams' %}" method="get">
 
-
-        {% if request.resolver_match.url_name != "all_exams" and request.resolver_match.url_name != "filter_exams" %}
-            <div class="w-full h-11 flex items-center bg-secondary rounded-2xl px-3">
-                <label for="ongoing" class="relative w-full flex items-center justify-between cursor-pointer">
-                    <span class="font-bold text-sm text-foreground">در حال برگزاری</span>
-                    <input type="checkbox" name="ongoing" id="ongoing" value="IP" class="sr-only peer"/>
-                    <div class="w-11 h-5 relative bg-background border-2 border-border peer-focus:outline-none rounded-full peer peer-checked:after:left-[26px] peer-checked:after:bg-background after:content-[''] after:absolute after:left-0.5 after:top-0.5 after:bg-border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary peer-checked:border-primary">
-                    </div>
-                </label>
-            </div>
-
-            <div class="w-full h-11 flex items-center bg-secondary rounded-2xl px-3 mt-3">
-                <label for="has_discount" class="relative w-full flex items-center justify-between cursor-pointer">
-                    <span class="font-bold text-sm text-foreground">دارای تخفیف</span>
-                    <input type="checkbox" name="has_discount" id="has_discount" value="false" class="sr-only peer"/>
-                    <div class="w-11 h-5 relative bg-background border-2 border-border peer-focus:outline-none rounded-full peer peer-checked:after:left-[26px] peer-checked:after:bg-background after:content-[''] after:absolute after:left-0.5 after:top-0.5 after:bg-border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary peer-checked:border-primary">
-                    </div>
-                </label>
-            </div>
-
+        <!-- accordion -->
+        {% if request.GET.has_discount %}
+            <div class="w-full space-y-2 py-3" x-data="{ open: true }">
         {% else %}
-            <!-- accordion -->
-            {% if request.GET.has_discount %}
-                <div class="w-full space-y-2 py-3" x-data="{ open: true }">
-            {% else %}
-                <div class="w-full space-y-2 py-3" x-data="{ open: false }">
-            {% endif %}
+            <div class="w-full space-y-2 py-3" x-data="{ open: false }">
+        {% endif %}
         <!-- accordion:button -->
         <button type="button"
                 class="w-full h-11 flex items-center justify-between gap-x-2 relative bg-secondary rounded-2xl transition hover:text-primary px-3"
@@ -44,7 +23,7 @@
                                                       d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"></path>
                                             </svg>
                                             </span>
-                                            <span class="font-semibold text-sm text-right">تخفیف</span>
+                                            <span class="font-semibold text-sm text-right">{{ exam_filter_form.has_discount.label }}</span>
                                         </span>
             <span class="" x-bind:class="open ? 'rotate-180' : ''">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -53,7 +32,8 @@
                                                       d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
                                             </svg>
                                         </span>
-        </button><!-- end accordion:button -->
+        </button>
+        <!-- end accordion:button -->
 
         <!-- accordion:content -->
         <div class="bg-secondary rounded-2xl relative p-3" x-show="open">
@@ -91,8 +71,7 @@
         <!-- end accordion:content -->
 
         </div>
-            <!-- accordion -->
-        {% endif %}
+        <!-- accordion -->
 
         <!-- accordion:container -->
         <div class="flex flex-col divide-y divide-border">
@@ -124,7 +103,8 @@
                                                       d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
                                             </svg>
                                         </span>
-            </button><!-- end accordion:button -->
+            </button>
+            <!-- end accordion:button -->
 
             <!-- accordion:content -->
             <div class="bg-secondary rounded-2xl relative p-3" x-show="open">
@@ -253,7 +233,7 @@
                                                           d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"></path>
                                                 </svg>
                                             </span>
-                                            <span class="font-semibold text-sm text-right">دسته بندی</span>
+                                            <span class="font-semibold text-sm text-right">{{ exam_filter_form.category.label }}</span>
                                         </span>
                 <span class="" x-bind:class="open ? 'rotate-180' : ''">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
