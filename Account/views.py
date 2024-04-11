@@ -3,15 +3,16 @@ from uuid import uuid4
 
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import FormView, UpdateView, ListView, DetailView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
-from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter
+from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow
 from Home.mixins import URLStorageMixin
 
 
@@ -218,6 +219,17 @@ class ProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, DetailView
     template_name = 'Account/profile.html'
     context_object_name = 'user'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        viewed_user = self.get_object()
+        user = self.request.user
+
+        is_following = Follow.objects.filter(follower=user, following=viewed_user).exists()
+
+        context['is_following'] = is_following
+
+        return context
+
 
 class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
     model = CustomUser
@@ -260,3 +272,28 @@ class EnterNewsletters(View):
             NewsLetter.objects.create(user=user, email=email)
 
             return JsonResponse({'message': f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد."}, status=200)
+
+
+@login_required
+def follow_user(request, username):
+    if request.method == "POST":
+        user_to_follow = get_object_or_404(CustomUser, username=username)
+
+        if request.user == user_to_follow:
+            return JsonResponse({'error': 'شما نمی‌توانید خود را فالو کنید!'}, status=400)
+
+        request.user.follow(user_to_follow)
+
+        return JsonResponse({'message': f"شما {username} را فالو کردید."}, status=200)
+
+
+@login_required
+def unfollow_user(request, username):
+    user_to_unfollow = get_object_or_404(CustomUser, username=username)
+
+    if request.user == user_to_unfollow:
+        return JsonResponse({'error': 'شما نمی‌توانید خود را آن‌فالو کنید!'}, status=400)
+
+    request.user.unfollow(user_to_unfollow)
+
+    return JsonResponse({'message': f"شما {username} را آن‌فالو کردید."}, status=200)

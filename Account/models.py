@@ -8,7 +8,7 @@ from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
 
 from Account.validators import validate_email
-from Course.models import VideoCourse
+from Course.models import VideoCourse, Exam
 
 
 class CustomUserManager(BaseUserManager):
@@ -72,6 +72,27 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
+    def follow(self, user):
+        """Follow `user` if not already following."""
+        if not self.is_following(user):
+            Follow.objects.create(follower=self, following=user)
+
+    def unfollow(self, user):
+        """Unfollow `user` if already following."""
+        Follow.objects.filter(follower=self, following=user).delete()
+
+    def is_following(self, user):
+        """Check if `self` is following `user`."""
+        return Follow.objects.filter(follower=self, following=user).exists()
+
+    def followers_count(self):
+        """Return count of followers."""
+        return self.followers.count()
+
+    def following_count(self):
+        """Return count of followings."""
+        return self.following.count()
+
     def __str__(self):
         return self.username
 
@@ -84,6 +105,22 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = "کاربر"
         verbose_name_plural = "کاربران"
+
+
+class Follow(models.Model):
+    follower = models.ForeignKey(CustomUser, related_name='following', on_delete=models.CASCADE, verbose_name="فالور")
+    following = models.ForeignKey(CustomUser, related_name='followers', on_delete=models.CASCADE,
+                                  verbose_name="فالویینگ")
+    followed_at = models.DateTimeField(auto_now_add=True, verbose_name="فالو شده در تاریخ")
+
+    class Meta:
+        db_table = 'account__follow'
+        verbose_name = "فالو"
+        verbose_name_plural = "فالوها"
+        unique_together = ('follower', 'following')
+
+    def __str__(self):
+        return f'{self.follower.username}، {self.following.username} را از تاریخ {self.followed_at} دنبال می‌کند.'
 
 
 class OTP(models.Model):
@@ -142,24 +179,6 @@ class Wallet(models.Model):
         db_table = "account__wallet"
         verbose_name = "کیف پول"
         verbose_name_plural = "کیف‌های پول"
-
-
-class WalletUsage(models.Model):
-    wallet = models.ForeignKey(to=Wallet, on_delete=models.CASCADE, verbose_name="کیف پول")
-
-    purchase_price = models.PositiveSmallIntegerField(default=0, verbose_name="قیمت خرید")
-
-    video_course = models.ForeignKey(to=VideoCourse, on_delete=models.CASCADE, verbose_name="دوره ویدئویی")
-
-    created_at = jDateTimeField(auto_now_add=True, editable=False, verbose_name="ایجاد شده در تاریخ")
-
-    def __str__(self):
-        return f"{self.wallet.owner}"
-
-    class Meta:
-        db_table = "account__wallet_usage"
-        verbose_name = "مورد استفاده از کیف پول"
-        verbose_name_plural = "موارد استفاده از کیف پول"
 
 
 class Notification(models.Model):

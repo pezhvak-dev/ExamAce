@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from Account.models import CustomUser, OTP, Wallet, WalletUsage, Notification, NewsLetter
+from Account.models import CustomUser, OTP, Wallet, Notification, NewsLetter, Follow
 
 
 class CustomUserAdmin(UserAdmin):
@@ -34,16 +34,11 @@ class OTPAdmin(admin.ModelAdmin):
     list_display = ("username", "mobile_phone", "password", "sms_code", "otp_type")
 
 
-class WalletUsageInline(admin.TabularInline):
-    model = WalletUsage
-    extra = 1
-    # readonly_fields = ("purchase_price",)
-
-
 @admin.register(Wallet)
 class WalletAdmin(admin.ModelAdmin):
     list_display = ("owner", "fund", "level", "usage_count")
-    inlines = [WalletUsageInline]
+
+    autocomplete_fields = ("owner",)
 
 
 @admin.register(Notification)
@@ -54,3 +49,12 @@ class NotificationAdmin(admin.ModelAdmin):
 @admin.register(NewsLetter)
 class NewsLetterAdmin(admin.ModelAdmin):
     list_display = ('email', 'user')
+
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ('follower', 'following', 'followed_at')
+
+    autocomplete_fields = ('follower', 'following')
+
+    search_fields = ('follower__username', 'following__username')

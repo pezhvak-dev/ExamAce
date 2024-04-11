@@ -9,7 +9,6 @@ $(document).ready(function () {
             url: $(this).attr('action'),
             data: formData,
             success: function (response) {
-                console.log(response);
 
                 Swal.fire({
                     icon: 'success',
