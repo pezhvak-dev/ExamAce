@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "admin_interface",
+    "colorfield",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,6 +58,9 @@ INSTALLED_APPS = [
     "star_ratings",
 ]
 
+X_FRAME_OPTIONS = "SAMEORIGIN"
+SILENCED_SYSTEM_CHECKS = ["security.W019"]
+
 STAR_RATINGS_RERATE = True
 STAR_RATINGS_RERATE_SAME_DELETE = True
 STAR_RATINGS_STAR_HEIGHT = 24
@@ -78,6 +83,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
 ]
 
 INTERNAL_IPS = [
@@ -143,6 +149,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+
+LANGUAGES = (
+    ("en", "English"),
+    ("fa", "فارسی")
+)
 
 TIME_ZONE = 'Asia/Tehran'
 
