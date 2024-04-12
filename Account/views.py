@@ -11,7 +11,7 @@ from django.views import View
 from django.views.generic import FormView, UpdateView, ListView, DetailView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
-from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
+from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, OwnerRequiredMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow
 from Course.models import Exam
 from Home.mixins import URLStorageMixin
@@ -215,7 +215,7 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class OwnerProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, DetailView):
+class OwnerProfileDetailView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, DetailView):
     model = CustomUser
     template_name = 'Account/owner_profile.html'
     context_object_name = 'user'
@@ -250,7 +250,7 @@ class VisitorProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, Det
         return context
 
 
-class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
+class ProfileEditView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, UpdateView):
     model = CustomUser
     template_name = 'Account/edit_profile.html'
     fields = ("full_name", "email", "about_me")
