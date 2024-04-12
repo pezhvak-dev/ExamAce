@@ -15,5 +15,6 @@ def send_news_created(sender, instance: News, created, **kwargs):
         send_created_news_email_to_news_letter(
             emails,
             f'{instance.category.name}',
+            # TODO: Change the host name
             f"127.0.0.1:8000/news/detail/{instance.slug}"
         )

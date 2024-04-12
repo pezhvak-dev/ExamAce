@@ -224,11 +224,16 @@ class OwnerProfileDetailView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, UR
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        print(user)
-
         exams = Exam.objects.filter(participated_users=user)
 
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
         context['exams'] = exams
+        context['favorite_exams'] = favorite_exams
 
         return context
 
@@ -324,6 +329,19 @@ class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStor
     template_name = 'Account/participated_exams.html'
     context_object_name = 'exams'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
+        context['favorite_exams'] = favorite_exams
+
+        return context
+
     def get_queryset(self):
         user = self.request.user
         exams = Exam.objects.filter(participated_users=user)
@@ -335,6 +353,19 @@ class FavoriteExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageM
     model = FavoriteExam
     template_name = 'Account/favorite_exams.html'
     context_object_name = 'exams'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
+        context['favorite_exams'] = favorite_exams
+
+        return context
 
     def get_queryset(self):
         slug = self.kwargs.get("slug")

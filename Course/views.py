@@ -6,11 +6,15 @@ from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, get_list_or_404
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.encoding import uri_to_iri
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, View
 from django_filters.views import FilterView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
+from Account.models import FavoriteExam
 from Course.filters import ExamFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin, NonFinishedExamsOnlyMixin
@@ -69,6 +73,19 @@ class AllExams(URLStorageMixin, ListView):
     context_object_name = 'exams'
     template_name = 'Course/all_exams.html'
     paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
+        context['favorite_exams'] = favorite_exams
+
+        return context
 
     def get_queryset(self):
         exams = Exam.objects.select_related('category', 'designer').order_by('-created_at')
@@ -393,6 +410,19 @@ class ExamsByCategory(URLStorageMixin, ListView):
     context_object_name = 'exams'
     template_name = 'Course/exams_by_category.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
+        context['favorite_exams'] = favorite_exams
+
+        return context
+
     def get_queryset(self):
         slug = uri_to_iri(self.kwargs.get('slug'))
 
@@ -408,8 +438,35 @@ class ExamFilterView(View):
         exams = Exam.objects.all()
         exam_filter = ExamFilter(request.GET, queryset=exams)
 
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
         context = {
-            'exams': exam_filter.qs
+            'exams': exam_filter.qs,
+            'favorite_exams': favorite_exams
         }
 
         return render(request=request, template_name=self.template_name, context=context)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ToggleFavorite(View):
+    def post(self, request, *args, **kwargs):
+        exam_id = request.POST.get('exam_id')
+        user = request.user
+
+        try:
+            exam = Exam.objects.get(id=exam_id)
+            if FavoriteExam.objects.filter(exam=exam, user=user).exists():
+                FavoriteExam.objects.filter(exam=exam, user=user).delete()
+                return JsonResponse({'success': True, 'action': 'removed'})
+            else:
+                FavoriteExam.objects.create(exam=exam, user=user)
+                return JsonResponse({'success': True, 'action': 'added'})
+        except Exam.DoesNotExist:
+            pass
+
+        return JsonResponse({'success': False}, status=400)

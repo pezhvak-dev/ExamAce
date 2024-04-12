@@ -244,26 +244,54 @@
                                                                     {% endif %}
                                                                 </div>
                                                             </div>
-                                                            <div class="space-y-3 mt-3">
-                                                                {#                                                                <div class="flex flex-col">#}
-                                                                {#                                                                <span class="text-xs text-primary">۷۵.۵% مشاهده#}
-                                                                {#                                                                    شده</span>#}
-                                                                {#                                                                    <div class="relative w-full h-1.5 bg-border rounded-full overflow-hidden">#}
-                                                                {#                                                                    <span class="absolute right-0 h-full bg-primary"#}
-                                                                {#                                                                          style="width: 75.5%;"></span>#}
-                                                                {#                                                                    </div>#}
-                                                                {#                                                                </div>#}
+                                                            <div class="flex gap-3 mt-3">
                                                                 <a href="{% url 'course:exam_detail' exam.exam.slug %}"
                                                                    class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
-                                                                    <span class="font-semibold text-sm">مشاهده آزمون</span>
+                                                                    <span class="line-clamp-1 font-semibold text-sm">مشاهده آزمون</span>
                                                                     <svg xmlns="http://www.w3.org/2000/svg"
-                                                                         viewBox="0 0 20 20" fill="currentColor"
-                                                                         class="w-5 h-5">
+                                                                         viewBox="0 0 20 20"
+                                                                         fill="currentColor" class="w-5 h-5">
                                                                         <path fill-rule="evenodd"
                                                                               d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
                                                                               clip-rule="evenodd"></path>
                                                                     </svg>
                                                                 </a>
+
+                                                                {% if request.user.is_authenticated %}
+                                                                    {% if exam.exam.id in favorite_exams %}
+                                                                        <button type="button"
+                                                                                class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors text-red-500"
+                                                                                data-exam-id="{{ exam.exam.id }}">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 viewBox="0 0 20 20"
+                                                                                 fill="currentColor" class="w-5 h-5">
+                                                                                <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                </path>
+                                                                            </svg>
+                                                                        </button>
+                                                                    {% else %}
+                                                                        <button type="button"
+                                                                                class="add-to-favorites-btn flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500"
+                                                                                data-exam-id="{{ exam.exam.id }}">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 viewBox="0 0 20 20"
+                                                                                 fill="currentColor" class="w-5 h-5">
+                                                                                <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
+                                                                                </path>
+                                                                            </svg>
+                                                                        </button>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <button type="button"
+                                                                            class="login-first flex-shrink-0 w-11 h-11 inline-flex items-center justify-center bg-secondary rounded-full text-muted transition-colors hover:text-red-500">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                                             viewBox="0 0 20 20"
+                                                                             fill="currentColor" class="w-5 h-5">
+                                                                            <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z"></path>
+                                                                        </svg>
+                                                                    </button>
+                                                                {% endif %}
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -286,6 +314,11 @@
                 </div>
             </div>
         </main>
-
     </div>
+
+    {% include 'includes/footer.html' %}
+
+    <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'js/like_unlike_exam_ajax.js' %}"></script>
+
 {% endblock %}

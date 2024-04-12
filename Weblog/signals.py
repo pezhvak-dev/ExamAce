@@ -15,5 +15,6 @@ def send_weblog_created(sender, instance: Weblog, created, **kwargs):
         send_created_weblog_email_to_news_letter(
             emails,
             f'{instance.category.name}',
+            # TODO: Change the host name
             f"127.0.0.1:8000/weblog/detail/{instance.slug}"
         )
