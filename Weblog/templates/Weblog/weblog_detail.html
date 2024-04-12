@@ -170,7 +170,7 @@
 
                                                         <input type="hidden" id="parent_id" name="parent_id" value="">
 
-                                                        <textarea name="text" id="text" rows="10"
+                                                        <textarea required name="text" id="text" rows="10"
                                                                   class="form-textarea w-full !ring-0 !ring-offset-0 bg-secondary border-0 focus:border-border border-border rounded-xl text-sm text-foreground p-5"
                                                                   placeholder="متن مورد نظر خود را وارد کنید ..."></textarea>
                                                         <button type="submit"
@@ -242,7 +242,8 @@
                                                                                               d="M12.207 2.232a.75.75 0 0 0 .025 1.06l4.146 3.958H6.375a5.375 5.375 0 0 0 0 10.75H9.25a.75.75 0 0 0 0-1.5H6.375a3.875 3.875 0 0 1 0-7.75h10.003l-4.146 3.957a.75.75 0 0 0 1.036 1.085l5.5-5.25a.75.75 0 0 0 0-1.085l-5.5-5.25a.75.75 0 0 0-1.06.025Z"
                                                                                               clip-rule="evenodd"></path>
                                                                                     </svg>
-                                                                                    <span id="likeCount-{{ comment.id }}" class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                    <span id="likeCount-{{ comment.id }}"
+                                                                                          class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
                                                                                                     {{ comment.likes.count }}
                                                                                     </span>
                                                                                 </button>
@@ -250,7 +251,7 @@
 
                                                                             {% if request.user.is_authenticated %}
                                                                                 {% if comment.id in user_likes %}
-                                                                                    <button onclick="toggleLike({{ comment.id }})"
+                                                                                    <button onclick="toggleLike('{{ comment.id }}', 'weblog')"
                                                                                             id="likeBtn-{{ comment.id }}"
                                                                                             type="button"
                                                                                             class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-red-500 text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
@@ -261,12 +262,13 @@
                                                                                             <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
                                                                                             </path>
                                                                                         </svg>
-                                                                                        <span id="likeCount-{{ comment.id }}" class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                        <span id="likeCount-{{ comment.id }}"
+                                                                                              class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
                                                                                                     {{ comment.likes.count }}
                                                                                     </span>
                                                                                     </button>
                                                                                 {% else %}
-                                                                                    <button onclick="toggleLike({{ comment.id }})"
+                                                                                    <button onclick="toggleLike('{{ comment.id }}', 'weblog')"
                                                                                             id="likeBtn-{{ comment.id }}"
                                                                                             type="button"
                                                                                             class="flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if comment.id in user_likes %}text-red-500{% endif %}">
@@ -277,7 +279,8 @@
                                                                                             <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
                                                                                             </path>
                                                                                         </svg>
-                                                                                        <span id="likeCount-{{ comment.id }}" class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                        <span id="likeCount-{{ comment.id }}"
+                                                                                              class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
                                                                                                     {{ comment.likes.count }}
                                                                                     </span>
                                                                                     </button>
@@ -292,7 +295,8 @@
                                                                                         <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
                                                                                         </path>
                                                                                     </svg>
-                                                                                    <span id="likeCount-{{ comment.id }}" class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                    <span id="likeCount-{{ comment.id }}"
+                                                                                          class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
                                                                                                     {{ comment.likes.count }}
                                                                                     </span>
                                                                                 </button>
@@ -346,7 +350,7 @@
 
                                                                                     {% if request.user.is_authenticated %}
                                                                                         {% if reply.id in user_likes %}
-                                                                                            <button onclick="toggleLike({{ reply.id }})"
+                                                                                            <button onclick="toggleLike('{{ comment.id }}', 'weblog')"
                                                                                                     id="likeBtn-{{ reply.id }}"
                                                                                                     type="button"
                                                                                                     class="flex items-center justify-center relative w-9 h-9 bg-secondary rounded-full text-red-500 text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
@@ -357,12 +361,13 @@
                                                                                                     <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
                                                                                                     </path>
                                                                                                 </svg>
-                                                                                                <span id="likeCount-{{ reply.id }}" class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                <span id="likeCount-{{ reply.id }}"
+                                                                                                      class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
                                                                                                     {{ reply.likes.count }}
                                                                                                 </span>
                                                                                             </button>
                                                                                         {% else %}
-                                                                                            <button onclick="toggleLike({{ reply.id }})"
+                                                                                            <button onclick="toggleLike('{{ comment.id }}', 'weblog')"
                                                                                                     id="likeBtn-{{ reply.id }}"
                                                                                                     type="button"
                                                                                                     class="flex items-center justify-center relative w-9 h-9 bg-secondary hover:text-red-500 rounded-full text-muted transition-colors {% if reply.id in user_likes %}text-red-500{% endif %}">
@@ -373,7 +378,8 @@
                                                                                                     <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
                                                                                                     </path>
                                                                                                 </svg>
-                                                                                                <span id="likeCount-{{ reply.id }}" class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                                <span id="likeCount-{{ reply.id }}"
+                                                                                                      class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
                                                                                                     {{ reply.likes.count }}
                                                                                                 </span>
                                                                                             </button>
@@ -388,7 +394,8 @@
                                                                                                 <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z">
                                                                                                 </path>
                                                                                             </svg>
-                                                                                            <span id="likeCount-{{ reply.id }}" class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
+                                                                                            <span id="likeCount-{{ reply.id }}"
+                                                                                                  class="absolute -top-1 -right-1 inline-flex bg-red-500 rounded-full text-xs text-white px-1">
                                                                                                     {{ reply.likes.count }}
                                                                                                 </span>
                                                                                         </button>
@@ -454,9 +461,9 @@
             </div>
             <!-- end container -->
         </main>
-
-        {% include 'includes/footer.html' %}
     </div>
+
+    {% include 'includes/footer.html' %}
 
     <script src="{% static 'js/like_unlike_comment_ajax.js' %}"></script>
     <script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>

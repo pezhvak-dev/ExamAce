@@ -40,7 +40,7 @@ class WeblogDetail(URLStorageMixin, HitCountDetailView, DetailView):
 
         user = self.request.user
 
-        comments = self.object.comments.all()
+        comments = self.object.weblog_comments.all()
 
         if self.request.user.is_authenticated:
             user_likes = Comment.objects.filter(likes=user).values_list('id', flat=True)
@@ -101,7 +101,7 @@ class DeleteComment(AuthenticatedUsersOnlyMixin, View):
         id = kwargs.get('id')
 
         comment = Comment.objects.get(id=id)
-        weblog = Weblog.objects.get(comments=comment)
+        weblog = Weblog.objects.get(weblog_comments=comment)
         comment.delete()
 
         messages.success(request, f"نظر شما با موفقیت حذف شد.")
@@ -109,16 +109,15 @@ class DeleteComment(AuthenticatedUsersOnlyMixin, View):
         return redirect(reverse("weblog:detail", kwargs={'slug': weblog.slug}))
 
 
-@require_POST
-def like_comment(request):
-    data = json.loads(request.body)
-    comment_id = data.get('comment_id')
+class LikeCommentView(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            comment_id = data.get('comment_id')
 
-    try:
-        comment = Comment.objects.get(id=comment_id)
-        user = request.user
+            comment = get_object_or_404(Comment, id=comment_id)
+            user = request.user
 
-        if user.is_authenticated:
             if user in comment.likes.all():
                 comment.likes.remove(user)
                 liked = False
@@ -127,7 +126,5 @@ def like_comment(request):
                 liked = True
 
             return JsonResponse({'liked': liked})
-        else:
-            return JsonResponse({'error': 'User not authenticated'}, status=401)
-    except Comment.DoesNotExist:
-        return JsonResponse({'error': 'Comment not found'}, status=404)
+        except Comment.DoesNotExist:
+            return JsonResponse({'error': 'چنین کامنتی یافت نشد.'}, status=404)

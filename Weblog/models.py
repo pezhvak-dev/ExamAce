@@ -104,16 +104,18 @@ class Weblog(models.Model):
 
 
 class Comment(models.Model):
-    weblog = models.ForeignKey(to=Weblog, on_delete=models.CASCADE, verbose_name="وبلاگ", related_name='comments')
+    weblog = models.ForeignKey(to=Weblog, on_delete=models.CASCADE, verbose_name="وبلاگ",
+                               related_name='weblog_comments')
 
-    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر", related_name="user_weblog_comments")
 
     parent = models.ForeignKey(to="self", on_delete=models.CASCADE, verbose_name="والد", blank=True, null=True,
                                related_name="replies")
 
     text = models.TextField(max_length=1000, verbose_name="متن")
 
-    likes = models.ManyToManyField(to="Account.CustomUser", verbose_name="لایک‌ها", related_name="comments_likes",
+    likes = models.ManyToManyField(to="Account.CustomUser", verbose_name="لایک‌ها",
+                                   related_name="weblog_comments_likes",
                                    blank=True)
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')

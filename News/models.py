@@ -101,3 +101,30 @@ class News(models.Model):
         db_table = 'news__news'
         verbose_name = 'خبر'
         verbose_name_plural = 'اخبار'
+
+
+class Comment(models.Model):
+    news = models.ForeignKey(to=News, on_delete=models.CASCADE, verbose_name="خبر", related_name='news_comments')
+
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر", related_name="user_news_comments")
+
+    parent = models.ForeignKey(to="self", on_delete=models.CASCADE, verbose_name="والد", blank=True, null=True,
+                               related_name="replies")
+
+    text = models.TextField(max_length=1000, verbose_name="متن")
+
+    likes = models.ManyToManyField(to="Account.CustomUser", verbose_name="لایک‌ها", related_name="news_comments_likes",
+                                   blank=True)
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
+
+    updated_at = jDateTimeField(auto_now=True, verbose_name='به‌روز‌رسانی شده در تاریخ')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.news.title}"
+
+    class Meta:
+        db_table = 'news__comment'
+        verbose_name = 'کامنت'
+        verbose_name_plural = 'کامنت‌ها'
+        ordering = ('-created_at',)
