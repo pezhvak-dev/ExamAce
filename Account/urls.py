@@ -19,4 +19,5 @@ urlpatterns = [
     path('follow/<str:username>/', views.FollowUser.as_view(), name='follow_user'),
     path('unfollow/<str:username>/', views.UnfollowUser.as_view(), name='unfollow_user'),
     path('participated/exams/<slug:slug>', views.ParticipatedExams.as_view(), name='participated_exams'),
+    path('favorite/exams/<slug:slug>', views.FavoriteExams.as_view(), name='favorite_exams'),
 ]

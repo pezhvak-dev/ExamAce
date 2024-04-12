@@ -256,3 +256,19 @@ class NewsLetter(models.Model):
         db_table = 'account__newsletter'
         verbose_name = "خبرنامه"
         verbose_name_plural = "خبرنامه‌ها"
+
+
+class FavoriteExam(models.Model):
+    user = models.ForeignKey(to=CustomUser, on_delete=models.CASCADE, blank=True, null=True, verbose_name="کاربر")
+
+    exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.user} - {self.exam.name}"
+
+    class Meta:
+        db_table = 'account__favorite_exam'
+        verbose_name = "آزمون مورد علاقه"
+        verbose_name_plural = "آزمون‌های مورد علاقه"

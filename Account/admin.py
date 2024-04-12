@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from Account.models import CustomUser, OTP, Wallet, Notification, NewsLetter, Follow
+from Account.models import CustomUser, OTP, Wallet, Notification, NewsLetter, Follow, FavoriteExam
 
 
 class CustomUserAdmin(UserAdmin):
@@ -58,3 +58,9 @@ class FollowAdmin(admin.ModelAdmin):
     autocomplete_fields = ('follower', 'following')
 
     search_fields = ('follower__username', 'following__username')
+
+
+@admin.register(FavoriteExam)
+class FavoriteExamAdmin(admin.ModelAdmin):
+    list_display = ('user', 'exam', 'created_at',)
+    search_fields = ('user__username', 'exam__name')

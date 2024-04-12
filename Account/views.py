@@ -12,7 +12,7 @@ from django.views.generic import FormView, UpdateView, ListView, DetailView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, OwnerRequiredMixin
-from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow
+from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow, FavoriteExam
 from Course.models import Exam
 from Home.mixins import URLStorageMixin
 
@@ -224,6 +224,8 @@ class OwnerProfileDetailView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, UR
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
+        print(user)
+
         exams = Exam.objects.filter(participated_users=user)
 
         context['exams'] = exams
@@ -317,7 +319,27 @@ class UnfollowUser(AuthenticatedUsersOnlyMixin, View):
         return JsonResponse({'message': f"شما {username} را آن‌فالو کردید."}, status=200)
 
 
-class ParticipatedExams(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
+class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, ListView):
     model = Exam
     template_name = 'Account/participated_exams.html'
     context_object_name = 'exams'
+
+    def get_queryset(self):
+        user = self.request.user
+        exams = Exam.objects.filter(participated_users=user)
+
+        return exams
+
+
+class FavoriteExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, ListView):
+    model = FavoriteExam
+    template_name = 'Account/favorite_exams.html'
+    context_object_name = 'exams'
+
+    def get_queryset(self):
+        slug = self.kwargs.get("slug")
+        user = CustomUser.objects.get(slug=slug)
+
+        exams = FavoriteExam.objects.filter(user=user)
+
+        return exams
