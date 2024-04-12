@@ -28,16 +28,7 @@
 
                     <div class="grid md:grid-cols-12 grid-cols-1 items-start gap-5">
 
-                        {% include 'includes/exam_filter_desktop.html' %}
-
                         <div class="lg:col-span-9 md:col-span-8">
-                            <!-- sort & filter(offcanvas) -->
-                            <div class="flex items-center gap-3 mb-3" x-data="{ offcanvasOpen: false }">
-
-                                {% include 'includes/exam_filter_mobile.html' %}
-
-                            </div>
-                            <!-- end sort & filter(offcanvas) -->
 
                             <!-- exams:wrapper -->
                             <div class="grid lg:grid-cols-3 sm:grid-cols-2 gap-x-5 gap-y-10">
@@ -105,21 +96,21 @@
                                                                   d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
                                                                   clip-rule="evenodd"></path>
                                                         </svg>
-                                                        <span class="font-semibold text-xs">{{ exam.total_duration }}</span>
+                                                        <span class="font-semibold text-xs"> زمان آزمون: {{ exam.total_duration }}</span>
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center justify-between gap-5">
                                                     <div class="flex items-center gap-3">
 
-                                                        {% if exam.teacher.image %}
+                                                        {% if exam.designer.image %}
                                                             <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                                <img src="{{ exam.teacher.image.url }}"
+                                                                <img src="{{ exam.designer.image.url }}"
                                                                      class="w-full h-full object-cover"
                                                                      alt="طراح آزمون {{ exam.name }}"/>
                                                             </div>
                                                         {% else %}
                                                             <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                                                <img src="{% static 'images/avatars/teacher.JPG' %}"
+                                                                <img src="{% static 'images/avatars/default_exam_designer.JPG' %}"
                                                                      class="w-full h-full object-cover"
                                                                      alt="طراح آزمون {{ exam.name }}"/>
                                                             </div>

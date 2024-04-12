@@ -5,7 +5,8 @@ from Account import views
 app_name = "account"
 
 urlpatterns = [
-    path("profile/<slug:slug>", views.ProfileDetailView.as_view(), name="profile"),
+    path("profile/owner/<slug:slug>", views.OwnerProfileDetailView.as_view(), name="owner_profile"),
+    path("profile/visitor/<slug:slug>", views.OwnerProfileDetailView.as_view(), name="visitor_profile"),
     path("profile/<slug:slug>/edit", views.ProfileEditView.as_view(), name="edit_profile"),
     path("login", views.LogInView.as_view(), name="login"),
     path("register", views.RegisterView.as_view(), name="register"),
@@ -17,4 +18,5 @@ urlpatterns = [
     path("enter_newsletters", views.EnterNewsletters.as_view(), name="enter_newsletters"),
     path('follow/<str:username>/', views.FollowUser.as_view(), name='follow_user'),
     path('unfollow/<str:username>/', views.UnfollowUser.as_view(), name='unfollow_user'),
+    path('participated/exams/<slug:slug>', views.ParticipatedExams.as_view(), name='participated_exams'),
 ]

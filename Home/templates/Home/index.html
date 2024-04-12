@@ -371,7 +371,7 @@
                                                                     <div class="flex flex-col items-start space-y-1">
                                                         <span class="line-clamp-1 font-semibold text-xs text-muted">مدرس
                                                             دوره:</span>
-                                                                        <a href="{% url 'account:profile' course.teacher__slug %}"
+                                                                        <a href="{% url 'account:owner_profile' course.teacher__slug %}"
                                                                            class="line-clamp-1 font-bold text-xs text-foreground hover:text-primary">{{ course.teacher__full_name }}</a>
                                                                     </div>
                                                                 </div>
@@ -617,7 +617,7 @@
                                                                              alt="تصویر طراح آزمون">
                                                                     {% endif %}
                                                                 </div>
-                                                                <a href="{% url 'account:profile' exam.designer__slug %}"
+                                                                <a href="{% url 'account:owner_profile' exam.designer__slug %}"
                                                                    class="line-clamp-1 font-bold text-xs text-foreground transition-colors hover:text-primary">{{ exam.designer__full_name }}</a>
                                                             </div>
                                                             <a href="{% url 'course:exams_by_category' exam.category__slug %}"
@@ -683,7 +683,7 @@
                                                                              alt="تصویر طراح آزمون">
                                                                     {% endif %}
                                                                 </div>
-                                                                <a href="{% url 'account:profile' exam.designer__slug %}"
+                                                                <a href="{% url 'account:owner_profile' exam.designer__slug %}"
                                                                    class="line-clamp-1 font-bold text-xs text-foreground transition-colors hover:text-primary">{{ exam.designer__full_name }}</a>
                                                             </div>
                                                             <a href="{% url 'course:exams_by_category' exam.category__slug %}"

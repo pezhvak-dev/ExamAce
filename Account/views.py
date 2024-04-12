@@ -13,6 +13,7 @@ from django.views.generic import FormView, UpdateView, ListView, DetailView
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
 from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
 from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow
+from Course.models import Exam
 from Home.mixins import URLStorageMixin
 
 
@@ -73,11 +74,11 @@ class LogInView(NonAuthenticatedUsersOnlyMixin, FormView):
 
             return redirect(redirect_url)
 
-        return redirect(reverse("account:profile", kwargs={"slug": request.user.username}))
+        return redirect(reverse("account:owner_profile", kwargs={"slug": request.user.username}))
 
     def get_success_url(self):
         referring_url = self.request.session.pop(key="referring_url", default=None)
-        return referring_url or reverse_lazy("account:profile")
+        return referring_url or reverse_lazy("account:owner_profile")
 
 
 class LogOutView(AuthenticatedUsersOnlyMixin, View):
@@ -123,7 +124,7 @@ class ChangePasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
             return redirect(redirect_url)
 
         else:
-            return redirect(reverse('account:profile', kwargs={'slug': self.request.user.username}))
+            return redirect(reverse('account:owner_profile', kwargs={'slug': self.request.user.username}))
 
     def form_invalid(self, form):
         return super().form_invalid(form)
@@ -189,7 +190,7 @@ class CheckOTPView(FormView):
 
             messages.success(request, f"{user.username} عزیز، حساب کاربری شما با موفقیت ایجاد شد.")
 
-            return redirect(reverse("account:profile", kwargs={"slug": user.username}))
+            return redirect(reverse("account:owner_profile", kwargs={"slug": user.username}))
 
         elif OTP.objects.filter(uuid=uuid, sms_code=sms_code, otp_type="F").exists():
             return redirect(reverse(viewname="account:change_password") + f"?uuid={uuid}")
@@ -214,19 +215,37 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class ProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, DetailView):
+class OwnerProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, DetailView):
     model = CustomUser
-    template_name = 'Account/profile.html'
+    template_name = 'Account/owner_profile.html'
     context_object_name = 'user'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        viewed_user = self.get_object()
         user = self.request.user
 
-        is_following = Follow.objects.filter(follower=user, following=viewed_user).exists()
+        exams = Exam.objects.filter(participated_users=user)
+
+        context['exams'] = exams
+
+        return context
+
+
+class VisitorProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, DetailView):
+    model = CustomUser
+    template_name = 'Account/visitor_profile.html'
+    context_object_name = 'user'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        owner = self.get_object()
+        user = self.request.user
+
+        is_following = Follow.objects.filter(follower=user, following=owner).exists()
+        entered_exams = Exam.objects.filter(participated_users=user)
 
         context['is_following'] = is_following
+        context['entered_exams'] = entered_exams
 
         return context
 
@@ -243,7 +262,7 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('account:profile', kwargs={'slug': self.request.user.username})
+        return reverse('account:owner_profile', kwargs={'slug': self.request.user.username})
 
 
 class NotificationListView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
@@ -296,3 +315,9 @@ class UnfollowUser(AuthenticatedUsersOnlyMixin, View):
         request.user.unfollow(user_to_unfollow)
 
         return JsonResponse({'message': f"شما {username} را آن‌فالو کردید."}, status=200)
+
+
+class ParticipatedExams(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
+    model = Exam
+    template_name = 'Account/participated_exams.html'
+    context_object_name = 'exams'

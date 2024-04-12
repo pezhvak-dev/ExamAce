@@ -40,7 +40,7 @@ class StaffOnlyMixin:
             message = "این بخش فقط مخصوص ادمین های وبسایت است."
             success = "no"
             failure = "yes"
-            next_url = reverse('account:profile')
+            next_url = reverse('account:owner_profile')
             return redirect(
                 redirect_url + f'?message={message}&success={success}&failure={failure}&next_url={next_url}')
 
@@ -56,7 +56,7 @@ class NonStaffOnlyMixin:
             message = "این بخش فقط مخصوص کاربران معمولی وبسایت است."
             success = "no"
             failure = "yes"
-            next_url = reverse('account:profile')
+            next_url = reverse('account:owner_profile')
             return redirect(
                 redirect_url + f'?message={message}&success={success}&failure={failure}&next_url={next_url}')
 
@@ -71,7 +71,7 @@ class SuperUserOnlyMixin:
             message = "این بخش فقط مخصوص کاربران معمولی وبسایت است."
             success = "no"
             failure = "yes"
-            next_url = reverse('account:profile')
+            next_url = reverse('account:owner_profile')
             return redirect(
                 redirect_url + f'?message={message}&success={success}&failure={failure}&next_url={next_url}')
 

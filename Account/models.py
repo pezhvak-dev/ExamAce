@@ -237,7 +237,7 @@ class Notification(models.Model):
     class Meta:
         db_table = 'account__notification'
         verbose_name = "اعلانیه"
-        verbose_name_plural = "اعلانیه‌ها"
+        verbose_name_plural = "اعلانات"
 
 
 class NewsLetter(models.Model):
