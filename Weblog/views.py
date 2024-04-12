@@ -45,8 +45,13 @@ class WeblogDetail(URLStorageMixin, HitCountDetailView, DetailView):
             user_likes = list(
                 user.liked_comments.filter(comment__weblog=self.object).values_list('comment_id', flat=True))
 
+        related_weblogs = self.object.get_related_weblogs(max_results=5)
+        latest_weblogs = self.object.get_latest_weblogs()
+
         context['comments'] = comments
         context['user_likes'] = user_likes
+        context['related_weblogs'] = related_weblogs
+        context['latest_weblogs'] = latest_weblogs
 
         return context
 
