@@ -281,15 +281,15 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Al
                      CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, View):
     def post(self, request, *args, **kwargs):
         user = request.user
-        exam_slug = self.kwargs['slug']
-        exam = get_object_or_404(Exam, slug=exam_slug)
+        exam_slug = self.kwargs.get("slug", None)
+        exam = Exam.objects.get(slug=exam_slug)
 
         for key, value in request.POST.items():
             if key.startswith('question_'):
                 question_number = int(key.replace('question_', ''))
                 selected_answer = value
 
-                exam_answer = get_object_or_404(ExamAnswer, exam=exam, question_number=question_number)
+                exam_answer = ExamAnswer.objects.get(exam=exam, question_number=question_number)
 
                 if selected_answer == exam_answer.choice_1:
                     selected_choice = '1'
