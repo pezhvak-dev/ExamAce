@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from Weblog.models import Weblog, Category, Tag, Comment, CommentLike
+from Weblog.models import Weblog, Category, Tag, Comment
 
 
 @admin.register(Weblog)
@@ -26,14 +26,6 @@ class TagAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
 
-class CommentLikeAdmin(admin.StackedInline):
-    model = CommentLike
-    extra = 1
-    can_delete = False
-
-
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('user', 'parent', 'created_at', 'updated_at')
-
-    inlines = [CommentLikeAdmin]

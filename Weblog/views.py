@@ -1,15 +1,18 @@
+import json
+
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, get_list_or_404, redirect
 from django.urls import reverse
 from django.utils.encoding import uri_to_iri
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, View
 from hitcount.views import HitCountDetailView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
 from Account.models import CustomUser
 from Home.mixins import URLStorageMixin
-from Weblog.models import Weblog, Comment, CommentLike
+from Weblog.models import Weblog, Comment
 
 
 class AllWeblogs(URLStorageMixin, ListView):
@@ -37,16 +40,21 @@ class WeblogDetail(URLStorageMixin, HitCountDetailView, DetailView):
 
         user = self.request.user
 
-        comments = self.object.comments.all()
+        comments = self.object.weblog_comments.all()
 
-        user_likes = []
         if self.request.user.is_authenticated:
-            user = CustomUser.objects.get(username=user.username)
-            user_likes = list(
-                user.liked_comments.filter(comment__weblog=self.object).values_list('comment_id', flat=True))
+            user_likes = Comment.objects.filter(likes=user).values_list('id', flat=True)
+
+        else:
+            user_likes = []
+
+        related_weblogs = self.object.get_related_weblogs(max_results=5)
+        latest_weblogs = self.object.get_latest_weblogs()
 
         context['comments'] = comments
         context['user_likes'] = user_likes
+        context['related_weblogs'] = related_weblogs
+        context['latest_weblogs'] = latest_weblogs
 
         return context
 
@@ -82,7 +90,10 @@ class AddComment(AuthenticatedUsersOnlyMixin, View):
         Comment.objects.create(user=user, text=text, weblog=weblog, parent_id=parent_id)
         messages.success(request, f"نظر شما با موفقیت ثبت شد.")
 
-        return redirect(reverse("weblog:detail", kwargs={'slug': slug}))
+        fragment = 'reply_section'
+        url = reverse('weblog:detail', kwargs={'slug': slug}) + f'#{fragment}'
+
+        return redirect(url)
 
 
 class DeleteComment(AuthenticatedUsersOnlyMixin, View):
@@ -90,7 +101,7 @@ class DeleteComment(AuthenticatedUsersOnlyMixin, View):
         id = kwargs.get('id')
 
         comment = Comment.objects.get(id=id)
-        weblog = Weblog.objects.get(comments=comment)
+        weblog = Weblog.objects.get(weblog_comments=comment)
         comment.delete()
 
         messages.success(request, f"نظر شما با موفقیت حذف شد.")
@@ -98,20 +109,22 @@ class DeleteComment(AuthenticatedUsersOnlyMixin, View):
         return redirect(reverse("weblog:detail", kwargs={'slug': weblog.slug}))
 
 
-class LikeComment(AuthenticatedUsersOnlyMixin, View):
-    def get(self, request, *args, **kwargs):
-        id = kwargs.get('id')
-        user = request.user
-
-        comment = Comment.objects.get(id=id)
-
+class LikeCommentView(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request):
         try:
-            comment_like = CommentLike.objects.get(comment=comment, user=user)
-            comment_like.delete()
+            data = json.loads(request.body)
+            comment_id = data.get('comment_id')
 
-            return JsonResponse({"response": "unliked"})
+            comment = get_object_or_404(Comment, id=comment_id)
+            user = request.user
 
-        except CommentLike.DoesNotExist:
-            CommentLike.objects.create(comment=comment, user=user)
+            if user in comment.likes.all():
+                comment.likes.remove(user)
+                liked = False
+            else:
+                comment.likes.add(user)
+                liked = True
 
-            return JsonResponse({"response": "liked"})
+            return JsonResponse({'liked': liked})
+        except Comment.DoesNotExist:
+            return JsonResponse({'error': 'چنین کامنتی یافت نشد.'}, status=404)

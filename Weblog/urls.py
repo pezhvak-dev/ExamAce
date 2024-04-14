@@ -10,5 +10,5 @@ urlpatterns = [
     path('category/<slug>', views.WeblogsByCategory.as_view(), name='by_category'),
     path('add/comment/<slug>', views.AddComment.as_view(), name='add_comment'),
     path('comment/delete/<id>', views.DeleteComment.as_view(), name='delete_comment'),
-    path('comment/like/<id>', views.LikeComment.as_view(), name='like_comment'),
+    path('like_comment/', views.LikeCommentView.as_view(), name='like_comment'),
 ]

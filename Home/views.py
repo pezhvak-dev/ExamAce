@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
+from Account.models import FavoriteExam
 from Course.models import VideoCourse, Exam
 from Home.mixins import URLStorageMixin
 from Home.models import HeroBanner, Banner1, Banner2, Banner3
@@ -15,6 +16,8 @@ class HomeView(URLStorageMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
+
+        user = self.request.user
 
         latest_video_courses = VideoCourse.objects.values("teacher__image",
                                                           "category__name",
@@ -38,6 +41,7 @@ class HomeView(URLStorageMixin, TemplateView):
         latest_exams_1 = Exam.objects.values(
             "name",
             "slug",
+            "id",
             "designer__image",
             "designer__full_name",
             "designer__slug",
@@ -56,6 +60,7 @@ class HomeView(URLStorageMixin, TemplateView):
         latest_exams_2 = Exam.objects.values(
             "name",
             "slug",
+            "id",
             "designer__image",
             "designer__full_name",
             "designer__slug",
@@ -85,6 +90,11 @@ class HomeView(URLStorageMixin, TemplateView):
 
         attitudes = Message.objects.filter(can_be_shown=True).order_by('-created_at')
 
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
         context['latest_video_courses'] = latest_video_courses  # Is a queryset
         context['latest_exams_1'] = latest_exams_1  # Is a queryset
         context['latest_exams_2'] = latest_exams_2  # Is a queryset
@@ -95,6 +105,7 @@ class HomeView(URLStorageMixin, TemplateView):
         context['banner_2'] = banner_2  # Is a single object
         context['banner_3'] = banner_3  # Is a queryset
         context['attitudes'] = attitudes  # Is a queryset
+        context['favorite_exams'] = favorite_exams  # Is a queryset
 
         return context
 

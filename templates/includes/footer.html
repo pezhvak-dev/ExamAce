@@ -128,9 +128,9 @@
                                 برای اطلاع از جدیدترین اخبار و جشنوراه‌های تخفیفی {آزمون} ایمیل خود
                                 را وارد کنید.
                             </p>
-                            <form action="{% url 'account:enter_newsletters' %}" method="post">
+                            <form id="newsletterForm" action="{% url 'account:enter_newsletters' %}" method="post">
                                 {% csrf_token %}
-                                
+
                                 <div class="flex items-center gap-3 relative">
                                             <span class="absolute right-3 text-muted">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
@@ -206,3 +206,6 @@
     </div>
 </footer>
 <!-- end footer -->
+<script src="{% static 'js/vendor/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'js/sweetalert2.js' %}"></script>
+<script src="{% static 'js/join_news_letters_ajax.js' %}"></script>

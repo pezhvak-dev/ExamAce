@@ -400,7 +400,7 @@
                             {% endif %}
 
                             <span class="xs:flex flex-col items-start hidden text-xs space-y-1">
-                                    <span class="font-semibold text-foreground">{{ user.username }}</span>
+                                    <span class="font-semibold text-foreground">{{ request.user.username }}</span>
                                     <span class="font-semibold text-muted">خوش آمـــدید</span>
                                 </span>
                             <span class="text-foreground transition-transform"
@@ -416,7 +416,7 @@
                         <div class="absolute top-full left-0 pt-3" x-show="isOpen"
                              x-on:click.outside="isOpen = false">
                             <div class="w-56 bg-background border border-border rounded-xl shadow-2xl shadow-black/5 p-3">
-                                <a href="{% url 'account:profile' slug=request.user.username %}"
+                                <a href="{% url 'account:owner_profile' slug=request.user.username %}"
                                    class="flex items-center gap-2 w-full text-foreground transition-colors hover:text-primary px-3 py-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                          stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -427,7 +427,7 @@
                                 </a>
                                 <a href="{% url 'account:logout' %}">
                                     <button type="button"
-                                            class="flex items-center gap-2 w-full text-red-500 transition-colors hover:text-red-700 px-3 py-2">
+                                            class="flex items-center gap-2 w-full text-red-500 transition-colors hover:text-red-700 px-3 py-2 logout-button">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                              stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -759,3 +759,6 @@
     </div><!-- end offcanvas -->
 </header>
 <!-- end header -->
+
+<script src="{% static 'js/sweetalert2.js' %}"></script>
+<script src="{% static 'js/log_out_confirmation.js' %}"></script>

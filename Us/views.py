@@ -34,7 +34,6 @@ class Contact(URLStorageMixin,FormView):
 
     def form_valid(self, form):
         user = CustomUser.objects.get(username=self.request.user.username)
-        print(user.mobile_phone)
 
         message = form.cleaned_data.get("message")
 

@@ -3,14 +3,17 @@ from uuid import uuid4
 
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
-from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import FormView, UpdateView, ListView, DetailView
 
 from Account.forms import OTPRegisterForm, CheckOTPForm, RegularLogin, ForgetPasswordForm, ChangePasswordForm
-from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin
-from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter
+from Account.mixins import NonAuthenticatedUsersOnlyMixin, AuthenticatedUsersOnlyMixin, OwnerRequiredMixin
+from Account.models import CustomUser, OTP, Notification, Wallet, NewsLetter, Follow, FavoriteExam
+from Course.models import Exam
 from Home.mixins import URLStorageMixin
 
 
@@ -71,11 +74,11 @@ class LogInView(NonAuthenticatedUsersOnlyMixin, FormView):
 
             return redirect(redirect_url)
 
-        return redirect(reverse("account:profile", kwargs={"slug": request.user.username}))
+        return redirect(reverse("account:owner_profile", kwargs={"slug": request.user.username}))
 
     def get_success_url(self):
         referring_url = self.request.session.pop(key="referring_url", default=None)
-        return referring_url or reverse_lazy("account:profile")
+        return referring_url or reverse_lazy("account:owner_profile")
 
 
 class LogOutView(AuthenticatedUsersOnlyMixin, View):
@@ -121,7 +124,7 @@ class ChangePasswordView(NonAuthenticatedUsersOnlyMixin, FormView):
             return redirect(redirect_url)
 
         else:
-            return redirect(reverse('account:profile', kwargs={'slug': self.request.user.username}))
+            return redirect(reverse('account:owner_profile', kwargs={'slug': self.request.user.username}))
 
     def form_invalid(self, form):
         return super().form_invalid(form)
@@ -187,7 +190,7 @@ class CheckOTPView(FormView):
 
             messages.success(request, f"{user.username} عزیز، حساب کاربری شما با موفقیت ایجاد شد.")
 
-            return redirect(reverse("account:profile", kwargs={"slug": user.username}))
+            return redirect(reverse("account:owner_profile", kwargs={"slug": user.username}))
 
         elif OTP.objects.filter(uuid=uuid, sms_code=sms_code, otp_type="F").exists():
             return redirect(reverse(viewname="account:change_password") + f"?uuid={uuid}")
@@ -212,13 +215,49 @@ class CheckOTPView(FormView):
         return super().form_invalid(form)
 
 
-class ProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, DetailView):
+class OwnerProfileDetailView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, DetailView):
     model = CustomUser
-    template_name = 'Account/profile.html'
+    template_name = 'Account/owner_profile.html'
     context_object_name = 'user'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
 
-class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
+        exams = Exam.objects.filter(participated_users=user)
+
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
+        context['exams'] = exams
+        context['favorite_exams'] = favorite_exams
+
+        return context
+
+
+class VisitorProfileDetailView(AuthenticatedUsersOnlyMixin, URLStorageMixin, DetailView):
+    model = CustomUser
+    template_name = 'Account/visitor_profile.html'
+    context_object_name = 'user'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        owner = self.get_object()
+        user = self.request.user
+
+        is_following = Follow.objects.filter(follower=user, following=owner).exists()
+        entered_exams = Exam.objects.filter(participated_users=user)
+
+        context['is_following'] = is_following
+        context['entered_exams'] = entered_exams
+
+        return context
+
+
+class ProfileEditView(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, UpdateView):
     model = CustomUser
     template_name = 'Account/edit_profile.html'
     fields = ("full_name", "email", "about_me")
@@ -230,7 +269,7 @@ class ProfileEditView(AuthenticatedUsersOnlyMixin, URLStorageMixin, UpdateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('account:profile', kwargs={'slug': self.request.user.username})
+        return reverse('account:owner_profile', kwargs={'slug': self.request.user.username})
 
 
 class NotificationListView(AuthenticatedUsersOnlyMixin, URLStorageMixin, ListView):
@@ -249,25 +288,89 @@ class EnterNewsletters(View):
         email = request.POST.get("email")
         user = None
 
-        redirect_url = request.session.get('current_url')
-
         if request.user.is_authenticated:
             user = request.user
 
         if NewsLetter.objects.filter(email=email).exists():
-            messages.error(request, f"این آدرس ایمیل قبلا در خبرنامه ثبت شده است.")
-
-            if redirect_url is not None:
-                return redirect(redirect_url)
-
-            return redirect("home:home")
+            return JsonResponse({'message': f"این آدرس ایمیل قبلا در خبرنامه ثبت شده است."}, status=400)
 
         else:
             NewsLetter.objects.create(user=user, email=email)
 
-            messages.success(request, f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد.")
+            return JsonResponse({'message': f"آدرس ایمیل شما با موفقیت در خبرنامه ثبت شد."}, status=200)
 
-            if redirect_url is not None:
-                return redirect(redirect_url)
 
-            return redirect("home:home")
+class FollowUser(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, username):
+        user_to_follow = get_object_or_404(CustomUser, username=username)
+
+        if request.user == user_to_follow:
+            return JsonResponse({'error': 'شما نمی‌توانید خود را فالو کنید!'}, status=400)
+
+        request.user.follow(user_to_follow)
+
+        return JsonResponse({'message': f"شما {username} را فالو کردید."}, status=200)
+
+
+class UnfollowUser(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, username):
+        user_to_unfollow = get_object_or_404(CustomUser, username=username)
+
+        if request.user == user_to_unfollow:
+            return JsonResponse({'error': 'شما نمی‌توانید خود را آن‌فالو کنید!'}, status=400)
+
+        request.user.unfollow(user_to_unfollow)
+
+        return JsonResponse({'message': f"شما {username} را آن‌فالو کردید."}, status=200)
+
+
+class ParticipatedExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, ListView):
+    model = Exam
+    template_name = 'Account/participated_exams.html'
+    context_object_name = 'exams'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
+        context['favorite_exams'] = favorite_exams
+
+        return context
+
+    def get_queryset(self):
+        user = self.request.user
+        exams = Exam.objects.filter(participated_users=user)
+
+        return exams
+
+
+class FavoriteExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageMixin, ListView):
+    model = FavoriteExam
+    template_name = 'Account/favorite_exams.html'
+    context_object_name = 'exams'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        if user.is_authenticated:
+            favorite_exams = Exam.objects.filter(favoriteexam__user=user).values_list('id', flat=True)
+        else:
+            favorite_exams = []
+
+        context['favorite_exams'] = favorite_exams
+
+        return context
+
+    def get_queryset(self):
+        slug = self.kwargs.get("slug")
+        user = CustomUser.objects.get(slug=slug)
+
+        exams = FavoriteExam.objects.filter(user=user)
+
+        return exams

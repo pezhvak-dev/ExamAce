@@ -104,14 +104,19 @@ class Weblog(models.Model):
 
 
 class Comment(models.Model):
-    weblog = models.ForeignKey(to=Weblog, on_delete=models.CASCADE, verbose_name="وبلاگ", related_name='comments')
+    weblog = models.ForeignKey(to=Weblog, on_delete=models.CASCADE, verbose_name="وبلاگ",
+                               related_name='weblog_comments')
 
-    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر")
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, verbose_name="کاربر", related_name="user_weblog_comments")
 
     parent = models.ForeignKey(to="self", on_delete=models.CASCADE, verbose_name="والد", blank=True, null=True,
                                related_name="replies")
 
     text = models.TextField(max_length=1000, verbose_name="متن")
+
+    likes = models.ManyToManyField(to="Account.CustomUser", verbose_name="لایک‌ها",
+                                   related_name="weblog_comments_likes",
+                                   blank=True)
 
     created_at = jDateTimeField(auto_now_add=True, verbose_name='تاریخ شروع')
 
@@ -125,21 +130,3 @@ class Comment(models.Model):
         verbose_name = 'کامنت'
         verbose_name_plural = 'کامنت‌ها'
         ordering = ('-created_at',)
-
-
-class CommentLike(models.Model):
-    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, related_name='liked_comments',
-                             verbose_name='کاربر')
-
-    comment = models.ForeignKey(to=Comment, on_delete=models.CASCADE, verbose_name='وبلاگ',
-                                related_name='comment_likes')
-
-    created_at = jDateTimeField(auto_now_add=True, verbose_name='ایجاد شده در تاریخ')
-
-    def __str__(self):
-        return f"{self.user.username}"
-
-    class Meta:
-        db_table = "weblog__comment_like"
-        verbose_name = "لایک کامنت"
-        verbose_name_plural = "لایک‌های کامنت"
