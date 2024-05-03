@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "News.apps.NewsConfig",
     "Us.apps.UsConfig",
+    "MediaHandling.apps.MediahandlingConfig",
 
     # Third party packages
     "widget_tweaks",
