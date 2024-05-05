@@ -68,34 +68,34 @@
                                                 <div class="flex flex-col flex-wrap rounded-lg border dark:border-dark-3 border-[#E4E4E4] py-3 px-4 sm:flex-row">
                                                     <a href="javascript:void(0)" @click="openTab = 1"
                                                        :class="openTab === 1 ? activeClasses : inactiveClasses"
-                                                       class="px-4 py-3 text-sm font-medium rounded-md md:text-base lg:px-6">
+                                                       class="px-4 text-foreground py-3 text-sm font-medium rounded-md md:text-base lg:px-6">
                                                         لورم ایپسوم یا طرح‌نما
                                                     </a>
 
                                                     <a href="javascript:void(0)"
                                                        @click="openTab = 2"
                                                        :class="openTab === 2 ? activeClasses : inactiveClasses"
-                                                       class="px-4 py-3 text-sm font-medium rounded-md md:text-base lg:px-6">
+                                                       class="px-4 py-3 text-foreground text-sm font-medium rounded-md md:text-base lg:px-6">
                                                         لورم ایپسوم یا طرح‌نما
                                                     </a>
 
                                                     <a href="javascript:void(0)"
                                                        @click="openTab = 3"
                                                        :class="openTab === 3 ? activeClasses : inactiveClasses"
-                                                       class="px-4 py-3 text-sm font-medium rounded-md md:text-base lg:px-6">
+                                                       class="px-4 py-3 text-foreground text-sm font-medium rounded-md md:text-base lg:px-6">
                                                         لورم ایپسوم یا طرح‌نما
                                                     </a>
                                                     <a href="javascript:void(0)"
                                                        @click="openTab = 4"
                                                        :class="openTab === 4 ? activeClasses : inactiveClasses"
-                                                       class="px-4 py-3 text-sm font-medium rounded-md md:text-base lg:px-6 text-justify">
+                                                       class="px-4 py-3 text-sm text-foreground font-medium rounded-md md:text-base lg:px-6 text-justify">
                                                         لورم ایپسوم یا طرح‌نما
                                                     </a>
 
                                                 </div>
                                                 <div>
                                                     <div x-show="openTab === 1"
-                                                         class="p-6 text-base leading-relaxed text-body-color dark:text-dark-6 text-justify">
+                                                         class="p-6 text-base text-foreground leading-relaxed text-body-color dark:text-dark-6 text-justify">
                                                         لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با
                                                         استفاده از
                                                         طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و
@@ -103,7 +103,7 @@
                                                         لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع
                                                     </div>
                                                     <div x-show="openTab === 2"
-                                                         class="p-6 text-base leading-relaxed text-body-color dark:text-dark-6 text-justify">
+                                                         class="p-6 text-base text-foreground leading-relaxed text-body-color dark:text-dark-6 text-justify">
                                                         لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با
                                                         استفاده از
                                                         طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و
@@ -117,7 +117,7 @@
                                                         لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع
                                                     </div>
                                                     <div x-show="openTab === 3"
-                                                         class="p-6 text-base leading-relaxed text-body-color dark:text-dark-6 text-justify">
+                                                         class="p-6 text-base text-foreground leading-relaxed text-body-color dark:text-dark-6 text-justify">
                                                         لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با
                                                         استفاده از
                                                         طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و
@@ -125,7 +125,7 @@
                                                         لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع
                                                     </div>
                                                     <div x-show="openTab === 4"
-                                                         class="p-6 text-base leading-relaxed text-body-color dark:text-dark-6 text-justify">
+                                                         class="p-6 text-base text-foreground leading-relaxed text-body-color dark:text-dark-6 text-justify">
                                                         لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با
                                                         استفاده از
                                                         طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و
@@ -767,14 +767,14 @@
                     <div class="lg:col-span-3 md:col-span-4 md:sticky md:top-24">
                         <!-- user:menus -->
                         <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
-                            <span class="font-black text-xl py-2">آخرین اخبار</span>
+                            <span class="font-black text-xl text-foreground py-2">آخرین اخبار</span>
 
                             {% for news in latest_news %}
                                 <a href="{% url 'news:detail' news.slug %}">
                                     <li>
                                         <button type="button"
                                                 class="w-full h-11 inline-flex items-center text-right gap-3 bg-background rounded-full text-muted transition-colors hover:bg-primary hover:text-primary-foreground px-4">
-                                            <span class="font-semibold text-xs"> {{ news.title }} </span>
+                                            <span class="font-semibold text-foreground text-xs"> {{ news.title }} </span>
                                         </button>
                                     </li>
                                 </a>
@@ -785,7 +785,7 @@
 
                         <!-- user:menus -->
                         <ul class="flex flex-col space-y-3 bg-secondary rounded-2xl p-5">
-                            <span class="font-black text-xl py-2">آخرین وبلاگ‌ها</span>
+                            <span class="font-black text-foreground text-xl py-2">آخرین وبلاگ‌ها</span>
 
                             {% for weblog in latest_weblogs %}
                                 <a href="{% url 'weblog:detail' weblog.slug %}">
@@ -794,7 +794,7 @@
                                                 class="w-full h-11 inline-flex items-center text-right gap-3 bg-background
                                                 rounded-full text-muted transition-colors hover:bg-primary
                                                 hover:text-primary-foreground px-4">
-                                            <span class="font-semibold text-xs"> {{ weblog.title }} </span>
+                                            <span class="font-semibold text-foreground text-xs"> {{ weblog.title }} </span>
                                         </button>
                                     </li>
                                 </a>
