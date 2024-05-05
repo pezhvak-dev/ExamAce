@@ -239,6 +239,7 @@ class ExamAnswer(models.Model):
         verbose_name_plural = 'پاسخ‌های آزمون'
 
 
+
 class Exam(models.Model):
     exam_payment_types = (
         ('F', 'رایگان'),
@@ -321,6 +322,26 @@ class Exam(models.Model):
         db_table = 'course__exam'
         verbose_name = 'آزمون'
         verbose_name_plural = 'آزمون‌ها'
+
+
+class BoughtExam(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.SET_NULL, blank=True, null=True,
+                             verbose_name="کاربر")
+
+    exam = models.ForeignKey(to=Exam, on_delete=models.SET_NULL, blank=True, null=True,
+                                     verbose_name="دوره ویدئویی", editable=False)
+
+    cost = models.PositiveBigIntegerField(default=0, verbose_name="قیمت خرید", editable=False)
+
+    created_at = jDateTimeField(auto_now_add=True, verbose_name="ایجاد شده در تاریخ")
+
+    def __str__(self):
+        return f"{self.user}"
+
+    class Meta:
+        db_table = "course__bought_exam"
+        verbose_name = "آزمون خریداری شده"
+        verbose_name_plural = "آزمون‌های خریداری شده"
 
 
 class DownloadedQuestionFile(models.Model):
