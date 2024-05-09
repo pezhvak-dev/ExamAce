@@ -18,7 +18,8 @@ from Account.models import FavoriteExam
 from Course.filters import ExamFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin, NonFinishedExamsOnlyMixin
-from Course.models import BoughtExam, VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, \
+from Course.models import BoughtExam, VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser, \
+    UserFinalAnswer, \
     UserTempAnswer, ExamSection, ExamUnit
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
@@ -223,116 +224,56 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
 
         time_left = int(total_duration - difference)
 
-        if time_left <= 0:
-            pass
-        exam_answer = ExamAnswer.objects.filter(unit__section= exam_section)
+        questions_and_answers = []
+        exam_answers = ExamAnswer.objects.filter(unit__section=exam_section)
 
-        answers = exam_answer.values(
-            "choice_1", "choice_2",
-            "choice_3", "choice_4"
-        )
+        for exam_answer in exam_answers:
+            if UserTempAnswer.objects.filter(
+                    user=user, question_number=exam_answer.question_number
+            ).exists():
+                exam_temp_answer = UserTempAnswer.objects.get(
+                    user=user,
+                    question_number=exam_answer.question_number
+                )
+
+                questions_and_answers.append(
+                    {
+                        "id": exam_answer.id,
+                        "slug": exam_answer.unit.slug,
+                        "question": exam_answer.question,
+                        "question_number": exam_answer.question_number,
+                        "answer_1": exam_answer.answer_1,
+                        "answer_2": exam_answer.answer_2,
+                        "answer_3": exam_answer.answer_3,
+                        "answer_4": exam_answer.answer_4,
+                        "selected_answer": exam_temp_answer.selected_answer
+                    }
+                )
+
+            else:
+                questions_and_answers.append(
+                    {
+                        "id": exam_answer.id,
+                        "slug": exam_answer.unit.slug,
+                        "question": exam_answer.question,
+                        "question_number": exam_answer.question_number,
+                        "answer_1": exam_answer.answer_1,
+                        "answer_2": exam_answer.answer_2,
+                        "answer_3": exam_answer.answer_3,
+                        "answer_4": exam_answer.answer_4,
+                        "selected_answer": None
+                    }
+                )
 
         context = {
             'time_left': time_left,
-            'answers': answers,
             'slug': exam.slug,
             'answer': answer,
-            'next_section': next_section
+            'next_section': next_section,
+            'questions_and_answers': questions_and_answers
         }
 
         return render(request=request, template_name=self.template_name, context=context)
-
-
-class FinalExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin,
-                      CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, NonFinishedExamsOnlyMixin,
-                      View):
-
-    def post(self, request, *args, **kwargs):
-        user = request.user
-        exam_slug = self.kwargs['slug']
-        exam = get_object_or_404(Exam, slug=exam_slug)
-
-        for key, value in request.POST.items():
-            if key.startswith('question_'):
-                question_number = int(key.replace('question_', ''))
-                selected_answer = value
-
-                exam_answer = ExamAnswer.objects.get(exam=exam, question_number=question_number)
-                if exam_answer.choice_1 == selected_answer:
-                    UserFinalAnswer.objects.create(
-                        user=user,
-                        exam=exam,
-                        question_number=question_number,
-                        selected_answer=1
-                    )
-
-                if exam_answer.choice_2 == selected_answer:
-                    UserFinalAnswer.objects.create(
-                        user=user,
-                        exam=exam,
-                        question_number=question_number,
-                        selected_answer=2
-                    )
-
-                if exam_answer.choice_3 == selected_answer:
-                    UserFinalAnswer.objects.create(
-                        user=user,
-                        exam=exam,
-                        question_number=question_number,
-                        selected_answer=3
-                    )
-
-                if exam_answer.choice_4 == selected_answer:
-                    UserFinalAnswer.objects.create(
-                        user=user,
-                        exam=exam,
-                        question_number=question_number,
-                        selected_answer=4
-                    )
-
-        messages.success(request, f"پاسخنامه آزمون {exam.name} با موقیت ثبت شد.")
-
-        return redirect(reverse("course:exam_detail", kwargs={"slug": exam_slug}))
-
-
-class TempExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin,
-                     CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, View):
-    def post(self, request, *args, **kwargs):
-        user = request.user
-        exam_slug = self.kwargs.get("slug", None)
-        exam = Exam.objects.get(slug=exam_slug)
-
-        for key, value in request.POST.items():
-            if key.startswith('question_'):
-                print(
-                    key
-                )
-
-                question_number = int(key.replace('question_', ''))
-                selected_answer = value
-
-                exam_answer = ExamAnswer.objects.get(unit__section__exam=exam, question_number=question_number)
-
-                if selected_answer == exam_answer.choice_1:
-                    selected_choice = '1'
-                elif selected_answer == exam_answer.choice_2:
-                    selected_choice = '2'
-                elif selected_answer == exam_answer.choice_3:
-                    selected_choice = '3'
-                elif selected_answer == exam_answer.choice_4:
-                    selected_choice = '4'
-                else:
-                    continue
-                time = datetime.now(pytz.timezone('Iran'))
-                UserTempAnswer.objects.update_or_create(
-                    user=user,
-                    exam=exam,
-                    question_number=question_number,
-                    defaults={'selected_answer': selected_choice},
-                    time=time
-                )
-
-        return JsonResponse(data={}, status=200)
 
 
 class CalculateExamResult(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin, View):
@@ -483,13 +424,13 @@ class RegisterInExam(AuthenticatedUsersOnlyMixin, View):
     def post(self, request, *args, **kwargs):
         exam_id = request.POST.get('courseId')
         user = self.request.user
-        
+
         exam = Exam.objects.get(id=exam_id)
 
         if not Exam.objects.filter(id=exam_id, participated_users=user).exists():
             exam.participated_users.add(user)
             exam.save()
-            
+
             exam.participated_users.add(user)
             exam.save()
 
@@ -501,3 +442,40 @@ class RegisterInExam(AuthenticatedUsersOnlyMixin, View):
         else:
             return JsonResponse(data={"message": f"شما قبلا در دوره {exam.name} ثبت نام کردید."},
                                 status=400)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class TempExamSubmit(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get("slug")
+
+        question_number = request.POST.get("question_number")
+        selected_answer = request.POST.get("selected_answer")
+
+        exam_section = ExamSection.objects.filter(slug=slug).last()
+
+        try:
+            temp_answer = UserTempAnswer.objects.get(
+                user=user,
+                question_number=question_number
+            )
+
+            temp_answer.selected_answer = selected_answer
+            temp_answer.question_number = question_number
+            temp_answer.save()
+
+        except UserTempAnswer.DoesNotExist:
+            UserTempAnswer.objects.create(
+                user=user,
+                exam_section=exam_section,
+                question_number=question_number,
+                selected_answer=selected_answer
+            )
+
+        return JsonResponse(
+            data={
+                "message": "saved!"
+            },
+            status=200
+        )

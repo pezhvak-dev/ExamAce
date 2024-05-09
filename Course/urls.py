@@ -15,9 +15,9 @@ urlpatterns = [
     path('exam/<slug>/enter', views.EnterExam.as_view(), name='enter_exam'),
     path('exam/<slug>', views.ExamDetail.as_view(), name='exam_detail'),
     path('books', views.AllBookCourses.as_view(), name='all_book_courses'),
-    path('exam/<slug>/submit/final', views.FinalExamSubmit.as_view(), name='final_exam_submit'),
-    path('exam/<slug>/submit/temp', views.TempExamSubmit.as_view(), name='temp_exam_submit'),
     path('exam/<slug>/calculate/result', views.CalculateExamResult.as_view(), name='calculate_exam_result'),
     path('exams/filter', views.ExamFilterView.as_view(), name='filter_exams'),
     path('exam/favorite/toggle/', views.ToggleFavorite.as_view(), name='toggle_favorite'),
+    path('exam/<slug>/submit/temp/', views.TempExamSubmit.as_view(),
+         name='submit_pdf_exam_temp_answer'),
 ]

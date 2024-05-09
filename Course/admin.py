@@ -10,11 +10,6 @@ class UserFinalAnswerInline(admin.StackedInline):
     extra = 1
 
 
-class UserTempAnswerInline(admin.StackedInline):
-    model = UserTempAnswer
-    extra = 1
-
-
 class DownloadedQuestionFileInline(admin.StackedInline):
     model = DownloadedQuestionFile
     extra = 1
@@ -104,3 +99,8 @@ admin.site.register(Exam, ExamAdmin)
 @admin.register(EnteredExamUser)
 class EnteredExamUserAdmin(admin.ModelAdmin):
     list_display = ("user", "exam")
+
+
+@admin.register(UserTempAnswer)
+class UserTempAnswerAdmin(admin.ModelAdmin):
+    list_display = ("user",)

@@ -217,19 +217,19 @@ class ExamAnswer(models.Model):
         ("4", "گزینه 4"),
     )
 
-    question = CKEditor5Field(config_name="extends", blank=True, null=True, verbose_name="صورت سوال")
+    question = models.CharField(max_length=500, blank=True, null=True, verbose_name="صورت سوال")
 
     question_number = models.PositiveSmallIntegerField(verbose_name="شماره سوال")
 
     unit = models.ForeignKey(to="ExamUnit", on_delete=models.CASCADE, verbose_name="درس")
 
-    choice_1 = models.CharField(max_length=100, verbose_name="گزینه 1", blank=True, null=True)
+    answer_1 = models.CharField(max_length=100, verbose_name="گزینه 1", blank=True, null=True)
 
-    choice_2 = models.CharField(max_length=100, verbose_name="گزینه 2", blank=True, null=True)
+    answer_2 = models.CharField(max_length=100, verbose_name="گزینه 2", blank=True, null=True)
 
-    choice_3 = models.CharField(max_length=100, verbose_name="گزینه 3", blank=True, null=True)
+    answer_3 = models.CharField(max_length=100, verbose_name="گزینه 3", blank=True, null=True)
 
-    choice_4 = models.CharField(max_length=100, verbose_name="گزینه 4", blank=True, null=True)
+    answer_4 = models.CharField(max_length=100, verbose_name="گزینه 4", blank=True, null=True)
 
     true_answer = models.CharField(max_length=1, choices=answer_choices, verbose_name="گزینه صحیح")
 
@@ -421,6 +421,7 @@ class UserTempAnswer(models.Model):
         ("3", "گزینه 3"),
         ("4", "گزینه 4"),
     )
+
     user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, blank=True, null=True,
                              verbose_name="کاربر")
 
@@ -432,7 +433,8 @@ class UserTempAnswer(models.Model):
 
     selected_answer = models.CharField(max_length=10, blank=True, choices=selected_answer_choices, null=True,
                                        verbose_name="گزینه انتخاب شده")
-    timestamp = models.DateTimeField()
+
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.exam.name}"
