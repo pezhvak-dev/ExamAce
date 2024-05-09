@@ -1,8 +1,9 @@
 from Account.models import CustomUser
 from Course.filters import ExamFilter
-from Course.models import Category, Exam
+from Course.models import Category as CourseCategory, Exam
 from Us.models import SocialMedia, AboutUs
-
+from Weblog.models import Category as WeblogCategory
+from News.models import Category as NewsCategory
 
 def social_media(request):
     social_media = SocialMedia.objects.last()
@@ -33,7 +34,7 @@ def custom_user_info(request):
 
 
 def filter_categories(request):
-    categories = Category.objects.all()
+    categories = CourseCategory.objects.all()
 
     context = {
         'filter_categories': categories
@@ -51,4 +52,22 @@ def filter_exams(request):
         'exam_filter_form': exam_filter.form
     }
 
+    return context
+
+
+def weblog_categories(request):
+    categories = WeblogCategory.objects.filter(parent=None, show=True)
+
+    context = {
+        'weblog_categories': categories
+    }
+    return context
+
+
+def news_categories(request):
+    categories = NewsCategory.objects.filter(parent=None, show=True)
+
+    context = {
+        'news_categories': categories
+    }
     return context

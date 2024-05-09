@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "django_cleanup",
     "hitcount",
     "star_ratings",
+    "nested_inline",
 ]
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
@@ -111,6 +112,8 @@ TEMPLATES = [
                 'utils.context_processors.custom_user_info',
                 'utils.context_processors.filter_categories',
                 'utils.context_processors.filter_exams',
+                'utils.context_processors.weblog_categories',
+                'utils.context_processors.news_categories',
             ],
         },
     },

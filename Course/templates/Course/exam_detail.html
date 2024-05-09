@@ -302,7 +302,8 @@
                                                     {% if not is_time_up %}
                                                         {% if is_user_registered %}
                                                             {% if can_be_continued %}
-                                                                <a href="{% url 'course:enter_exam' exam.slug %}"
+                                                                {{ exam.sections.first.slug }}
+                                                                <a href="{% url 'course:enter_exam' exam.sections.first.slug %}"
                                                                    class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
                                                                     <span class="line-clamp-1 font-semibold text-sm">ادامه آزمون</span>
                                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -316,7 +317,8 @@
                                                                     </svg>
                                                                 </a>
                                                             {% else %}
-                                                                <a href="{% url 'course:enter_exam' exam.slug %}"
+                                                                {{ exam.sections.first.slug }}
+                                                                <a href="{% url 'course:enter_exam' exam.sections.first.slug %}"
                                                                    class="w-full h-11 inline-flex items-center justify-center gap-1 bg-primary rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
                                                                     <span class="line-clamp-1 font-semibold text-sm">شروع آزمون</span>
                                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none"

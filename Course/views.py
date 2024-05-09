@@ -112,9 +112,9 @@ class ExamDetail(URLStorageMixin, DetailView):
 
         user = self.request.user
 
-        sections = ExamAnswer.objects.filter(exam=self.object)
+        sections = ExamSection.objects.filter(exam=self.object)
 
-        section_names = list(set(sections.values_list('section__name', flat=True)))
+        section_names = list(set(sections.values_list('name', flat=True)))
         banner_4 = Banner4.objects.filter(can_be_shown=True).last()
         banner_5 = Banner5.objects.filter(can_be_shown=True).last()
 
@@ -212,7 +212,10 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
         user = request.user
         slug = kwargs.get('slug')
 
-        exam = Exam.objects.get(slug=slug)
+        exam_section = ExamSection.objects.get(slug=slug)
+        exam = Exam.objects.get(sections=exam_section)
+        print(exam.id)
+        answer = UserTempAnswer.objects.get(user=user, exam_section=exam_section)
 
         if not EnteredExamUser.objects.filter(exam=exam, user=user).exists():
             EnteredExamUser.objects.create(exam=exam, user=user)
@@ -222,11 +225,14 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
         date_1 = entered_exam_user.created_at
         date_2 = datetime.now(pytz.timezone('Iran'))
 
-        total_duration = exam.total_duration.total_seconds()
+        total_duration = exam_section.total_duration.total_seconds()
 
         difference = get_time_difference(date_1=date_1, date_2=date_2)
 
         time_left = int(total_duration - difference)
+
+        if time_left <= 0:
+            pass
 
         answers = ExamAnswer.objects.values(
             "choice_1", "choice_2",
@@ -236,7 +242,8 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
         context = {
             'time_left': time_left,
             'answers': answers,
-            'slug': exam.slug
+            'slug': exam.slug,
+            'answer': answer
         }
 
         return render(request=request, template_name=self.template_name, context=context)
@@ -303,10 +310,14 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Al
 
         for key, value in request.POST.items():
             if key.startswith('question_'):
+                print(
+                    key
+                )
+
                 question_number = int(key.replace('question_', ''))
                 selected_answer = value
 
-                exam_answer = ExamAnswer.objects.get(exam=exam, question_number=question_number)
+                exam_answer = ExamAnswer.objects.get(unit__section__exam=exam, question_number=question_number)
 
                 if selected_answer == exam_answer.choice_1:
                     selected_choice = '1'
@@ -318,12 +329,13 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Al
                     selected_choice = '4'
                 else:
                     continue
-
+                time = datetime.now(pytz.timezone('Iran'))
                 UserTempAnswer.objects.update_or_create(
                     user=user,
                     exam=exam,
                     question_number=question_number,
-                    defaults={'selected_answer': selected_choice}
+                    defaults={'selected_answer': selected_choice},
+                    time=time
                 )
 
         return JsonResponse(data={}, status=200)

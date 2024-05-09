@@ -22,6 +22,8 @@ class Category(models.Model):
 
     description = CKEditor5Field(config_name="extends", verbose_name='درباره دسته بندی')
 
+    show = models.BooleanField(default=True, verbose_name='آیا نشان داده بشود؟')
+
     def __str__(self):
         return f"{self.name}"
 
@@ -168,9 +170,13 @@ class VideoCourseObject(models.Model):
 class ExamSection(models.Model):
     name = models.CharField(max_length=100, verbose_name="نام")
 
+    exam = models.ForeignKey(to="Exam", on_delete=models.CASCADE, verbose_name="آزمون", related_name="sections")
+
     slug = models.SlugField(allow_unicode=True, unique=True, verbose_name="اسلاگ")
 
     description = CKEditor5Field(config_name="extends", verbose_name="توضیحات", blank=True, null=True)
+
+    total_duration = models.DurationField(verbose_name='مدت آزمون')
 
     coefficient = models.SmallIntegerField(default=1, verbose_name="ضریب")
 
@@ -187,6 +193,8 @@ class ExamUnit(models.Model):
     name = models.CharField(max_length=100, verbose_name="نام")
 
     slug = models.SlugField(allow_unicode=True, unique=True, verbose_name="اسلاگ")
+
+    section = models.ForeignKey(to="ExamSection", on_delete=models.CASCADE, verbose_name="بخش")
 
     description = CKEditor5Field(config_name="extends", verbose_name="توضیحات", blank=True, null=True)
 
@@ -209,21 +217,19 @@ class ExamAnswer(models.Model):
         ("4", "گزینه 4"),
     )
 
+    question = CKEditor5Field(config_name="extends", blank=True, null=True, verbose_name="صورت سوال")
+
     question_number = models.PositiveSmallIntegerField(verbose_name="شماره سوال")
-
-    exam = models.ForeignKey(to="Exam", on_delete=models.CASCADE, verbose_name="آزمون")
-
-    section = models.ForeignKey(to="ExamSection", on_delete=models.CASCADE, verbose_name="بخش")
 
     unit = models.ForeignKey(to="ExamUnit", on_delete=models.CASCADE, verbose_name="درس")
 
-    choice_1 = models.CharField(max_length=100, verbose_name="گزینه 1")
+    choice_1 = models.CharField(max_length=100, verbose_name="گزینه 1", blank=True, null=True)
 
-    choice_2 = models.CharField(max_length=100, verbose_name="گزینه 2")
+    choice_2 = models.CharField(max_length=100, verbose_name="گزینه 2", blank=True, null=True)
 
-    choice_3 = models.CharField(max_length=100, verbose_name="گزینه 3")
+    choice_3 = models.CharField(max_length=100, verbose_name="گزینه 3", blank=True, null=True)
 
-    choice_4 = models.CharField(max_length=100, verbose_name="گزینه 4")
+    choice_4 = models.CharField(max_length=100, verbose_name="گزینه 4", blank=True, null=True)
 
     true_answer = models.CharField(max_length=1, choices=answer_choices, verbose_name="گزینه صحیح")
 
@@ -264,6 +270,9 @@ class Exam(models.Model):
 
     questions_file = models.FileField(upload_to='Course/Exam/pdf', verbose_name='فایل سوالات آزمون',
                                       validators=[FileExtensionValidator(allowed_extensions=["pdf"])])
+
+    answer_file = models.FileField(upload_to='Course/Exam/pdf', verbose_name='فایل پاسخ نامه',
+                                   validators=[FileExtensionValidator(allowed_extensions=["pdf"])])
 
     is_downloading_question_files_allowed = models.BooleanField(default=True,
                                                                 verbose_name='آیا دانلود سوالات آزمون مجاز است؟')
@@ -396,10 +405,13 @@ class UserTempAnswer(models.Model):
 
     exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
 
+    exam_section = models.ForeignKey(to='ExamSection', on_delete=models.CASCADE, blank=True, null=True, verbose_name="بخش آزمون")
+
     question_number = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="شماره سوال")
 
     selected_answer = models.CharField(max_length=10, blank=True, choices=selected_answer_choices, null=True,
                                        verbose_name="گزینه انتخاب شده")
+    timestamp = models.DateTimeField()
 
     def __str__(self):
         return f"{self.user.username} - {self.exam.name}"

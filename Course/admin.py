@@ -1,4 +1,5 @@
 from django.contrib import admin
+from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason, Exam, ExamAnswer, ExamSection, \
     DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, UserTempAnswer, ExamUnit
@@ -60,13 +61,25 @@ class VideoSeasonAdmin(admin.ModelAdmin):
     search_fields = ('course__name',)
 
 
-class ExamAnswerInline(admin.StackedInline):
+class ExamAnswerInline(NestedStackedInline):
     model = ExamAnswer
     extra = 1
 
 
-@admin.register(Exam)
-class ExamAdmin(admin.ModelAdmin):
+class ExamUnitInline(NestedStackedInline):
+    model = ExamUnit
+    extra = 1
+    inlines = [ExamAnswerInline]
+
+
+class ExamSectionInline(NestedStackedInline):
+    model = ExamSection
+    extra = 1
+    inlines = [ExamUnitInline]
+
+
+class ExamAdmin(NestedModelAdmin):
+    model = Exam
     list_display = (
         'name', 'total_duration', 'category', 'type', 'level',
         'price', 'has_discount', 'discount_percentage', 'price_after_discount'
@@ -74,7 +87,7 @@ class ExamAdmin(admin.ModelAdmin):
 
     prepopulated_fields = {'slug': ('name',)}
 
-    inlines = [ExamAnswerInline, UserTempAnswerInline, UserFinalAnswerInline, EnteredExamUserInline]
+    inlines = [ExamSectionInline]
 
     def save_model(self, request, obj, form, change):
         if not obj.designer_id:
@@ -83,15 +96,4 @@ class ExamAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-@admin.register(ExamSection)
-class ExamSectionAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-
-    prepopulated_fields = {'slug': ('name',)}
-
-
-@admin.register(ExamUnit)
-class ExamUnitAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-
-    prepopulated_fields = {'slug': ('name',)}
+admin.site.register(Exam, ExamAdmin)

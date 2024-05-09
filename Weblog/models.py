@@ -28,11 +28,16 @@ class Category(models.Model):
 
     slug = models.SlugField(unique=True, allow_unicode=True, verbose_name='اسلاگ')
 
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children', blank=True, null=True,
+                               verbose_name='والد')
+
     icon = models.ImageField(upload_to='News/Category/icons/', verbose_name='آیکون', blank=True, null=True)
 
     cover_image = models.ImageField(upload_to='News/Category/images', verbose_name='تصویر', blank=True, null=True)
 
     description = CKEditor5Field(config_name="extends", verbose_name='درباره دسته بندی')
+
+    show = models.BooleanField(default=True, verbose_name='آیا نشان داده بشود؟')
 
     def __str__(self):
         return f"{self.name}"

@@ -16,13 +16,28 @@
                     {% for answer in answers %}
                         <fieldset>
                             <legend>سوال {{ forloop.counter }}</legend>
-                            {% for key, value in answer.items %}
+
+
                                 <div>
-                                    <input type="radio" id="{{ key }}" name="question_{{ forloop.parentloop.counter }}"
-                                           value="{{ value }}">
-                                    <label for="{{ key }}">{{ value }}</label>
+
+                                    <input type="radio" id="1" name="question_{{ forloop.counter }}"
+                                           value="1">
+                                    <label for="1">1</label>
+
+                                    <input type="radio" id="2" name="question_{{ forloop.counter }}"
+                                           value="2">
+                                    <label for="2">2</label>
+
+                                    <input type="radio" id="3" name="question_{{ forloop.counter }}"
+                                           value="3">
+                                    <label for="3">3</label>
+                                    <input type="radio" id="4" name="question_{{ forloop.counter }}"
+                                           value="4">
+                                    <label for="4">4</label>
+
                                 </div>
-                            {% endfor %}
+
+
                         </fieldset>
                         <hr>
                     {% endfor %}
