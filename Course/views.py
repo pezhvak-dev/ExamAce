@@ -18,7 +18,7 @@ from Account.models import FavoriteExam
 from Course.filters import ExamFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin, NonFinishedExamsOnlyMixin
-from Course.models import VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, \
+from Course.models import BoughtExam, VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, \
     UserTempAnswer, ExamSection, ExamUnit
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
@@ -167,22 +167,6 @@ class ExamDetail(URLStorageMixin, DetailView):
         context['sections_names'] = section_names  # Returns a list
 
         return context
-
-
-class RegisterExam(AuthenticatedUsersOnlyMixin, AllowedExamsOnlyMixin, URLStorageMixin, View):
-    def get(self, request, *args, **kwargs):
-        slug = kwargs.get("slug")
-        user = request.user
-        exam = Exam.objects.get(slug=slug)
-
-        if exam.type == "F":
-            exam.participated_users.add(user)
-            messages.success(request, f"ثبت نام در آزمون {exam.name} با موفقیت انجام شد.")
-
-        else:
-            messages.warning(request, f"آزمون {exam.name} به سبد خرید شما افزوده شد.")
-
-        return redirect(reverse("course:exam_detail", kwargs={"slug": slug}))
 
 
 class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, AllowedFilesDownloadMixin,
@@ -482,3 +466,28 @@ class ToggleFavorite(View):
             pass
 
         return JsonResponse({'success': False}, status=400)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class RegisterInExam(AuthenticatedUsersOnlyMixin, View):
+    def post(self, request, *args, **kwargs):
+        exam_id = request.POST.get('courseId')
+        user = self.request.user
+        
+        exam = Exam.objects.get(id=exam_id)
+
+        if not Exam.objects.filter(id=exam_id, participated_users=user).exists():
+            exam.participated_users.add(user)
+            exam.save()
+            
+            exam.participated_users.add(user)
+            exam.save()
+
+            BoughtExam.objects.create(user=user, exam=exam)
+
+            return JsonResponse(data={"message": f"ثبت نام در دوره {exam.name} با موفقیت انجام شد."},
+                                status=200)
+
+        else:
+            return JsonResponse(data={"message": f"شما قبلا در دوره {exam.name} ثبت نام کردید."},
+                                status=400)
