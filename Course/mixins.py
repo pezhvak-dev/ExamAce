@@ -6,17 +6,18 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from Account.models import CustomUser
-from Course.models import Exam, EnteredExamUser, DownloadedQuestionFile, UserFinalAnswer
+from Course.models import Exam, EnteredExamUser, DownloadedQuestionFile, UserFinalAnswer, ExamSection
 from utils.useful_functions import get_time_difference
 
 
 class ParticipatedUsersOnlyMixin:
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
+
         user = request.user
 
         user = CustomUser.objects.get(username=user.username)
-        can_user_participate = Exam.objects.filter(slug=slug, participated_users=user).exists()
+        can_user_participate = ExamSection.objects.filter(slug=slug, exam__participated_users=user).exists()
 
         if not can_user_participate:
             redirect_url = request.session.get('current_url')
@@ -36,7 +37,8 @@ class CheckForExamTimeMixin:
         slug = kwargs.get('slug')
         user = request.user
 
-        exam = Exam.objects.get(slug=slug)
+        exam_section = ExamSection.objects.get(slug=slug)
+        exam = Exam.objects.get(sections=exam_section)
         if EnteredExamUser.objects.filter(exam=exam, user=user).exists():
             entered_exam_user = EnteredExamUser.objects.get(exam=exam, user=user)
 
@@ -59,7 +61,8 @@ class CheckForExamTimeMixin:
 class AllowedExamsOnlyMixin:
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
-        exam = Exam.objects.get(slug=slug)
+        exam_section = ExamSection.objects.get(slug=slug)
+        exam = Exam.objects.get(sections=exam_section)
 
         if not exam.is_entrance_allowed:
             messages.error(request, f"با عرض پوزش، در حال حاضر شرکت در آزمون {exam.name} امکان پذیر نیست.")
@@ -100,7 +103,8 @@ class NonFinishedExamsOnlyMixin:
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         user = request.user
-        exam = Exam.objects.get(slug=slug)
+        exam_section = ExamSection.objects.get(slug=slug)
+        exam = Exam.objects.get(sections=exam_section)
 
         if UserFinalAnswer.objects.filter(user=user, exam=exam).exists():
             messages.error(request, f"شما قبلا پاسخنامه آزمون {exam.name} را ثبت کرده اید!")

@@ -77,6 +77,8 @@ class ExamSectionInline(NestedStackedInline):
     extra = 1
     inlines = [ExamUnitInline]
 
+    prepopulated_fields = {'slug': ('name',)}
+
 
 class ExamAdmin(NestedModelAdmin):
     model = Exam
@@ -97,3 +99,8 @@ class ExamAdmin(NestedModelAdmin):
 
 
 admin.site.register(Exam, ExamAdmin)
+
+
+@admin.register(EnteredExamUser)
+class EnteredExamUserAdmin(admin.ModelAdmin):
+    list_display = ("user", "exam")

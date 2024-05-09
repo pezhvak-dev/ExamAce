@@ -170,7 +170,7 @@ class ExamDetail(URLStorageMixin, DetailView):
 
 
 class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, AllowedFilesDownloadMixin,
-                           ParticipatedUsersOnlyMixin, URLStorageMixin, View):
+                           ParticipatedUsersOnlyMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get('slug')
@@ -188,8 +188,7 @@ class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, AllowedFilesDownloadMixi
 
 
 class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin,
-                CheckForExamTimeMixin, DownloadedQuestionsFileFirstMixin, NonFinishedExamsOnlyMixin,
-                URLStorageMixin, View):
+                CheckForExamTimeMixin, NonFinishedExamsOnlyMixin, View):
     template_name = "Course/multiple_choice_exam.html"
 
     def get(self, request, *args, **kwargs):
@@ -197,9 +196,18 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
         slug = kwargs.get('slug')
 
         exam_section = ExamSection.objects.get(slug=slug)
+
         exam = Exam.objects.get(sections=exam_section)
-        print(exam.id)
-        answer = UserTempAnswer.objects.get(user=user, exam_section=exam_section)
+        sections = ExamSection.objects.filter(exam=exam)
+        flag = False
+        next_section = None
+        for section in sections:
+            if flag:
+                next_section = section.slug
+            if section == exam_section:
+                flag = True
+
+        answer = UserTempAnswer.objects.filter(user=user, exam__sections=exam_section).last()
 
         if not EnteredExamUser.objects.filter(exam=exam, user=user).exists():
             EnteredExamUser.objects.create(exam=exam, user=user)
@@ -217,8 +225,9 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
 
         if time_left <= 0:
             pass
+        exam_answer = ExamAnswer.objects.filter(unit__section= exam_section)
 
-        answers = ExamAnswer.objects.values(
+        answers = exam_answer.values(
             "choice_1", "choice_2",
             "choice_3", "choice_4"
         )
@@ -227,7 +236,8 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
             'time_left': time_left,
             'answers': answers,
             'slug': exam.slug,
-            'answer': answer
+            'answer': answer,
+            'next_section': next_section
         }
 
         return render(request=request, template_name=self.template_name, context=context)

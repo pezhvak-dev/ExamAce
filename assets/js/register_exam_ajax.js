@@ -17,6 +17,7 @@ function registerExam(courseId) {
                     "courseId": courseId
                 },
                 success: function (response) {
+                    console.log("FE")
                     Swal.fire({
                         icon: 'success',
                         title: 'ثبت نام در آزمون',

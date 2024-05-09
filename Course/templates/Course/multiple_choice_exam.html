@@ -48,6 +48,23 @@
                         ذخیره سازی موقت
                     </a>
 
+                {% if next_section %}
+                    <a href="{% url 'course:enter_exam' next_section %}" type="button" id="submitBtn"
+                            class="w-full h-11 inline-flex items-center justify-center gap-1 bg-red-500 rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
+                        <span class="line-clamp-1 font-semibold text-sm">ثبت نهایی این بخش</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                             viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor"
+                             class="w-5 h-5">
+                            <path fill-rule="evenodd"
+                                  d="M14.78 14.78a.75.75 0 0 1-1.06 0L6.5 7.56v5.69a.75.75 0 0 1-1.5 0v-7.5A.75.75 0 0 1 5.75 5h7.5a.75.75 0 0 1 0 1.5H7.56l7.22 7.22a.75.75 0 0 1 0 1.06Z"
+                                  clip-rule="evenodd">
+                            </path>
+                        </svg>
+                    </a>
+
+                {% else %}
+
                     <button type="button" id="submitBtn"
                             class="w-full h-11 inline-flex items-center justify-center gap-1 bg-red-500 rounded-full text-primary-foreground hover:opacity-80 transition-all px-4">
                         <span class="line-clamp-1 font-semibold text-sm">ثبت نهایی</span>
@@ -61,6 +78,7 @@
                             </path>
                         </svg>
                     </button>
+                {% endif %}
                 </form>
             </div>
         </main>
