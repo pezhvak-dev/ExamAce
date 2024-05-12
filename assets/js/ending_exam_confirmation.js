@@ -9,7 +9,7 @@ function confirmSubmission(slug, appName) {
         cancelButtonText: 'خیر'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = `/course/${appName}/exam/${slug}/submit/final`;
+            window.location.href = `/course/exam/${slug}/calculate/result`;
         }
     });
     return false;

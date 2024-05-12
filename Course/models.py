@@ -219,19 +219,19 @@ class ExamAnswer(models.Model):
 
     question = models.CharField(max_length=500, blank=True, null=True, verbose_name="صورت سوال")
 
-    question_number = models.PositiveSmallIntegerField(verbose_name="شماره سوال")
+    question_number = models.PositiveSmallIntegerField(verbose_name="شماره سوال", null=True, blank=True)
 
     unit = models.ForeignKey(to="ExamUnit", on_delete=models.CASCADE, verbose_name="درس")
 
-    answer_1 = models.CharField(max_length=100, verbose_name="گزینه 1", blank=True, null=True)
+    answer_1 = models.CharField(max_length=100, verbose_name="گزینه 1", default=1)
 
-    answer_2 = models.CharField(max_length=100, verbose_name="گزینه 2", blank=True, null=True)
+    answer_2 = models.CharField(max_length=100, verbose_name="گزینه 2", default=2)
 
-    answer_3 = models.CharField(max_length=100, verbose_name="گزینه 3", blank=True, null=True)
+    answer_3 = models.CharField(max_length=100, verbose_name="گزینه 3", default=3)
 
-    answer_4 = models.CharField(max_length=100, verbose_name="گزینه 4", blank=True, null=True)
+    answer_4 = models.CharField(max_length=100, verbose_name="گزینه 4", default=4)
 
-    true_answer = models.CharField(max_length=1, choices=answer_choices, verbose_name="گزینه صحیح")
+    true_answer = models.CharField(max_length=1, choices=answer_choices, verbose_name="گزینه صحیح", null=True, blank=True)
 
     true_answer_explanation = CKEditor5Field(config_name="extends", blank=True, null=True,
                                              verbose_name="توضیحات اضافه پاسخ صحیح")

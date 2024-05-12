@@ -58,18 +58,18 @@ class VideoSeasonAdmin(admin.ModelAdmin):
 
 class ExamAnswerInline(NestedStackedInline):
     model = ExamAnswer
-    extra = 1
+    extra = 0
 
 
 class ExamUnitInline(NestedStackedInline):
     model = ExamUnit
-    extra = 1
+    extra = 0
     inlines = [ExamAnswerInline]
 
 
 class ExamSectionInline(NestedStackedInline):
     model = ExamSection
-    extra = 1
+    extra = 0
     inlines = [ExamUnitInline]
 
     prepopulated_fields = {'slug': ('name',)}
@@ -85,6 +85,8 @@ class ExamAdmin(NestedModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
 
     inlines = [ExamSectionInline]
+
+
 
     def save_model(self, request, obj, form, change):
         if not obj.designer_id:
