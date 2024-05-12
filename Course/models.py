@@ -278,9 +278,6 @@ class Exam(models.Model):
     is_downloading_question_files_allowed = models.BooleanField(default=True,
                                                                 verbose_name='آیا دانلود سوالات آزمون مجاز است؟')
 
-    question_file_name = models.CharField(max_length=100, unique=True, verbose_name='نام فایل', help_text="فقط انگلیسی",
-                                          validators=[english_language_validator])
-
     description = CKEditor5Field(config_name="extends", verbose_name='درباره آزمون')
 
     cover_image = models.ImageField(upload_to='Course/Exam/cover_images', verbose_name='عکس کاور')
@@ -437,7 +434,7 @@ class UserTempAnswer(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.exam.name}"
+        return f"{self.user.username}"
 
     class Meta:
         db_table = 'course__user_temp_answer'

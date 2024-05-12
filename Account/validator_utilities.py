@@ -63,7 +63,7 @@ def validate_username_handler(username, username_exists_importance=True):
             message = "این نام کاربری قبلا  ثبت شده است."
             code = "already_exists"
 
-    if len(username) < 5:
+    if len(username) < 4:
         has_errors = True
         message = "نام کاربری نمی‌تواند کمتر از 5 کاراکتر داشته باشد."
         code = "length_is_low"

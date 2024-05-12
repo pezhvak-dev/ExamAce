@@ -374,3 +374,4 @@ class FavoriteExams(AuthenticatedUsersOnlyMixin, OwnerRequiredMixin, URLStorageM
         exams = FavoriteExam.objects.filter(user=user)
 
         return exams
+

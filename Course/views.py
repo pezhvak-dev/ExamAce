@@ -14,7 +14,7 @@ from django.views.generic import ListView, DetailView, View
 from django_filters.views import FilterView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
-from Account.models import FavoriteExam
+from Account.models import FavoriteExam, CustomUser
 from Course.filters import ExamFilter
 from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, AllowedExamsOnlyMixin, \
     DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin, NonFinishedExamsOnlyMixin
@@ -177,9 +177,24 @@ class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, AllowedFilesDownloadMixi
         exam = Exam.objects.get(slug=slug)
         questions_file = exam.questions_file
 
-        # Set headers for file download
         response = HttpResponse(questions_file, content_type='application/force-download')
-        response['Content-Disposition'] = f'attachment; filename="{exam.question_file_name}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="daftarche-soal.pdf"'
+
+        if not DownloadedQuestionFile.objects.filter(exam=exam, user=user).exists():
+            DownloadedQuestionFile.objects.create(exam=exam, user=user)
+
+        return response
+
+
+class ExamAnswerDownload(AuthenticatedUsersOnlyMixin, View):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        slug = kwargs.get('slug')
+        exam = Exam.objects.get(slug=slug)
+        answer_file = exam.answer_file
+
+        response = HttpResponse(answer_file, content_type='application/force-download')
+        response['Content-Disposition'] = f'attachment; filename="pasokh_name.pdf"'
 
         if not DownloadedQuestionFile.objects.filter(exam=exam, user=user).exists():
             DownloadedQuestionFile.objects.create(exam=exam, user=user)
@@ -197,7 +212,7 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
 
         exam_section = ExamSection.objects.get(slug=slug)
 
-        exam = Exam.objects.get(sections=exam_section)
+        exam = exam_section.exam
         sections = ExamSection.objects.filter(exam=exam)
         flag = False
         next_section = None
@@ -228,12 +243,19 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
 
         for exam_answer in exam_answers:
             if UserTempAnswer.objects.filter(
-                    user=user, question_number=exam_answer.question_number
+                    user=user,
+                    question_number=exam_answer.question_number,
+                    exam=exam,
+                    exam_section=exam_section
             ).exists():
                 exam_temp_answer = UserTempAnswer.objects.get(
                     user=user,
-                    question_number=exam_answer.question_number
+                    question_number=exam_answer.question_number,
+                    exam=exam,
+                    exam_section=exam_section
                 )
+
+                print(exam_temp_answer.selected_answer)
 
                 questions_and_answers.append(
                     {
@@ -269,86 +291,29 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
             'slug': exam.slug,
             'answer': answer,
             'next_section': next_section,
-            'questions_and_answers': questions_and_answers
+            'questions_and_answers': questions_and_answers,
+            'exam_section_slug': exam_section.slug
         }
 
         return render(request=request, template_name=self.template_name, context=context)
 
 
-class CalculateExamResult(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, AllowedExamsOnlyMixin, View):
+class CalculateExamResult(AuthenticatedUsersOnlyMixin, View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
-        user = request.user
+        username = request.user.username
+
+        user = CustomUser.objects.get(username=username)
         exam = get_object_or_404(Exam, slug=slug)
 
-        user_final_answers = UserFinalAnswer.objects.filter(user=user, exam=exam).values("question_number",
-                                                                                         "selected_answer")
+        print("GR")
 
-        correct_answers = ExamAnswer.objects.filter(exam=exam).values("question_number", "true_answer",
-                                                                      "true_answer_explanation", "section_id",
-                                                                      "unit_id")
+        temp_answers = UserTempAnswer.objects.filter(user=user, exam=exam)
 
-        section_mapping = {section.id: section for section in
-                           ExamSection.objects.filter(examanswer__exam=exam).distinct()}
+        for answer in temp_answers:
+            print("GRvgdsr")
 
-        unit_mapping = {unit.id: unit for unit in ExamUnit.objects.filter(examanswer__exam=exam).distinct()}
-
-        # Create a dictionary to store the comparison results
-        answer_comparison = {}
-
-        # Convert querysets to dictionaries for easier lookup
-        user_final_answers_dict = {answer['question_number']: answer['selected_answer'] for answer in
-                                   user_final_answers}
-        correct_answers_dict = {answer['question_number']: {'true_answer': answer['true_answer'],
-                                                            'true_answer_explanation': answer[
-                                                                'true_answer_explanation'],
-                                                            'section_id': answer['section_id'],
-                                                            'unit_id': answer['unit_id']}
-                                for answer in correct_answers}
-
-        # Iterate over each question number in correct_answers_dict to populate answer_comparison
-        for question_number in correct_answers_dict:
-            correct_answer_info = correct_answers_dict[question_number]
-            correct_answer = correct_answer_info['true_answer']
-            true_answer_explanation = correct_answer_info['true_answer_explanation']
-            section_id = correct_answer_info['section_id']
-            unit_id = correct_answer_info['unit_id']
-            user_selected_answer = user_final_answers_dict.get(question_number)
-
-            # Fetch ExamSection and ExamUnit details using section_id and unit_id from the mappings
-            if section_id in section_mapping:
-                section = section_mapping[section_id]
-                section_name = section.name
-            else:
-                section_name = None
-
-            if unit_id in unit_mapping:
-                unit = unit_mapping[unit_id]
-                unit_coefficient = unit.coefficient
-            else:
-                unit_coefficient = None
-
-            # Check if user has not answered a question (selected_answer is None)
-            if user_selected_answer is None:
-                user_selected_answer = None
-                answered_correctly = False
-            else:
-                answered_correctly = (user_selected_answer == correct_answer)
-
-            answer_comparison[question_number] = {
-                'correct_answer': correct_answer,
-                'user_selected_answer': user_selected_answer,
-                'true_answer_explanation': true_answer_explanation,
-                'answered_correctly': answered_correctly,
-                'section_name': section_name,
-                'unit_coefficient': unit_coefficient
-            }
-
-        context = {
-            "answer_comparison": answer_comparison,
-        }
-
-        return render(request, "Course/answer_results.html", context=context)
+            print(answer.question_number)
 
 
 class ExamsByCategory(URLStorageMixin, ListView):
@@ -452,11 +417,15 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, View):
         question_number = request.POST.get("question_number")
         selected_answer = request.POST.get("selected_answer")
 
+
         exam_section = ExamSection.objects.filter(slug=slug).last()
+        exam = exam_section.exam
 
         try:
             temp_answer = UserTempAnswer.objects.get(
                 user=user,
+                exam_section=exam_section,
+                exam=exam,
                 question_number=question_number
             )
 
@@ -468,6 +437,7 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, View):
             UserTempAnswer.objects.create(
                 user=user,
                 exam_section=exam_section,
+                exam=exam,
                 question_number=question_number,
                 selected_answer=selected_answer
             )
