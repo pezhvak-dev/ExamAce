@@ -170,8 +170,7 @@ class ExamDetail(URLStorageMixin, DetailView):
         return context
 
 
-class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, AllowedFilesDownloadMixin,
-                           ParticipatedUsersOnlyMixin, View):
+class ExamQuestionDownload(AuthenticatedUsersOnlyMixin, AllowedFilesDownloadMixin, View):
     def get(self, request, *args, **kwargs):
         user = request.user
         slug = kwargs.get('slug')
