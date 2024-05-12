@@ -255,8 +255,6 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
                     exam_section=exam_section
                 )
 
-                print(exam_temp_answer.selected_answer)
-
                 questions_and_answers.append(
                     {
                         "id": exam_answer.id,
