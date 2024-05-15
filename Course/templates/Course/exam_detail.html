@@ -12,81 +12,25 @@
                 <div class="flex md:flex-nowrap flex-wrap items-start gap-5">
                     <div class="md:w-4/12 w-full md:sticky md:top-24 space-y-8">
 
-                        <div class="space-y-5">
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center gap-1">
-                                    <div class="w-1 h-1 bg-foreground rounded-full"></div>
-                                    <div class="w-2 h-2 bg-foreground rounded-full"></div>
-                                </div>
-
-                            </div>
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-3">
-                                    <div class="flex-shrink-0 w-10 h-10 rounded-full overflow-hidden">
-                                        {% if exam.designer.image %}
-                                            <img src="{{ exam.designer.image.url }}"
-                                                 class="w-full h-full object-cover"
-                                                 alt="عکس طراح آزمون"/>
-                                        {% else %}
-                                            <img src="{% static 'images/avatars/default_exam_designer.JPG' %}"
-                                                 class="w-full h-full object-cover"
-                                                 alt="عکس طراح آزمون"/>
-                                        {% endif %}
-                                    </div>
-                                    <div class="flex flex-col items-start space-y-1">
-                                        <p class="line-clamp-1 font-bold text-sm text-foreground hover:text-primary">
-                                            {{ exam.designer.full_name }}
-                                        </p>
-                                    </div>
-                                </div>
-                                {% if exam.designer.about_me %}
-                                    <div class="bg-secondary rounded-tl-3xl rounded-b-3xl text-sm text-muted p-5">
-                                        {{ exam.designer.about_me }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="advert-banner  ">
-                                <div class="container mx-auto sm:px-4 max-w-full mx-auto sm:px-4">
-                                    <div class="flex flex-wrap  g-3 items-center">
-                                        <div class="w-full">
-                                            <div class="advert-banner-item img-tilt" data-tilt>
-                                                <a href="{{ banner_4.link }}">
-                                                    <img src="{{ banner_4.file.url }}" alt="">
-                                                </a>
+                        {% for banner in banner_4 %}
+                            <div class="space-y-5">
+                                <div class="advert-banner">
+                                    <div class="container mx-auto sm:px-4 max-w-full mx-auto sm:px-4">
+                                        <div class="flex flex-wrap  g-3 items-center">
+                                            <div class="w-full">
+                                                <div class="advert-banner-item img-tilt" data-tilt>
+                                                    <a href="{{ banner.link }}">
+                                                        <img src="{{ banner.file.url }}" alt="">
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="advert-banner  ">
-                                <div class="container mx-auto sm:px-4 max-w-full mx-auto sm:px-4">
-                                    <div class="flex flex-wrap  g-3 items-center">
-                                        <div class="w-full">
-                                            <div class="advert-banner-item img-tilt" data-tilt>
-                                                <a href="{{ banner_4.link }}">
-                                                    <img src="{{ banner_4.file.url }}" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        {% endfor %}
 
-                            <div class="advert-banner  ">
-                                <div class="container mx-auto sm:px-4 max-w-full mx-auto sm:px-4">
-                                    <div class="flex flex-wrap  g-3 items-center">
-                                        <div class="w-full">
-                                            <div class="advert-banner-item img-tilt" data-tilt>
-                                                <a href="{{ banner_4.link }}">
-                                                    <img src="{{ banner_4.file.url }}" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                     <div class="md:w-8/12 w-full">
                         <div class="relative">
@@ -434,22 +378,28 @@
                         </div>
                     </div>
                     <div class="md:w-4/12 w-full md:sticky md:top-24 space-y-8">
-                        <div class="space-y-5">
-                            <div class="advert-banner px-1 ">
-                                <div class="container mx-auto sm:px-4 max-w-full mx-auto sm:px-4">
-                                    <div class="flex flex-wrap  g-3 items-center">
-                                        <div class="w-full">
-                                            <div class="advert-banner-item img-tilt" data-tilt>
-                                                <a href="{{ banner_5.link }}">
-                                                    <img src="{{ banner_5.file.url }}"
-                                                         alt="">
-                                                </a>
+
+
+                        {% for banner in banner_5 %}
+                            <div class="space-y-5">
+                                <div class="advert-banner px-1 ">
+                                    <div class="container mx-auto sm:px-4 max-w-full mx-auto sm:px-4">
+                                        <div class="flex flex-wrap  g-3 items-center">
+                                            <div class="w-full">
+                                                <div class="advert-banner-item img-tilt" data-tilt>
+                                                    <a href="{{ banner.link }}">
+                                                        <img src="{{ banner.file.url }}"
+                                                             alt="">
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        {% endfor %}
+
+
                     </div>
                 </div>
             </div>

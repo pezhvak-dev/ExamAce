@@ -116,8 +116,9 @@ class ExamDetail(URLStorageMixin, DetailView):
         sections = ExamSection.objects.filter(exam=self.object)
 
         section_names = list(set(sections.values_list('name', flat=True)))
-        banner_4 = Banner4.objects.filter(can_be_shown=True).last()
-        banner_5 = Banner5.objects.filter(can_be_shown=True).last()
+
+        banner_4 = Banner4.objects.filter(can_be_shown=True)[:3]
+        banner_5 = Banner5.objects.filter(can_be_shown=True)[:3]
 
         #  Checks if user can enter exam anymore or not. (Based on entrance time)
         is_time_up = False
@@ -159,8 +160,8 @@ class ExamDetail(URLStorageMixin, DetailView):
             can_be_continued = False
             has_finished_exam = False
 
-        context['banner_4'] = banner_4  # Returns a single object
-        context['banner_5'] = banner_5  # Returns a single object
+        context['banner_4'] = banner_4  # Returns a queryset
+        context['banner_5'] = banner_5  # Returns a queryset
         context['is_time_up'] = is_time_up  # Returns a boolean
         context['is_user_registered'] = is_user_registered  # Returns a boolean
         context['can_be_continued'] = can_be_continued  # Returns a boolean
@@ -414,7 +415,6 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, View):
 
         question_number = request.POST.get("question_number")
         selected_answer = request.POST.get("selected_answer")
-
 
         exam_section = ExamSection.objects.filter(slug=slug).last()
         exam = exam_section.exam
