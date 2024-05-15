@@ -20,8 +20,8 @@ class HeroBanner(models.Model):
 
     class Meta:
         db_table = "home__hero_banner"
-        verbose_name = "هیرو بنر"
-        verbose_name_plural = "هیرو بنرها"
+        verbose_name = "هیرو بنر (نامحدود)"
+        verbose_name_plural = "هیرو بنرها (نامحدود)"
 
 
 class Banner1(models.Model):
@@ -42,8 +42,8 @@ class Banner1(models.Model):
 
     class Meta:
         db_table = "home__banner_1"
-        verbose_name = "بنر 1"
-        verbose_name_plural = "بنرهای 1"
+        verbose_name = "بنر صفحه اصلی - پایین چرا سایت ما (اولین بنر سمت راست و دومین بنر سمت چپ) (2 بنر)"
+        verbose_name_plural = "بنر صفحه اصلی - پایین چرا سایت ما (اولین بنر سمت راست و دومین بنر سمت چپ) (2 بنر)"
 
 
 class Banner2(models.Model):
@@ -64,8 +64,8 @@ class Banner2(models.Model):
 
     class Meta:
         db_table = "home__banner_2"
-        verbose_name = "بنر 2"
-        verbose_name_plural = "بنرهای 2"
+        verbose_name = "بنر پایین درباره اسم وبسایت چی میشنویم (1 بنر)"
+        verbose_name_plural = "بنر پایین درباره اسم وبسایت چی میشنویم (1 بنر)"
 
 
 class Banner3(models.Model):
@@ -86,8 +86,9 @@ class Banner3(models.Model):
 
     class Meta:
         db_table = "home__banner_3"
-        verbose_name = "بنر 3"
-        verbose_name_plural = "بنرهای 3"
+        verbose_name = "بنر صفحه اصلی - پایین آخرین آزمون‌‌ها (اولین بنر سمت راست و دومین بنر سمت چپ) (2 بنر)"
+        verbose_name_plural = "بنر صفحه اصلی - پایین آخرین آزمون‌‌ها (اولین بنر سمت راست و دومین بنر سمت چپ) (2 بنر)"
+
 
 
 class Banner4(models.Model):
