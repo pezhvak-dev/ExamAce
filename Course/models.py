@@ -3,7 +3,6 @@ from django.core.validators import MaxValueValidator, FileExtensionValidator
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 from django_jalali.db.models import jDateTimeField
-from moviepy.editor import VideoFileClip
 
 from Home.validators import english_language_validator
 
@@ -146,20 +145,6 @@ class VideoCourseObject(models.Model):
     def __str__(self):
         return f"{self.title}"
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        try:
-            # Load the video file
-            video_path = self.video_file.path
-            clip = VideoFileClip(video_path)
-            # Get the duration in seconds and save it
-            self.duration = int(clip.duration)
-            clip.close()
-            # Update the model with the duration
-            super().save(*args, **kwargs)
-        except Exception as e:
-            # Handle any exceptions, such as if the file is not found or is not a valid video file
-            print(f"An error occurred while getting the duration of the video file: {e}")
 
     class Meta:
         db_table = 'course__video_course_object'
