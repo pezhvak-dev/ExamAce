@@ -11,6 +11,7 @@
     <div class="flex flex-col min-h-screen bg-background">
 
         {% for questions_and_answer in questions_and_answers %}
+            {{ questions_and_answer|select_dictionary_item:"selected_answer" }}
 
             <div class="mr-8">
 

@@ -19,6 +19,7 @@ urlpatterns = [
     path('exam/<slug>/calculate/result', views.CalculateExamResult.as_view(), name='calculate_exam_result'),
     path('exams/filter', views.ExamFilterView.as_view(), name='filter_exams'),
     path('exam/favorite/toggle/', views.ToggleFavorite.as_view(), name='toggle_favorite'),
-    path('exam/<slug>/submit/temp/', views.TempExamSubmit.as_view(),
-         name='submit_pdf_exam_temp_answer'),
+    path('exam/<slug>/submit/temp/', views.TempExamSubmit.as_view(),name='submit_pdf_exam_temp_answer'),
+    path('report_card/<int:exam_id>/', views.ReportCardView.as_view(), name='report_card'),
+
 ]

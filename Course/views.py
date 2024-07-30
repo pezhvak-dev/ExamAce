@@ -1,4 +1,5 @@
 import ast
+from collections import defaultdict
 from datetime import datetime
 
 import pytz
@@ -10,7 +11,7 @@ from django.utils.decorators import method_decorator
 from django.utils.encoding import uri_to_iri
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.views.generic import ListView, DetailView, View
+from django.views.generic import ListView, DetailView, View, TemplateView
 from django_filters.views import FilterView
 
 from Account.mixins import AuthenticatedUsersOnlyMixin
@@ -20,7 +21,7 @@ from Course.mixins import ParticipatedUsersOnlyMixin, CheckForExamTimeMixin, All
     DownloadedQuestionsFileFirstMixin, AllowedFilesDownloadMixin, NonFinishedExamsOnlyMixin
 from Course.models import BoughtExam, VideoCourse, Exam, ExamAnswer, DownloadedQuestionFile, EnteredExamUser, \
     UserFinalAnswer, \
-    UserTempAnswer, ExamSection, ExamUnit
+    UserTempAnswer, ExamSection, ExamUnit, ExamResult, SectionResult, UnitResult
 from Home.mixins import URLStorageMixin
 from Home.models import Banner4, Banner5
 from utils.useful_functions import get_time_difference
@@ -259,7 +260,7 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
                 questions_and_answers.append(
                     {
                         "id": exam_answer.id,
-                        "slug": exam_answer.unit.slug,
+                        "slug": exam_answer.unit.section.slug,
                         "question": exam_answer.question,
                         "question_number": exam_answer.question_number,
                         "answer_1": exam_answer.answer_1,
@@ -274,7 +275,7 @@ class EnterExam(AuthenticatedUsersOnlyMixin, ParticipatedUsersOnlyMixin, Allowed
                 questions_and_answers.append(
                     {
                         "id": exam_answer.id,
-                        "slug": exam_answer.unit.slug,
+                        "slug": exam_answer.unit.section.slug,
                         "question": exam_answer.question,
                         "question_number": exam_answer.question_number,
                         "answer_1": exam_answer.answer_1,
@@ -306,13 +307,56 @@ class CalculateExamResult(AuthenticatedUsersOnlyMixin, View):
         exam = get_object_or_404(Exam, slug=slug)
 
         print("GR")
+        all_true = 0
+        all_false = 0
+        all_questions = 0
+        exam_result = ExamResult.objects.create(exam=exam, user=user)
 
         temp_answers = UserTempAnswer.objects.filter(user=user, exam=exam)
+        for section in exam.sections.all():
+            section_true = 0
+            section_false = 0
+            section_questions = 0
 
-        for answer in temp_answers:
-            print("GRvgdsr")
+            section_result = SectionResult.objects.create(section=section, exam_result=exam_result, user=user)
+            for unit in section.units.all():
+                unit_true = 0
+                unit_false = 0
+                unit_questions = 0
 
-            print(answer.question_number)
+                unit_result = UnitResult.objects.create(unit=unit, section_result=section_result, user=user)
+                for question in unit.questions.all():
+                    answer = temp_answers.get(question_number=question.question_number)
+                    print(answer.selected_answer)
+                    print(question.true_answer)
+
+                    all_questions += 1 * section.coefficient * unit.coefficient
+                    section_questions += 1 * unit.coefficient
+                    unit_questions += 1
+
+                    if answer.selected_answer == question.true_answer:
+                        all_true += 1 * section.coefficient * unit.coefficient
+                        section_true += 1 * unit.coefficient
+                        unit_true += 1
+                    elif (answer.selected_answer is not None) and (question.true_answer is not None):
+                        all_false += 1 * section.coefficient * unit.coefficient
+                        section_false += 1 * unit.coefficient
+                        unit_false += 1
+                unit_result.false_answers = unit_false
+                unit_result.true_answers = unit_true
+                unit_result.percentage = ((unit_true - (unit_false/3))/unit_questions)*100
+                unit_result.save()
+
+            section_result.false_answers = section_false
+            section_result.true_answers = section_true
+            section_result.percentage = ((section_true - (section_false/3))/section_questions)*100
+            section_result.save()
+
+        exam_result.false_answers = all_false
+        exam_result.true_answers = all_true
+        exam_result.percentage = ((all_true - (all_false/3))/all_questions)*100
+        exam_result.save()
+        return redirect(to=f'/course/report_card/{exam.id}')
 
 
 class ExamsByCategory(URLStorageMixin, ListView):
@@ -418,6 +462,7 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, View):
 
         exam_section = ExamSection.objects.filter(slug=slug).last()
         exam = exam_section.exam
+        correct_answer = ExamAnswer.objects.get(unit__section__exam=exam, question_number=question_number)
 
         try:
             temp_answer = UserTempAnswer.objects.get(
@@ -437,7 +482,8 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, View):
                 exam_section=exam_section,
                 exam=exam,
                 question_number=question_number,
-                selected_answer=selected_answer
+                selected_answer=selected_answer,
+                correct_answer=correct_answer.true_answer
             )
 
         return JsonResponse(
@@ -446,3 +492,52 @@ class TempExamSubmit(AuthenticatedUsersOnlyMixin, View):
             },
             status=200
         )
+
+
+class ReportCardView(TemplateView):
+    template_name = 'Course/report-card.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        exam_id = self.kwargs.get('exam_id')
+        exam = get_object_or_404(Exam, id=exam_id)
+        user = self.request.user  # Assumes the user is authenticated and is the one taking the exam
+
+        # Fetch the ExamResult for the user and the specific exam
+        exam_result = get_object_or_404(ExamResult, exam=exam, user=user)
+        section_results = SectionResult.objects.filter(exam_result=exam_result)
+        unit_results = UnitResult.objects.filter(section_result__in=section_results)
+        enter_exam = get_object_or_404(EnteredExamUser, exam=exam, user=user)
+
+        # Fetch user answers and correct answers
+        user_answers = UserTempAnswer.objects.filter(user=user, exam=exam)
+
+        print(user_answers)
+
+        # Fetch user info
+        student_name = user.username
+        student_class = "10A"  # This should be dynamic based on your app logic
+        test_date = enter_exam.created_at
+
+        total_questions = exam_result.true_answers + exam_result.false_answers
+        score = exam_result.percentage
+        correct_count = exam_result.true_answers
+
+        # Calculate unit scores percentage
+        unit_scores_percentage = {
+            unit_result.unit.name: unit_result.percentage for unit_result in unit_results
+        }
+
+        context.update({
+            "student_name": student_name,
+            "student_class": student_class,
+            "test_date": test_date,
+            "section_results": section_results,
+            "total_questions": total_questions,
+            "correct_answers": correct_count,
+            "score": score,
+            "unit_scores": unit_scores_percentage,
+            "user_answers": user_answers
+        })
+
+        return context

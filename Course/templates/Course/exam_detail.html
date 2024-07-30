@@ -333,7 +333,7 @@
                                                             {% endif %}
                                                         {% endif %}
                                                     {% else %}
-                                                        <a href="{% url 'course:calculate_exam_result' exam.slug %}"
+                                                        <a href="{% url 'course:report_card' exam.id %}"
                                                            class="w-full h-11 inline-flex items-center justify-center gap-1 bg-success rounded-full text-primary-foreground transition-all hover:opacity-80 px-4">
                                                             <span class="line-clamp-1 font-semibold text-sm">محاسبه جواب</span>
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none"

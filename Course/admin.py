@@ -2,7 +2,8 @@ from django.contrib import admin
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
 from Course.models import VideoCourse, VideoCourseObject, Category, VideoSeason, Exam, ExamAnswer, ExamSection, \
-    DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, UserTempAnswer, ExamUnit
+    DownloadedQuestionFile, EnteredExamUser, UserFinalAnswer, UserTempAnswer, ExamUnit, UnitResult, SectionResult, \
+    ExamResult
 
 
 class UserFinalAnswerInline(admin.StackedInline):
@@ -86,8 +87,6 @@ class ExamAdmin(NestedModelAdmin):
 
     inlines = [ExamSectionInline]
 
-
-
     def save_model(self, request, obj, form, change):
         if not obj.designer_id:
             obj.designer = request.user
@@ -106,3 +105,21 @@ class EnteredExamUserAdmin(admin.ModelAdmin):
 @admin.register(UserTempAnswer)
 class UserTempAnswerAdmin(admin.ModelAdmin):
     list_display = ("user",)
+
+
+class UnitResultInline(NestedStackedInline):
+    model = UnitResult
+    extra = 0
+
+
+class SectionResultInline(NestedStackedInline):
+    model = SectionResult
+    extra = 0
+    inlines = [UnitResultInline]
+
+
+class ExamResultAdmin(NestedModelAdmin):
+    model = ExamResult
+    inlines = [SectionResultInline]
+
+admin.site.register(ExamResult, ExamResultAdmin)

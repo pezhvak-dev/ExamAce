@@ -1,0 +1,104 @@
+<{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>گزارش نتایج</title>
+    <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}"/>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/dependencies/swiper-bundle.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/dependencies/plyr.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}"/>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-3xl">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">گزارش نتایج</h1>
+        <div class="student-info mb-6 px-5 flex justify-between items-center ">
+            <p><strong>نام:</strong> {{ student_name }}</p>
+            <p><strong>تاریخ:</strong> {{ test_date }}</p>
+        </div>
+        <div class="test-results mb-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 py-5">نتایج</h2>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border border-gray-300 px-4 py-2">بخش</th>
+                        <th class="border border-gray-300 px-4 py-2">پاسخ‌های صحیح</th>
+                        <th class="border border-gray-300 px-4 py-2">پاسخ‌های نادرست</th>
+                        <th class="border border-gray-300 px-4 py-2">درصد</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in section_results %}
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2">{{ result.section.name }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ result.true_answers }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ result.false_answers }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ result.percentage }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="unit-scores mb-6">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4 py-5">امتیازات واحدها</h3>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border border-gray-300 px-4 py-2">واحد</th>
+                        <th class="border border-gray-300 px-4 py-2">امتیاز</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for unit, score in unit_scores.items %}
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2">{{ unit }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ score }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="user-answers mb-6">
+            <h3 class="text-xl font-semibold text-gray-700 mb-4 py-5">پاسخ‌ها</h3>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="border border-gray-300 px-4 py-2">شماره سوال</th>
+                        <th class="border border-gray-300 px-4 py-2">پاسخ صحیح</th>
+                        <th class="border border-gray-300 px-4 py-2">پاسخ ارائه شده</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for answer in user_answers %}
+                    <tr>
+                        <td class="border border-gray-300 px-4 py-2">{{ answer.question_number }}</td>
+                        <td class="border border-gray-300 px-4 py-2">{{ answer.correct_answer }}</td>
+                        {% if answer.selected_answer == answer.correct_answer %}
+                            <td class="border border-gray-300 px-4 py-2 bg-green-500 text-white">{{ answer.selected_answer }}</td>
+                        {% else %}
+                            <td class="border border-gray-300 px-4 py-2 text-red-500">{{ answer.selected_answer }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="summary mb-6">
+            <p class="py-1"><strong>تعداد کل سوالات:</strong> {{ total_questions }}</p>
+            <p class="py-1"><strong>پاسخ‌های صحیح:</strong> {{ correct_answers }}</p>
+            <p class="py-1"><strong>امتیاز:</strong> {{ score }}%</p>
+        </div>
+        <!-- Buttons -->
+        <div class="flex justify-between items-center">
+            <button onclick="window.print()" class="h-11 inline-flex items-center justify-center gap-3 bg-primary rounded-xl whitespace-nowrap text-xs text-primary-foreground transition-all hover:opacity-80 px-4">چاپ</button>
+
+
+            <a href="/" class="h-11 inline-flex items-center justify-center gap-3 bg-primary rounded-xl whitespace-nowrap text-xs text-primary-foreground transition-all hover:opacity-80 px-4">بازگشت به خانه</a>
+     </div>
+    </div>
+</body>
+</html>

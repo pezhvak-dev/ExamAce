@@ -145,7 +145,6 @@ class VideoCourseObject(models.Model):
     def __str__(self):
         return f"{self.title}"
 
-
     class Meta:
         db_table = 'course__video_course_object'
         verbose_name = 'جزئیات فیلم'
@@ -179,7 +178,7 @@ class ExamUnit(models.Model):
 
     slug = models.SlugField(allow_unicode=True, unique=True, verbose_name="اسلاگ")
 
-    section = models.ForeignKey(to="ExamSection", on_delete=models.CASCADE, verbose_name="بخش")
+    section = models.ForeignKey(to="ExamSection", on_delete=models.CASCADE, verbose_name="بخش", related_name="units")
 
     description = CKEditor5Field(config_name="extends", verbose_name="توضیحات", blank=True, null=True)
 
@@ -206,7 +205,7 @@ class ExamAnswer(models.Model):
 
     question_number = models.PositiveSmallIntegerField(verbose_name="شماره سوال", null=True, blank=True)
 
-    unit = models.ForeignKey(to="ExamUnit", on_delete=models.CASCADE, verbose_name="درس")
+    unit = models.ForeignKey(to="ExamUnit", on_delete=models.CASCADE, verbose_name="درس", related_name="questions")
 
     answer_1 = models.CharField(max_length=100, verbose_name="گزینه 1", default=1)
 
@@ -216,7 +215,8 @@ class ExamAnswer(models.Model):
 
     answer_4 = models.CharField(max_length=100, verbose_name="گزینه 4", default=4)
 
-    true_answer = models.CharField(max_length=1, choices=answer_choices, verbose_name="گزینه صحیح", null=True, blank=True)
+    true_answer = models.CharField(max_length=1, choices=answer_choices, verbose_name="گزینه صحیح", null=True,
+                                   blank=True)
 
     true_answer_explanation = CKEditor5Field(config_name="extends", blank=True, null=True,
                                              verbose_name="توضیحات اضافه پاسخ صحیح")
@@ -228,7 +228,6 @@ class ExamAnswer(models.Model):
         db_table = 'course__exam_answer'
         verbose_name = 'پاسخ آزمون'
         verbose_name_plural = 'پاسخ‌های آزمون'
-
 
 
 class Exam(models.Model):
@@ -320,7 +319,7 @@ class BoughtExam(models.Model):
                              verbose_name="کاربر")
 
     exam = models.ForeignKey(to=Exam, on_delete=models.SET_NULL, blank=True, null=True,
-                                     verbose_name="دوره ویدئویی", editable=False)
+                             verbose_name="دوره ویدئویی", editable=False)
 
     cost = models.PositiveBigIntegerField(default=0, verbose_name="قیمت خرید", editable=False)
 
@@ -396,6 +395,32 @@ class UserFinalAnswer(models.Model):
         verbose_name_plural = "پاسخ‌های نهایی کابران"
 
 
+class ExamResult(models.Model):
+    user = models.ForeignKey(to="Account.CustomUser", on_delete=models.CASCADE, related_name="exam_results")
+    exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, related_name="exam_results")
+    percentage = models.FloatField(blank=True, null=True, verbose_name="درصد")
+    true_answers = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="تعداد صجیج")
+    false_answers = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="تعداد غلط")
+
+
+class SectionResult(models.Model):
+    exam_result = models.ForeignKey(to=ExamResult, on_delete=models.CASCADE, related_name="section_results")
+    user = models.ForeignKey(to='Account.CustomUser', on_delete=models.CASCADE, related_name="section_results")
+    section = models.ForeignKey(to=ExamSection, on_delete=models.CASCADE, related_name="section_results")
+    percentage = models.FloatField(blank=True, null=True, verbose_name="درصد")
+    true_answers = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="تعداد صجیج")
+    false_answers = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="تعداد غلط")
+
+
+class UnitResult(models.Model):
+    section_result = models.ForeignKey(to=SectionResult, on_delete=models.CASCADE, related_name="unit_results")
+    user = models.ForeignKey(to='Account.CustomUser', on_delete=models.CASCADE, related_name="unit_results")
+    unit = models.ForeignKey(to=ExamUnit, on_delete=models.CASCADE, related_name="unit_results")
+    percentage = models.FloatField(blank=True, null=True, verbose_name="درصد")
+    true_answers = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="تعداد صجیج")
+    false_answers = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="تعداد غلط")
+
+
 class UserTempAnswer(models.Model):
     selected_answer_choices = (
         ("1", "گزینه 1"),
@@ -409,12 +434,16 @@ class UserTempAnswer(models.Model):
 
     exam = models.ForeignKey(to=Exam, on_delete=models.CASCADE, blank=True, null=True, verbose_name="آزمون")
 
-    exam_section = models.ForeignKey(to='ExamSection', on_delete=models.CASCADE, blank=True, null=True, verbose_name="بخش آزمون")
+    exam_section = models.ForeignKey(to='ExamSection', on_delete=models.CASCADE, blank=True, null=True,
+                                     verbose_name="بخش آزمون")
 
     question_number = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name="شماره سوال")
 
     selected_answer = models.CharField(max_length=10, blank=True, choices=selected_answer_choices, null=True,
                                        verbose_name="گزینه انتخاب شده")
+
+    correct_answer = models.CharField(max_length=10, blank=True, choices=selected_answer_choices, null=True,
+                                       verbose_name="گزینه درست")
 
     timestamp = models.DateTimeField(auto_now_add=True)
 
